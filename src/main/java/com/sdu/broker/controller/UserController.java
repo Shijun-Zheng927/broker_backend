@@ -16,4 +16,11 @@ public class UserController {
     public User login(@RequestBody User user) {
         return userService.login(user);
     }
+
+    @CrossOrigin
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer register(@RequestBody User user) {
+        return userService.register(user);
+    }
 }
