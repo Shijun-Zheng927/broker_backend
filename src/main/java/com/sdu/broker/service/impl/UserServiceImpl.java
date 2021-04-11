@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
 //        System.out.println(hasPhone);
         if (hasPhone == null) {
             userMapper.register(user);
-            return user.getId();
+            return 1;
         } else {
             return 0;
         }
