@@ -36,7 +36,7 @@ public class PayController {
     //支付宝异步通知路径,付款完毕后会异步调用本项目的方法,必须为公网地址
     private final String NOTIFY_URL = "http://127.0.0.1/notifyUrl";
     //支付宝同步通知路径,也就是当付款完毕后跳转本项目的页面,可以不是公网地址
-    private final String RETURN_URL = "http://127.0.0.1/returnUrl";
+    private final String RETURN_URL = "http://localhost:8443/returnUrl";
 
     @RequestMapping("/alipay")
     public void alipay(HttpServletResponse httpResponse) throws IOException {
@@ -51,7 +51,8 @@ public class PayController {
         //生成随机Id
         String out_trade_no = UUID.randomUUID().toString();
         //付款金额，必填
-        String total_amount =Integer.toString(r.nextInt(9999999)+1000000);
+//        String total_amount =Integer.toString(r.nextInt(9999999)+1000000);
+        String total_amount = Integer.toString(99);
         //订单名称，必填
         String subject ="奥迪A8 2021款 A8L 60 TFSl quattro豪华型";
         //商品描述，可空
@@ -59,16 +60,16 @@ public class PayController {
         request.setBizContent("{\"out_trade_no\":\""+ out_trade_no +"\","
                 + "\"total_amount\":\""+ total_amount +"\","
                 + "\"subject\":\""+ subject +"\","
-//                + "\"body\":\""+ body +"\","
+                + "\"body\":\""+ body +"\","
                 + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
         String form = "";
-        System.out.println(request.getBizContent());
+//        System.out.println(request.getBizContent());
         try {
             form = alipayClient.pageExecute(request).getBody(); // 调用SDK生成表单
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
-        System.out.println(form);
+//        System.out.println(form);
         httpResponse.setContentType("text/html;charset=" + CHARSET);
         httpResponse.getWriter().write(form);// 直接将完整的表单html输出到页面
         httpResponse.getWriter().flush();
