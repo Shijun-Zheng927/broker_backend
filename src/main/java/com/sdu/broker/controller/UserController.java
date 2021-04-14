@@ -11,14 +11,14 @@ public class UserController {
     private UserService userService;
 
     @CrossOrigin
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping(value = "/login")
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
     public User login(@RequestBody User user) {
         return userService.login(user);
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping(value = "/register")
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer register(@RequestBody User user) {
         return userService.register(user);
