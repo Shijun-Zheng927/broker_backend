@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface UserMapper {
-    @Select("select phone,username from user where phone = #{phone} and password = #{password}")
+    @Select("select id, phone, username from user where phone = #{phone} and password = #{password}")
     User login(User user);
 
     @Update("insert into user(phone, password, username, email, company, introduction, occupation) values" +
