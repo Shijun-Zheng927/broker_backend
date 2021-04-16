@@ -11,6 +11,11 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    /**
+     * 获取账户余额
+     * @param map
+     * @return
+     */
     @CrossOrigin
     @PostMapping( "/getAccount")
     public Double getAccount(@RequestBody Map<String, Object> map) {

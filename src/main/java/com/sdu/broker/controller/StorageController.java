@@ -12,12 +12,20 @@ public class StorageController {
     @Autowired
     private StorageService storageService;
 
+    /**
+     * 获取阿里存储信息页面
+     * @return
+     */
     @CrossOrigin
     @GetMapping(value = "/getAli")
     public List<StorageType> getAli() {
         return storageService.getAli();
     }
 
+    /**
+     * 获取华为存储信息页面
+     * @return
+     */
     @CrossOrigin
     @GetMapping(value = "/getHuawei")
     public List<StorageType> getHuawei() {
