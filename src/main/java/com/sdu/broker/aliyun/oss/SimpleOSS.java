@@ -6,7 +6,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.BucketInfo;
 import org.apache.logging.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+//import org.apache.log4j.PropertyConfigurator;
 public class SimpleOSS{
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2" ;
