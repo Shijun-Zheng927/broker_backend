@@ -1,6 +1,7 @@
 package com.sdu.broker.service.impl;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import com.sdu.broker.mapper.AccountMapper;
 import com.sdu.broker.mapper.UserMapper;
 import com.sdu.broker.pojo.User;
 import com.sdu.broker.service.UserService;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AccountMapper accountMapper;
 
     @Override
     public User login(User user) {
@@ -23,6 +26,7 @@ public class UserServiceImpl implements UserService {
 //        System.out.println(hasPhone);
         if (hasPhone == null) {
             userMapper.register(user);
+            accountMapper.register(user.getId());
             return 1;
         } else {
             return 0;

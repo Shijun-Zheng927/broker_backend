@@ -10,6 +10,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * 登录
+     * @param user
+     * @return
+     */
     @CrossOrigin
     @PostMapping(value = "/login")
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,6 +22,11 @@ public class UserController {
         return userService.login(user);
     }
 
+    /**
+     * 注册
+     * @param user
+     * @return
+     */
     @CrossOrigin
     @PostMapping(value = "/register")
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
