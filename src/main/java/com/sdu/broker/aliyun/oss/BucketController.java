@@ -1,10 +1,13 @@
 package com.sdu.broker.aliyun.oss;
 
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.OSSException;
+import com.aliyun.oss.*;
 import com.aliyun.oss.model.*;
+import org.checkerframework.checker.units.qual.K;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 //import org.springframework.boot.context.properties.ConfigurationProperties;
 
 //@ConfigurationProperties(prefix = 'ali')
@@ -13,7 +16,11 @@ public class BucketController {
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
 
-    public static void  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
+    //创建一个Bucket
+    public static int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
+        //1,参数列表：bucketName:桶名称   storageClass:存储类型
+        //          dataRedundancyType:数据容灾类型
+        //          cannedACL:数据读写权限
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         try{
@@ -65,20 +72,118 @@ public class BucketController {
             System.out.println("\t用户标志：" + info.getBucket().getOwner());
         } catch (OSSException oe){
             oe.printStackTrace();
-        } catch (ClientException ce){
-            ce.printStackTrace();
-        } catch (Exception e){
+            return 0;
+        }  catch (Exception e){
             e.printStackTrace();
+            return 0;
         } finally{
             ossClient.shutdown();
         }
 
+        return 1;
 
     }
 
+    //列举所有Bucket
+    public static List<Bucket> listAllBuckets(){
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        List<Bucket> buckets = ossClient.listBuckets();
+        for (Bucket bucket : buckets){
+            System.out.println(" - " + bucket.getName());
+        }
+        ossClient.shutdown();
+        return buckets;
+    }
+
+
+    //列举有参数的Bucket
+    public static List<Bucket> listRequestBuckets(String Prefix, String Marker, int maxKeys) {
+        //调用该方法需要三个参数中至少有一个不为空
+        //Prefix代表列举Bucket的前缀(如果没有，前端传空字符串)
+        //Marker代表列举的起始位置(如果没有，前端传空字符串)
+        //maxKeys表示列举空间的指定个数，默认值为100,如果传过来0转换成100
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        ListBucketsRequest listBucketsRequest = new ListBucketsRequest();
+        try {
+            if (!Prefix.isEmpty()) {
+                listBucketsRequest.setPrefix(Prefix);
+            }
+            if (!Marker.isEmpty()) {
+                listBucketsRequest.setMarker(Marker);
+            }
+            if (maxKeys == 0) {
+                listBucketsRequest.setMaxKeys(100);
+            } else if (maxKeys != 0) {
+                listBucketsRequest.setMaxKeys(maxKeys);
+            }
+
+        } catch (OSSException oe) {
+            return null;
+        } catch (Exception e){
+            return null;
+        }
+        BucketList bucketList = ossClient.listBuckets(listBucketsRequest);
+        for(Bucket bucket : bucketList.getBucketList()){
+            System.out.println(" - " + bucket.getName());
+        }
+        ossClient.shutdown();
+        return bucketList.getBucketList();
+    }
+
+    //判断bucket是否存在，输入参数：bucketName
+    public static boolean doesBucketExist(String bucketName){
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        boolean exists = ossClient.doesBucketExist(bucketName);
+        System.out.println(exists);
+        ossClient.shutdown();
+        return exists;
+    }
+
+    //获取bucket存储空间地域
+    public static String getBucketLocation(String bucketName){
+        //输入参数：bucektName
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        String location = ossClient.getBucketLocation(bucketName);
+        System.out.println(location);
+        return location;
+    }
+
+    //获取存储空间的信息
+    public static Map<String,String>  getBucketInfo(String bucketName){
+        //输入参数：bucketName
+        //返回值：包含地域、创建日期、拥有者信息、权限信息、容灾类型的一个map集合
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+
+        BucketInfo info = ossClient.getBucketInfo(bucketName);
+        String location = info.getBucket().getLocation();
+        String creationDate = info.getBucket().getCreationDate().toString();
+        String owner = info.getBucket().getOwner().toString();
+        String grants = info.getGrants().toString();
+        String dataRedundancyType = info.getDataRedundancyType().toString();
+
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Location", location);
+        map.put("CreationDate", creationDate);
+        map.put("Owner", owner);
+        map.put("Grants", grants);
+        map.put("DataRedundancy", dataRedundancyType);
+
+        ossClient.shutdown();
+
+        return map;
+    }
+
+
+
+
+
+
     public static void main(String[] args) {
-        String bucket_name = "xmsx-002";
-        createBucket(bucket_name,1,1,2);
+//        listAllBuckets();
+//        listRequestBuckets("xmsx","",2);
+        Map<String, String> result = getBucketInfo("xmsx-001");
+        System.out.println(result);
     }
 
 }
