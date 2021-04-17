@@ -20,7 +20,7 @@ public interface StorageMapper {
             @Result(property = "dataRetrievalFee", column = "data_retrieval_fee"),
             @Result(property = "ossAcceleration", column = "oss_acceleration"),
             @Result(property = "lrsPrice", column = "lrs_price"),
-            @Result(property = "zrs_price", column = "zrs_price")
+            @Result(property = "zrsPrice", column = "zrs_price")
     })
     List<StorageType> getAli();
 

@@ -12,7 +12,7 @@ public class StorageType {
     private String dataRetrievalFee;        // 数据取回费用
     private String ossAcceleration;         // OSS传输加速(上传/下载加速)
     private Double lrsPrice;                // 存储空间价格(本地冗余LRS) (/GB/月)
-    private Double zrs_price;               // 存储空间价格(同城冗余ZRS)
+    private Double zrsPrice;               // 存储空间价格(同城冗余ZRS)
     private String introduction;            // 简介
     private String designPersistenceSingle; // 设计持久性（单AZ）
     private String designAvailabilitySingle;// 设计可用性（单AZ）
@@ -108,12 +108,12 @@ public class StorageType {
         this.lrsPrice = lrsPrice;
     }
 
-    public Double getZrs_price() {
-        return zrs_price;
+    public Double getZrsPrice() {
+        return zrsPrice;
     }
 
-    public void setZrs_price(Double zrs_price) {
-        this.zrs_price = zrs_price;
+    public void setZrsPrice(Double zrsPrice) {
+        this.zrsPrice = zrsPrice;
     }
 
     public String getIntroduction() {
