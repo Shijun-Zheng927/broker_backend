@@ -5,6 +5,10 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.sdu.broker.service.AccountService;
+import com.sdu.broker.utils.TokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,11 +56,11 @@ public class PayController {
         String out_trade_no = UUID.randomUUID().toString();
         //付款金额，必填
 //        String total_amount =Integer.toString(r.nextInt(9999999)+1000000);
-        String total_amount = Integer.toString(99);
+        String total_amount = Integer.toString(30);
         //订单名称，必填
-        String subject ="奥迪A8 2021款 A8L 60 TFSl quattro豪华型";
+        String subject ="平台充值30元";
         //商品描述，可空
-        String body = "尊敬的会员欢迎购买奥迪A8 2021款 A8L 60 TFSl quattro豪华型";
+        String body = "尊敬的用户, 欢迎续费";
         request.setBizContent("{\"out_trade_no\":\""+ out_trade_no +"\","
                 + "\"total_amount\":\""+ total_amount +"\","
                 + "\"subject\":\""+ subject +"\","
@@ -77,8 +81,12 @@ public class PayController {
 
     }
 
+    @Autowired
+    private AccountService accountService;
+
     @RequestMapping(value = "/returnUrl", method = RequestMethod.GET)
-    public String returnUrl(HttpServletRequest request, HttpServletResponse response)
+    public String returnUrl(HttpServletRequest request, HttpServletResponse response,
+                            @RequestHeader("Authorization") String authorization)
             throws IOException, AlipayApiException {
         System.out.println("=================================同步回调=====================================");
 
@@ -113,6 +121,12 @@ public class PayController {
             System.out.println("商户订单号="+out_trade_no);
             System.out.println("支付宝交易号="+trade_no);
             System.out.println("付款金额="+total_amount);
+
+            if (!TokenUtils.verify(authorization)) {
+                response.setStatus(999);
+                return "no";
+            }
+            accountService.recharge(TokenUtils.getUserId(authorization), Double.parseDouble(total_amount));
 
             //支付成功，修复支付状态
 //            payService.updateById(Integer.valueOf(out_trade_no));
