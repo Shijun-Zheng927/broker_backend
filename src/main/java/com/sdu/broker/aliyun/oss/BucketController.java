@@ -1,10 +1,9 @@
 package com.sdu.broker.aliyun.oss;
 
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.OSSException;
+import com.aliyun.oss.*;
 import com.aliyun.oss.model.*;
+
+import java.util.List;
 //import org.springframework.boot.context.properties.ConfigurationProperties;
 
 //@ConfigurationProperties(prefix = 'ali')
@@ -75,13 +74,57 @@ public class BucketController {
 
         return 1;
 
-
-
     }
 
+    //列举所有Bucket
+    public static List<Bucket> listAllBuckets(){
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        List<Bucket> buckets = ossClient.listBuckets();
+        for (Bucket bucket : buckets){
+            System.out.println(" - " + bucket.getName());
+        }
+        ossClient.shutdown();
+        return buckets;
+    }
+
+
+    //列举有参数的Bucket
+    public static List<Bucket> listRequestBuckets(String Prefix, String Marker, int maxKeys) {
+        //调用该方法需要三个参数中至少有一个不为空
+        //Prefix代表列举Bucket的前缀(如果没有，前端传空字符串)
+        //Marker代表列举的起始位置(如果没有，前端传空字符串)
+        //maxKeys表示列举空间的指定个数，默认值为100,如果传过来0转换成100
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        ListBucketsRequest listBucketsRequest = new ListBucketsRequest();
+        try {
+            if (!Prefix.isEmpty()) {
+                listBucketsRequest.setPrefix(Prefix);
+            }
+            if (!Marker.isEmpty()) {
+                listBucketsRequest.setMarker(Marker);
+            }
+            if (maxKeys == 0) {
+                listBucketsRequest.setMaxKeys(100);
+            } else if (maxKeys != 0) {
+                listBucketsRequest.setMaxKeys(maxKeys);
+            }
+
+        } catch (OSSException oe) {
+            return null;
+        } catch (Exception e){
+            return null;
+        }
+        BucketList bucketList = ossClient.listBuckets(listBucketsRequest);
+        for(Bucket bucket : bucketList.getBucketList()){
+            System.out.println(" - " + bucket.getName());
+        }
+        return bucketList.getBucketList();
+    }
+
+
     public static void main(String[] args) {
-        String bucket_name = "xmsx-002";
-        createBucket(bucket_name,1,1,2);
+//        listAllBuckets();
+//        listRequestBuckets("xmsx","",2);
     }
 
 }
