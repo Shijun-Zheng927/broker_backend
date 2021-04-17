@@ -3,6 +3,7 @@ package com.sdu.broker.aliyun.oss;
 import com.aliyun.oss.*;
 import com.aliyun.oss.model.*;
 import org.checkerframework.checker.units.qual.K;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +12,15 @@ import java.util.Set;
 //import org.springframework.boot.context.properties.ConfigurationProperties;
 
 //@ConfigurationProperties(prefix = 'ali')
+@Component
 public class BucketController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
 
     //创建一个Bucket
-    public static int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
+    public int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
+        System.out.println(bucketName + " " + storageClass + " " + dataRedundancyType + " " + cannedACL);
         //1,参数列表：bucketName:桶名称   storageClass:存储类型
         //          dataRedundancyType:数据容灾类型
         //          cannedACL:数据读写权限
@@ -26,6 +29,7 @@ public class BucketController {
         try{
             if(ossClient.doesBucketExist(bucketName)){
                 System.out.println("您已创建Bucket:" + bucketName + "。");
+                return 0;
             }else {
                 System.out.println("您的Bucket不存在，创建Bucket:" + bucketName + "。");
 
