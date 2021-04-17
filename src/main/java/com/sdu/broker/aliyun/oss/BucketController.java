@@ -13,7 +13,7 @@ public class BucketController {
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
 
-    public static void  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
+    public static int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         try{
@@ -65,13 +65,16 @@ public class BucketController {
             System.out.println("\t用户标志：" + info.getBucket().getOwner());
         } catch (OSSException oe){
             oe.printStackTrace();
-        } catch (ClientException ce){
-            ce.printStackTrace();
-        } catch (Exception e){
+            return 0;
+        }  catch (Exception e){
             e.printStackTrace();
+            return 0;
         } finally{
             ossClient.shutdown();
         }
+
+        return 1;
+
 
 
     }
