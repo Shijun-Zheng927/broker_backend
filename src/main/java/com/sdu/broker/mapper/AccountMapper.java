@@ -1,7 +1,5 @@
 package com.sdu.broker.mapper;
 
-import com.sdu.broker.pojo.Account;
-import com.sdu.broker.pojo.RechargeRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
