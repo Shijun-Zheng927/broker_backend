@@ -211,6 +211,45 @@ public class APIBucketController {
         }
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/getBucketTagging", method = RequestMethod.POST)
+    public Map<String,String> getBucketTagging(@RequestBody Map<String, String> map,
+                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            Map<String, String> result = bucketController.getBucketTagging(bucketName);
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/listBucketByTag", method = RequestMethod.POST)
+    public List<com.aliyun.oss.model.Bucket> listBucketByTag(@RequestBody Map<String, String> map,
+                                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String tagKey = map.get("tagKey");
+        String tagValue = map.get("tagValue");
+        if (tagKey == null || tagKey.equals("") || tagValue == null || tagValue.equals("")) {
+            response.setStatus(777);
+        }
+        if (platform.equals("ALI")) {
+            List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
+            if (result == null) {
+                return null;
+            }
+            return getBuckets(userId, platform, result);
+        } else {
+            return null;
+        }
+    }
 
 
 

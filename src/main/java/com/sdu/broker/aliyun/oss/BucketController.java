@@ -248,7 +248,7 @@ public class BucketController {
     }
 
     //获取存储标签
-    public static Map<String,String> getBucketTagging(String bucketName){
+    public Map<String,String> getBucketTagging(String bucketName){
         //输入参数：bucketName
         //返回结果：一个包含所有tag的Map集合
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -259,7 +259,7 @@ public class BucketController {
     }
 
     //列举带指定标签的bucket
-    public static List<Bucket> listBucketByTag(String tagKey, String tagValue){
+    public List<Bucket> listBucketByTag(String tagKey, String tagValue){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ListBucketsRequest listBucketsRequest = new ListBucketsRequest();
         listBucketsRequest.setTag(tagKey,tagValue);
