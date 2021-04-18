@@ -94,7 +94,7 @@ public class BucketController {
 
 
     //列举有参数的Bucket
-    public static List<Bucket> listRequestBuckets(String Prefix, String Marker, int maxKeys) {
+    public static List<Bucket> listRequestBuckets(String prefix, String marker, int maxKeys) {
         //调用该方法需要三个参数中至少有一个不为空
         //Prefix代表列举Bucket的前缀(如果没有，前端传空字符串)
         //Marker代表列举的起始位置(如果没有，前端传空字符串)
@@ -102,11 +102,11 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ListBucketsRequest listBucketsRequest = new ListBucketsRequest();
         try {
-            if (!Prefix.isEmpty()) {
-                listBucketsRequest.setPrefix(Prefix);
+            if (!prefix.isEmpty()) {
+                listBucketsRequest.setPrefix(prefix);
             }
-            if (!Marker.isEmpty()) {
-                listBucketsRequest.setMarker(Marker);
+            if (!marker.isEmpty()) {
+                listBucketsRequest.setMarker(marker);
             }
             if (maxKeys == 0) {
                 listBucketsRequest.setMaxKeys(100);
@@ -177,7 +177,7 @@ public class BucketController {
         AccessControlList bucketAcl = ossClient.getBucketAcl(bucketName);
         System.out.println(bucketAcl.toString());
         ossClient.shutdown();
-        return bucketName.toString();
+        return bucketAcl.toString();
     }
 
     //设置存储空间访问权限
@@ -228,7 +228,7 @@ public class BucketController {
     public static String setBucketTagging(String bucketName, String tagKey, String tagValue){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
-            SetBucketTaggingRequest request = new SetBucketTaggingRequest();
+            SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
             request.setTag(tagKey,tagValue);
             ossClient.setBucketTagging(request);
         } catch (OSSException e) {
