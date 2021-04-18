@@ -176,7 +176,7 @@ public class BucketController {
     }
 
     //获取存储空间访问权限
-    public static String getBucketAcl(String bucketName){
+    public String getBucketAcl(String bucketName){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         AccessControlList bucketAcl = ossClient.getBucketAcl(bucketName);
         System.out.println(bucketAcl.toString());

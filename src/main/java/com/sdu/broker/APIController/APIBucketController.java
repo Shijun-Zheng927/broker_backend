@@ -29,10 +29,7 @@ public class APIBucketController {
     @RequestMapping(value = "/createBucket", method = RequestMethod.POST)
     public String createBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!TokenUtils.verify(authorization)) {
-            response.setStatus(999);
-            return "no";
-        }
+        verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -47,7 +44,7 @@ public class APIBucketController {
                         Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
             } else {
                 response.setStatus(777);
-                return "format wrong";
+                return null;
             }
             if (result == 1) {
                 Bucket bucket = new Bucket();
@@ -68,10 +65,7 @@ public class APIBucketController {
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
     public List<com.aliyun.oss.model.Bucket> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!TokenUtils.verify(authorization)) {
-            response.setStatus(999);
-            return null;
-        }
+        verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -90,10 +84,7 @@ public class APIBucketController {
     @RequestMapping(value = "/listRequestBucket", method = RequestMethod.POST)
     public List<com.aliyun.oss.model.Bucket> listRequestBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!TokenUtils.verify(authorization)) {
-            response.setStatus(999);
-            return null;
-        }
+        verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -124,25 +115,30 @@ public class APIBucketController {
     @RequestMapping(value = "/getBucketInfo", method = RequestMethod.POST)
     public Map<String, String> getBucketInfo(@RequestBody Map<String, String> map,
                                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!TokenUtils.verify(authorization)) {
-            response.setStatus(999);
-            return null;
-        }
+        verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
-            if (bucketName == null) {
-                response.setStatus(777);
-                return null;
-            }
-            Bucket bucket = new Bucket(userId, platform, bucketName);
-            Integer legal = bucketService.isLegal(bucket);
-            if (legal == null) {
-                response.setStatus(666);
-                return null;
-            }
             Map<String, String> result = bucketController.getBucketInfo(bucketName);
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getBucketAcl", method = RequestMethod.POST)
+    public String getBucketAcl(@RequestBody Map<String, String> map,
+                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            String result = bucketController.getBucketAcl(bucketName);
             return result;
         } else {
             return null;
@@ -152,6 +148,24 @@ public class APIBucketController {
 
 
 
+
+    public void verifyIdentity(HttpServletResponse response, String token) {
+        if (!TokenUtils.verify(token)) {
+            response.setStatus(999);
+        }
+    }
+
+    public void verifyBucketName(HttpServletResponse response, Integer userId, String platform, String bucketName) {
+        if (bucketName == null || bucketName.equals("")) {
+            response.setStatus(777);
+            return;
+        }
+        Bucket bucket = new Bucket(userId, platform, bucketName);
+        Integer legal = bucketService.isLegal(bucket);
+        if (legal == null) {
+            response.setStatus(666);
+        }
+    }
 
     private List<com.aliyun.oss.model.Bucket> getBuckets(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
         Bucket b = new Bucket();
