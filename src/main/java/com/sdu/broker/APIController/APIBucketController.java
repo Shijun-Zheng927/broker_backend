@@ -30,7 +30,9 @@ public class APIBucketController {
     @RequestMapping(value = "/createBucket", method = RequestMethod.POST)
     public String createBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -70,7 +72,9 @@ public class APIBucketController {
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
     public List<String> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -90,7 +94,9 @@ public class APIBucketController {
     @RequestMapping(value = "/listRequestBucket", method = RequestMethod.POST)
     public List<String> listRequestBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
@@ -121,8 +127,10 @@ public class APIBucketController {
     @ResponseBody
     @RequestMapping(value = "/doesBucketExist", method = RequestMethod.POST)
     public boolean doesBucketExist(@RequestBody Map<String, String> map,
-                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return false;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -139,7 +147,9 @@ public class APIBucketController {
     @RequestMapping(value = "/getBucketLocation", method = RequestMethod.POST)
     public String getBucketLocation(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -156,7 +166,9 @@ public class APIBucketController {
     @RequestMapping(value = "/getBucketInfo", method = RequestMethod.POST)
     public Map<String, String> getBucketInfo(@RequestBody Map<String, String> map,
                                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -173,7 +185,9 @@ public class APIBucketController {
     @RequestMapping(value = "/getBucketAcl", method = RequestMethod.POST)
     public String getBucketAcl(@RequestBody Map<String, String> map,
                                              @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -190,7 +204,9 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketAcl", method = RequestMethod.POST)
     public String setBucketAcl(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -212,7 +228,9 @@ public class APIBucketController {
     @RequestMapping(value = "/deleteBucket", method = RequestMethod.DELETE)
     public String deleteBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -233,7 +251,9 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketTagging", method = RequestMethod.POST)
     public String setBucketTagging(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -256,7 +276,9 @@ public class APIBucketController {
     @RequestMapping(value = "/getBucketTagging", method = RequestMethod.POST)
     public Map<String,String> getBucketTagging(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -273,7 +295,9 @@ public class APIBucketController {
     @RequestMapping(value = "/listBucketByTag", method = RequestMethod.POST)
     public List<String> listBucketByTag(@RequestBody Map<String, String> map,
                                                              @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String tagKey = map.get("tagKey");
@@ -297,7 +321,9 @@ public class APIBucketController {
     @RequestMapping(value = "/deleteBucketTagging", method = RequestMethod.DELETE)
     public String deleteBucketTagging(@RequestBody Map<String, String> map,
                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -314,7 +340,9 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketInventoryConfiguration", method = RequestMethod.POST)
     public String setBucketInventoryConfiguration(@RequestBody Map<String, String> map,
                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        verifyIdentity(response, authorization);
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
@@ -381,10 +409,12 @@ public class APIBucketController {
     }
     
 
-    public void verifyIdentity(HttpServletResponse response, String token) {
+    public boolean verifyIdentity(HttpServletResponse response, String token) {
         if (!TokenUtils.verify(token)) {
             response.setStatus(999);
+            return false;
         }
+        return true;
     }
 
     public void verifyBucketName(HttpServletResponse response, Integer userId, String platform, String bucketName) {
