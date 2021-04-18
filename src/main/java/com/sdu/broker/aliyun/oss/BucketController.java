@@ -132,7 +132,7 @@ public class BucketController {
     }
 
     //判断bucket是否存在，输入参数：bucketName
-    public static boolean doesBucketExist(String bucketName){
+    public boolean doesBucketExist(String bucketName){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         boolean exists = ossClient.doesBucketExist(bucketName);
         System.out.println(exists);
@@ -141,7 +141,7 @@ public class BucketController {
     }
 
     //获取bucket存储空间地域
-    public static String getBucketLocation(String bucketName){
+    public String getBucketLocation(String bucketName){
         //输入参数：bucektName
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         String location = ossClient.getBucketLocation(bucketName);

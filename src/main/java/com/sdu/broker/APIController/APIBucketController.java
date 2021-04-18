@@ -116,6 +116,40 @@ public class APIBucketController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/doesBucketExist", method = RequestMethod.POST)
+    public boolean doesBucketExist(@RequestBody Map<String, String> map,
+                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            boolean result = bucketController.doesBucketExist(bucketName);
+            return result;
+        } else {
+            return false;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getBucketLocation", method = RequestMethod.POST)
+    public String getBucketLocation(@RequestBody Map<String, String> map,
+                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            String result = bucketController.getBucketLocation(bucketName);
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/getBucketInfo", method = RequestMethod.POST)
     public Map<String, String> getBucketInfo(@RequestBody Map<String, String> map,
                                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
