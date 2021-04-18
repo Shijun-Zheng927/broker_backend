@@ -185,7 +185,7 @@ public class BucketController {
     }
 
     //设置存储空间访问权限
-    public static String setBucketAcl(String bucketName, int acl){
+    public String setBucketAcl(String bucketName, int acl){
         //输入的acl只能是1 || 2 || 3
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try{

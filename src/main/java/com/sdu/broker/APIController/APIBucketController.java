@@ -145,6 +145,28 @@ public class APIBucketController {
         }
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/setBucketAcl", method = RequestMethod.POST)
+    public String setBucketAcl(@RequestBody Map<String, String> map,
+                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            String acl = map.get("acl");
+            if (!BucketUtils.regex(0, 3, acl)) {
+                response.setStatus(777);
+                return null;
+            }
+            String s = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+            return s;
+        } else {
+            return null;
+        }
+    }
+
 
 
 
