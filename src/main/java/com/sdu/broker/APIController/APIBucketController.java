@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +69,7 @@ public class APIBucketController {
 
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
-    public List<com.aliyun.oss.model.Bucket> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<String> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
@@ -77,7 +78,8 @@ public class APIBucketController {
             if (result == null) {
                 return null;
             }
-            return getBuckets(userId, platform, result);
+            List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
+            return bucketToString(buckets);
         } else {
             return null;
         }
@@ -86,7 +88,7 @@ public class APIBucketController {
 
     @ResponseBody
     @RequestMapping(value = "/listRequestBucket", method = RequestMethod.POST)
-    public List<com.aliyun.oss.model.Bucket> listRequestBucket(@RequestBody Map<String, String> map,
+    public List<String> listRequestBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
@@ -109,7 +111,8 @@ public class APIBucketController {
             if (result == null) {
                 return null;
             }
-            return getBuckets(userId, platform, result);
+            List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
+            return bucketToString(buckets);
         } else {
             return null;
         }
@@ -268,7 +271,7 @@ public class APIBucketController {
 
     @ResponseBody
     @RequestMapping(value = "/listBucketByTag", method = RequestMethod.POST)
-    public List<com.aliyun.oss.model.Bucket> listBucketByTag(@RequestBody Map<String, String> map,
+    public List<String> listBucketByTag(@RequestBody Map<String, String> map,
                                                              @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         verifyIdentity(response, authorization);
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
@@ -283,7 +286,8 @@ public class APIBucketController {
             if (result == null) {
                 return null;
             }
-            return getBuckets(userId, platform, result);
+            List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
+            return bucketToString(buckets);
         } else {
             return null;
         }
@@ -405,6 +409,14 @@ public class APIBucketController {
             if (legal == null) {
                 result.remove(bucket);
             }
+        }
+        return result;
+    }
+
+    private List<String> bucketToString(List<com.aliyun.oss.model.Bucket> list) {
+        List<String> result = new ArrayList<>();
+        for (com.aliyun.oss.model.Bucket bucket : list) {
+            result.add(bucket.toString());
         }
         return result;
     }
