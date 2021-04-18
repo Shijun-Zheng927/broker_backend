@@ -181,7 +181,7 @@ public class BucketController {
         AccessControlList bucketAcl = ossClient.getBucketAcl(bucketName);
         System.out.println(bucketAcl.toString());
         ossClient.shutdown();
-        return bucketName.toString();
+        return bucketAcl.toString();
     }
 
     //设置存储空间访问权限
@@ -212,7 +212,7 @@ public class BucketController {
     }
 
     //删除存储空间
-    public static String deleteBucket(String bucketName){
+    public String deleteBucket(String bucketName){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
             ossClient.deleteBucket(bucketName);
@@ -229,12 +229,12 @@ public class BucketController {
 
     //设置存储标签
     //同一个Bucket
-    public static String setBucketTagging(String bucketName, String tagKey, String tagValue){
+    public String setBucketTagging(String bucketName, String tagKey, String tagValue){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
-//            SetBucketTaggingRequest request = new SetBucketTaggingRequest();
-//            request.setTag(tagKey,tagValue);
-//            ossClient.setBucketTagging(request);
+            SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
+            request.setTag(tagKey,tagValue);
+            ossClient.setBucketTagging(request);
         } catch (OSSException e) {
             e.printStackTrace();
             return "false";

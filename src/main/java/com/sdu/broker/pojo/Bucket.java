@@ -9,6 +9,11 @@ public class Bucket {
     public Bucket() {
     }
 
+    public Bucket(String platform, String name) {
+        this.platform = platform;
+        this.name = name;
+    }
+
     public Bucket(Integer userId, String platform, String name) {
         this.userId = userId;
         this.platform = platform;
