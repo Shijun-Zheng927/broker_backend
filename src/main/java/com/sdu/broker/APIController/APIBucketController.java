@@ -375,11 +375,7 @@ public class APIBucketController {
             return null;
         }
     }
-
-
-
-
-
+    
 
     public void verifyIdentity(HttpServletResponse response, String token) {
         if (!TokenUtils.verify(token)) {
