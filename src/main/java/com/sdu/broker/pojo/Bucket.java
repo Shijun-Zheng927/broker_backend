@@ -6,6 +6,15 @@ public class Bucket {
     private String platform;
     private String name;
 
+    public Bucket() {
+    }
+
+    public Bucket(Integer userId, String platform, String name) {
+        this.userId = userId;
+        this.platform = platform;
+        this.name = name;
+    }
+
     public Integer getId() {
         return id;
     }

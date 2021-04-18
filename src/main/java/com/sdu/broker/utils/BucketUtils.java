@@ -20,4 +20,9 @@ public class BucketUtils {
         }
         return true;
     }
+
+    public static boolean isNumber(String s) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        return pattern.matcher(s).matches();
+    }
 }

@@ -33,4 +33,10 @@ public class UtilsTest {
         String result = TokenUtils.sign("1");
         System.out.println(result);
     }
+
+    @Test
+    public void isNumber() {
+        boolean result = BucketUtils.isNumber("100");
+        System.out.println(result);
+    }
 }

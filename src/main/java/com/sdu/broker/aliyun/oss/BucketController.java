@@ -17,7 +17,7 @@ public class BucketController {
 
     //创建一个Bucket
     public int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
-        System.out.println(bucketName + " " + storageClass + " " + dataRedundancyType + " " + cannedACL);
+//        System.out.println(bucketName + " " + storageClass + " " + dataRedundancyType + " " + cannedACL);
         //1,参数列表：bucketName:桶名称   storageClass:存储类型
         //          dataRedundancyType:数据容灾类型
         //          cannedACL:数据读写权限
@@ -86,7 +86,7 @@ public class BucketController {
     }
 
     //列举所有Bucket
-    public static List<Bucket> listAllBuckets(){
+    public List<Bucket> listAllBuckets(){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         List<Bucket> buckets = ossClient.listBuckets();
         for (Bucket bucket : buckets){
@@ -98,7 +98,7 @@ public class BucketController {
 
 
     //列举有参数的Bucket
-    public static List<Bucket> listRequestBuckets(String Prefix, String Marker, int maxKeys) {
+    public List<Bucket> listRequestBuckets(String Prefix, String Marker, int maxKeys) {
         //调用该方法需要三个参数中至少有一个不为空
         //Prefix代表列举Bucket的前缀(如果没有，前端传空字符串)
         //Marker代表列举的起始位置(如果没有，前端传空字符串)
@@ -150,7 +150,7 @@ public class BucketController {
     }
 
     //获取存储空间的信息
-    public static Map<String,String>  getBucketInfo(String bucketName){
+    public Map<String,String> getBucketInfo(String bucketName){
         //输入参数：bucketName
         //返回值：包含地域、创建日期、拥有者信息、权限信息、容灾类型的一个map集合
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -232,9 +232,9 @@ public class BucketController {
     public static String setBucketTagging(String bucketName, String tagKey, String tagValue){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
-            SetBucketTaggingRequest request = new SetBucketTaggingRequest();
-            request.setTag(tagKey,tagValue);
-            ossClient.setBucketTagging(request);
+//            SetBucketTaggingRequest request = new SetBucketTaggingRequest();
+//            request.setTag(tagKey,tagValue);
+//            ossClient.setBucketTagging(request);
         } catch (OSSException e) {
             e.printStackTrace();
             return "false";
@@ -382,8 +382,8 @@ public class BucketController {
     public static void main(String[] args) {
 //        listAllBuckets();
 //        listRequestBuckets("xmsx","",2);
-        Map<String, String> result = getBucketInfo("xmsx-001");
-        System.out.println(result);
+//        Map<String, String> result = getBucketInfo("xmsx-001");
+//        System.out.println(result);
     }
 
 }
