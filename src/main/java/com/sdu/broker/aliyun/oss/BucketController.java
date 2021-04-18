@@ -272,7 +272,7 @@ public class BucketController {
     }
 
     //删除bucket标签
-    public static String deleteBucketTagging(String bucketName){
+    public String deleteBucketTagging(String bucketName){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteBucketTagging(new GenericRequest(bucketName));
         ossClient.shutdown();
@@ -280,7 +280,7 @@ public class BucketController {
     }
 
     //添加存储空间清单配置
-    public static String setBucketInventoryConfiguration(String bucketName,String inventoryId, int inventoryFrequency,
+    public String setBucketInventoryConfiguration(String bucketName,String inventoryId, int inventoryFrequency,
                                                          int InventoryIncludedObjectVersions,int isEnabled,
                                                          String objPrefix, String destinationPrefix,
                                                          int bucketFormat, String accountId,

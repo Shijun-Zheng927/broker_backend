@@ -38,6 +38,10 @@ public class APIBucketController {
             String dataRedundancyType = map.get("dataRedundancyType");
             String cannedACL = map.get("cannedACL");
             int result;
+            if (storageClass == null || dataRedundancyType == null || cannedACL == null) {
+                response.setStatus(777);
+                return null;
+            }
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null && !bucketName.equals("")) {
                 result = bucketController.createBucket(BucketUtils.addPrefix(bucketName), Integer.parseInt(storageClass),
@@ -156,7 +160,7 @@ public class APIBucketController {
         verifyBucketName(response, userId, platform, bucketName);
         if (platform.equals("ALI")) {
             String acl = map.get("acl");
-            if (!BucketUtils.regex(0, 3, acl)) {
+            if (acl == null || !BucketUtils.regex(0, 3, acl)) {
                 response.setStatus(777);
                 return null;
             }
@@ -250,6 +254,95 @@ public class APIBucketController {
             return null;
         }
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteBucketTagging", method = RequestMethod.DELETE)
+    public String deleteBucketTagging(@RequestBody Map<String, String> map,
+                                      @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        if (platform.equals("ALI")) {
+            String result = bucketController.deleteBucketTagging(bucketName);
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/setBucketInventoryConfiguration", method = RequestMethod.POST)
+    public String setBucketInventoryConfiguration(@RequestBody Map<String, String> map,
+                                      @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        verifyIdentity(response, authorization);
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        verifyBucketName(response, userId, platform, bucketName);
+        String inventoryId = map.get("inventoryId");
+        if (inventoryId == null || inventoryId.equals("")) {
+            System.out.println(inventoryId);
+            response.setStatus(777);
+            return null;
+        }
+        String inventoryFrequency = map.get("inventoryFrequency");
+        if (inventoryFrequency == null || !BucketUtils.regex(1, 2, inventoryFrequency)) {
+            response.setStatus(777);
+            return null;
+        }
+        String inventoryIncludedObjectVersions = map.get("inventoryIncludedObjectVersions");
+        if (inventoryIncludedObjectVersions == null || !BucketUtils.regex(1, 2, inventoryIncludedObjectVersions)) {
+            response.setStatus(777);
+            return null;
+        }
+        String isEnabled = map.get("isEnabled");
+        if (isEnabled == null || !BucketUtils.regex(0, 1, isEnabled)) {
+            response.setStatus(777);
+            return null;
+        }
+        String objPrefix = map.get("objPrefix");
+        if (objPrefix == null || objPrefix.equals("")) {
+            response.setStatus(777);
+            return null;
+        }
+        String destinationPrefix = map.get("destinationPrefix");
+        if (destinationPrefix == null || destinationPrefix.equals("")) {
+            response.setStatus(777);
+            return null;
+        }
+        String bucketFormat = map.get("bucketFormat");
+        if (bucketFormat == null || !BucketUtils.regex(1, 1, bucketFormat)) {
+            response.setStatus(777);
+            return null;
+        }
+        String accountId = map.get("accountId");
+        if (accountId == null || accountId.equals("")) {
+            response.setStatus(777);
+            return null;
+        }
+        String roleArn = map.get("roleArn");
+        if (roleArn == null || roleArn.equals("")) {
+            response.setStatus(777);
+            return null;
+        }
+        String destBucketName = map.get("destBucketName");
+        if (destBucketName == null || destBucketName.equals("")) {
+            response.setStatus(777);
+            return null;
+        }
+        if (platform.equals("ALI")) {
+            String result = bucketController.setBucketInventoryConfiguration(bucketName, inventoryId, Integer.parseInt(inventoryFrequency),
+                    Integer.parseInt(inventoryIncludedObjectVersions), Integer.parseInt(isEnabled),
+                    objPrefix, destinationPrefix, Integer.parseInt(bucketFormat), accountId, roleArn, destBucketName);
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+
 
 
 
