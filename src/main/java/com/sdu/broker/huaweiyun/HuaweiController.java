@@ -3,6 +3,7 @@ package com.sdu.broker.huaweiyun;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.*;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+@Component
 public class HuaweiController {
 
     /* 初始化OBS客户端所需的参数 */
@@ -21,7 +23,7 @@ public class HuaweiController {
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
     /* 创建桶 */
-    public static int createBucket(String bucketName,int rwPolicy,int storageClass)
+    public int createBucket(String bucketName,int rwPolicy,int storageClass)
     {
         ObsBucket obsBucket = new ObsBucket();
         //设置桶名字

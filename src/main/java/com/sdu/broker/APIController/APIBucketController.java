@@ -1,6 +1,7 @@
 package com.sdu.broker.APIController;
 
 import com.sdu.broker.aliyun.oss.BucketController;
+import com.sdu.broker.huaweiyun.HuaweiController;
 import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
@@ -22,6 +23,8 @@ public class APIBucketController {
     private BucketService bucketService;
     @Autowired
     private PlatformService platformService;
+    @Autowired
+    private HuaweiController huaweiController;
 
     @ResponseBody
     @RequestMapping(value = "/createBucket", method = RequestMethod.POST)
@@ -38,7 +41,8 @@ public class APIBucketController {
             String dataRedundancyType = map.get("dataRedundancyType");
             String cannedACL = map.get("cannedACL");
             int result;
-            if (storageClass == null || dataRedundancyType == null || cannedACL == null) {
+            if (storageClass == null || dataRedundancyType == null || cannedACL == null || storageClass.equals("") 
+                    || dataRedundancyType.equals("") || cannedACL.equals("")) {
                 response.setStatus(777);
                 return null;
             }
@@ -61,7 +65,31 @@ public class APIBucketController {
                 return "fail";
             }
         } else {
-            return "HUAWEI";
+            String bucketName = map.get("bucketName");
+            String rwPolicy = map.get("rwPolicy");
+            String storageClass = map.get("storageClass");
+            if (bucketName == null || rwPolicy == null || storageClass == null || bucketName.equals("")
+                    || rwPolicy.equals("") || storageClass.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            int result;
+            if (BucketUtils.regex(0, 4, rwPolicy) && BucketUtils.regex(0, 2, storageClass)) {
+                result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy), Integer.parseInt(storageClass));
+            } else {
+                response.setStatus(777);
+                return null;
+            }
+            if (result == 1) {
+                Bucket bucket = new Bucket();
+                bucket.setName(bucketName);
+                bucket.setUserId(userId);
+                bucket.setPlatform(platform);
+                bucketService.addBucket(bucket);
+                return "success";
+            } else {
+                return "fail";
+            }
         }
 
     }
