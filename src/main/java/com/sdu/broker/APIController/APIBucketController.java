@@ -11,10 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 @CrossOrigin
@@ -79,7 +76,7 @@ public class APIBucketController {
         String platform = platformService.getPlatform(userId);
         if (platform.equals("ALI")) {
             List<com.aliyun.oss.model.Bucket> result = bucketController.listAllBuckets();
-            if (result == null) {
+            if (result.size() == 0) {
                 return null;
             }
             List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
@@ -114,7 +111,7 @@ public class APIBucketController {
                 return null;
             }
             List<com.aliyun.oss.model.Bucket> result = bucketController.listRequestBuckets(prefix, market, Integer.parseInt(maxKeys));
-            if (result == null) {
+            if (result.size() == 0) {
                 return null;
             }
             List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
@@ -134,7 +131,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return false;
+        }
         if (platform.equals("ALI")) {
             boolean result = bucketController.doesBucketExist(bucketName);
             return result;
@@ -153,7 +152,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String result = bucketController.getBucketLocation(bucketName);
             return result;
@@ -172,7 +173,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             Map<String, String> result = bucketController.getBucketInfo(bucketName);
             return result;
@@ -191,7 +194,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String result = bucketController.getBucketAcl(bucketName);
             return result;
@@ -210,7 +215,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String acl = map.get("acl");
             if (acl == null || !BucketUtils.regex(0, 3, acl)) {
@@ -234,7 +241,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String result = bucketController.deleteBucket(bucketName);
             if (result.equals("删除存储空间成功")) {
@@ -263,7 +272,9 @@ public class APIBucketController {
             response.setStatus(777);
             return "format wrong";
         }
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String result = bucketController.setBucketTagging(bucketName, tagKey, tagValue);
             return result;
@@ -282,7 +293,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             Map<String, String> result = bucketController.getBucketTagging(bucketName);
             return result;
@@ -307,7 +320,7 @@ public class APIBucketController {
         }
         if (platform.equals("ALI")) {
             List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
-            if (result == null) {
+            if (result.size() == 0) {
                 return null;
             }
             List<com.aliyun.oss.model.Bucket> buckets = getBuckets(userId, platform, result);
@@ -327,7 +340,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         if (platform.equals("ALI")) {
             String result = bucketController.deleteBucketTagging(bucketName);
             return result;
@@ -346,7 +361,9 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        verifyBucketName(response, userId, platform, bucketName);
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
         String inventoryId = map.get("inventoryId");
         if (inventoryId == null || inventoryId.equals("")) {
             System.out.println(inventoryId);
@@ -417,29 +434,40 @@ public class APIBucketController {
         return true;
     }
 
-    public void verifyBucketName(HttpServletResponse response, Integer userId, String platform, String bucketName) {
+    public boolean verifyBucketName(HttpServletResponse response, Integer userId, String platform, String bucketName) {
         if (bucketName == null || bucketName.equals("")) {
             response.setStatus(777);
-            return;
+            return true;
         }
         Bucket bucket = new Bucket(userId, platform, bucketName);
         Integer legal = bucketService.isLegal(bucket);
         if (legal == null) {
             response.setStatus(666);
+            return true;
         }
+        return false;
     }
 
     private List<com.aliyun.oss.model.Bucket> getBuckets(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
         Bucket b = new Bucket();
         b.setId(userId);
         b.setPlatform(platform);
-        for (com.aliyun.oss.model.Bucket bucket : result) {
+        Iterator<com.aliyun.oss.model.Bucket> iterator = result.iterator();
+        while (iterator.hasNext()) {
+            com.aliyun.oss.model.Bucket bucket = iterator.next();
             b.setName(bucket.getName());
             Integer legal = bucketService.isLegal(b);
             if (legal == null) {
-                result.remove(bucket);
+                iterator.remove();
             }
         }
+//        for (com.aliyun.oss.model.Bucket bucket : result) {
+//            b.setName(bucket.getName());
+//            Integer legal = bucketService.isLegal(b);
+//            if (legal == null) {
+//                result.remove(bucket);
+//            }
+//        }
         return result;
     }
 
