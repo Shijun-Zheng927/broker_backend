@@ -131,6 +131,8 @@ public class UpdateController {
         //关闭ossClient
         ossClient.shutdown();
 
+        return "";
+
     }
 
 

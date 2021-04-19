@@ -21,7 +21,7 @@ public class HuaweiController {
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
     /* 创建桶 */
-    public static void createBucket(String bucketName,int rwPolicy,int storageClass)
+    public static int createBucket(String bucketName,int rwPolicy,int storageClass)
     {
         ObsBucket obsBucket = new ObsBucket();
         //设置桶名字
@@ -65,14 +65,21 @@ public class HuaweiController {
             }
         }
 
-        // 设置桶区域位置
-        obsBucket.setLocation(default_bucketLoc);
-        obsClient.createBucket(obsBucket);
-        System.out.println("create bucket:" + bucketName + " success！");
+        try {
+            // 设置桶区域位
+            obsBucket.setLocation(default_bucketLoc);
+            obsClient.createBucket(obsBucket);
+            System.out.println("create bucket:" + bucketName + " success！");
+            return 1;
+        }
+        catch (ObsException e){
+            return 0;
+        }
+
     }
 
     /* 列举桶 */
-    public static void listBucket()
+    public static List<ObsBucket> listBucket()
     {
         System.out.println("start listing all bucket");
         ListBucketsRequest request = new ListBucketsRequest();
@@ -85,18 +92,21 @@ public class HuaweiController {
             System.out.println("Location:" + bucket.getLocation());
             System.out.println();
         }
+        return buckets;
     }
 
     /* 删除桶 */
-    public void removeBucket(String bucketName) throws IOException
+    public int removeBucket(String bucketName) throws IOException
     {
         boolean exist = existBucket(bucketName);
         if (exist) {
             obsClient.deleteBucket(bucketName);
             System.out.println("delete bucket : " + bucketName + "success");
             obsClient.close();
+            return 1;
         } else {
             System.out.println("Not exist:" + bucketName);
+            return 0;
         }
 
     }
@@ -109,7 +119,7 @@ public class HuaweiController {
     }
 
     /* 获取桶元数据 */
-    public BucketMetadataInfoResult result(String bucketName)
+    public BucketMetadataInfoResult getresult(String bucketName)
     {
         BucketMetadataInfoRequest request = new BucketMetadataInfoRequest(bucketName);
         request.setOrigin("http://www.a.com");
@@ -166,16 +176,20 @@ public class HuaweiController {
     /* 获取桶策略 */
     public String getBucketPolicy(String bucketName)
     {
-        String policy = obsClient.getBucketPolicy(bucketName);
-        System.out.println("\t" + policy);
-        return policy;
+        try{
+            String policy = obsClient.getBucketPolicy(bucketName);
+            System.out.println("\t" + policy);
+            return policy;
+        }catch (ObsException e){
+            return "no policy";
+        }
+
     }
 
     /* 删除桶策略 */
     public void deleteBucketPolicy(String bucketName){
         obsClient.deleteBucketPolicy(bucketName);
     }
-
 
     /* 获取桶的区域位置 */
     public String getlocation(String bucketName){
@@ -200,10 +214,11 @@ public class HuaweiController {
     }
 
     /* 获取桶配额 */
-    public String getBucketQuota(String bucketName){
+    public long getBucketQuota(String bucketName){
         BucketQuota quota = obsClient.getBucketQuota(bucketName);
-        System.out.println("\t" + quota.getBucketQuota());
-        return quota.toString();
+//        System.out.println("\t" + quota.getBucketQuota());
+
+        return quota.getBucketQuota();
     }
 
     /* 设置桶存储类型 */
@@ -223,12 +238,11 @@ public class HuaweiController {
         obsClient.setBucketStoragePolicy(bucketName, storgePolicy);
     }
 
-
     /* 获取桶存储类型 */
     public String getBucketStorageClass(String bucketName){
         BucketStoragePolicyConfiguration storagePolicy = obsClient.getBucketStoragePolicy(bucketName);
-        System.out.println("\t" + storagePolicy.getBucketStorageClass());
-        return storagePolicy.toString();
+//        System.out.println("\t" + storagePolicy.getBucketStorageClass());
+        return storagePolicy.getBucketStorageClass().toString();
     }
 
 
