@@ -68,10 +68,11 @@ public class UpdateController {
         } catch (OSSException ossException) {
             ossException.printStackTrace();
             return "false";
-        } catch (ClientException e) {
-            e.printStackTrace();
-            return "false";
         }
+//        catch (ClientException e) {
+//            e.printStackTrace();
+//            return "false";
+//        }
 
         return "上传Byte数组成功";
     }
@@ -249,7 +250,7 @@ public class UpdateController {
     //追加上传
 
     //追加上传流
-    //
+    //第一次追加上传（创建一个追加类型的文件）
     public static  String appendObjectStreamFirst(String bucketName,String objectPath,String contentType,String content){
         //contentType 常用值如下
         //纯文本：Content-Type text/plain
@@ -301,6 +302,7 @@ public class UpdateController {
         return position;
     }
 
+    //追加上传流（第二次及以后）
     public static  String appendObjectStream(String bucketName,String objectPath,String contentType,String content,String givenPosition){
 
         OSS ossClient = new OSSClientBuilder().
@@ -351,10 +353,153 @@ public class UpdateController {
     }
 
 
+    //追加上传（文件）
+    //创建
+    public static  String appendObjectFileFirst(String bucketName,String objectPath,String contentType,String localPath){
+        //contentType 常用值如下
+        //纯文本：Content-Type text/plain
+        // JPG:image/jpeg  gif:image/gif png:image/png  word:application/msword
+        //jsp:text/html mp3:audio/mp3 mp4:video/mpeg4 ppt:application/vnd.ms-powerpoint
+        //localPath:所选择本地文件的路径
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+
+        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName,objectPath,new File(localPath),metadata);
+
+        /*
+         通过AppendObjectRequest设置单个参数。
+         设置Bucket名称。
+        appendObjectRequest.setBucketName("<yourBucketName>");
+         设置Object名称。即不包含Bucket名称在内的Object的完整路径，例如example/test.txt。
+        appendObjectRequest.setKey("<yourObjectName>");
+         设置待追加的内容。有两种可选类型：InputStream类型和File类型。这里为InputStream类型。
+        appendObjectRequest.setInputStream(new ByteArrayInputStream(content1.getBytes()));
+         设置待追加的内容。有两种可选类型：InputStream类型和File类型。这里为File类型。
+        appendObjectRequest.setFile(new File("<yourLocalFile>"));
+         指定文件的元信息，第一次追加时有效。
+        appendObjectRequest.setMetadata(meta);
+         第一次追加。
+         设置文件的追加位置。
+        */
+
+        appendObjectRequest.setPosition(0L);
+        AppendObjectResult appendObjectResult = ossClient.appendObject(appendObjectRequest);
+        // 文件的64位CRC值。此值根据ECMA-182标准计算得出。
+        System.out.println(appendObjectResult.getObjectCRC());
+
+        String position = appendObjectResult.getNextPosition().toString();
+
+        System.out.println(position);
 
 
+        // 关闭OSSClient。
+        ossClient.shutdown();
 
-    public static void main(String[] args) {
+        return position;
+    }
+
+
+    //追加上传文件
+    public static  String appendObjectFile(String bucketName,String objectPath,String contentType,String localPath,String givenPosition){
+
+        OSS ossClient = new OSSClientBuilder().
+                build(endpoint,accessKeyId,accessKeySecret);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+
+        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName,objectPath,new File(localPath),metadata);
+
+        // 通过AppendObjectRequest设置单个参数。
+        // 设置Bucket名称。
+        //appendObjectRequest.setBucketName("<yourBucketName>");
+        // 设置Object名称。即不包含Bucket名称在内的Object的完整路径，例如example/test.txt。
+        //appendObjectRequest.setKey("<yourObjectName>");
+        // 设置待追加的内容。有两种可选类型：InputStream类型和File类型。这里为InputStream类型。
+        //appendObjectRequest.setInputStream(new ByteArrayInputStream(content1.getBytes()));
+        // 设置待追加的内容。有两种可选类型：InputStream类型和File类型。这里为File类型。
+        //appendObjectRequest.setFile(new File("<yourLocalFile>"));
+        // 指定文件的元信息，第一次追加时有效。
+        //appendObjectRequest.setMetadata(meta);
+
+
+        appendObjectRequest.setPosition(Long.parseLong(givenPosition));
+        AppendObjectResult appendObjectResult = ossClient.appendObject(appendObjectRequest);
+        // 文件的64位CRC值。此值根据ECMA-182标准计算得出。
+        System.out.println(appendObjectResult.getObjectCRC());
+
+        String position = appendObjectResult.getNextPosition().toString();
+
+        System.out.println(position);
+
+
+        // 第二次追加。
+        // nextPosition指明下一次请求中应当提供的Position，即文件当前的长度。
+//        appendObjectRequest.setPosition(appendObjectResult.getNextPosition());
+//        appendObjectRequest.setInputStream(new ByteArrayInputStream(content2.getBytes()));
+//        appendObjectResult = ossClient.appendObject(appendObjectRequest);
+//        // 第三次追加。
+//        appendObjectRequest.setPosition(appendObjectResult.getNextPosition());
+//        appendObjectRequest.setInputStream(new ByteArrayInputStream(content3.getBytes()));
+//        appendObjectResult = ossClient.appendObject(appendObjectRequest);
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return position;
+    }
+
+    //断点续传上传
+
+    public static String checkPointUpload(String bucketName, String objectPath, String localFilePath, String contentType) throws Throwable {
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+
+        ObjectMetadata meta = new ObjectMetadata();
+        meta.setContentType(contentType);
+
+        // 文件上传时设置访问权限ACL。
+        // meta.setObjectAcl(CannedAccessControlList.Private);
+
+        // 通过UploadFileRequest设置多个参数。
+        // 填写Bucket名称和Object完整路径。Object完整路径中不能包含Bucket名称。
+        UploadFileRequest uploadFileRequest = new UploadFileRequest(bucketName,objectPath);
+
+        // 通过UploadFileRequest设置单个参数。
+        // 填写Bucket名称。
+        //uploadFileRequest.setBucketName("examplebucket");
+        // 填写Object完整路径。Object完整路径中不能包含Bucket名称。
+        //uploadFileRequest.setKey(objectPath);
+        // 填写本地文件的完整路径。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
+        uploadFileRequest.setUploadFile(localFilePath);
+        // 指定上传并发线程数，默认值为1。
+        uploadFileRequest.setTaskNum(5);
+        // 指定上传的分片大小。
+        uploadFileRequest.setPartSize( 1024 * 200);
+        // 开启断点续传，默认关闭。
+        uploadFileRequest.setEnableCheckpoint(true);
+        // 记录本地分片上传结果的文件。上传过程中的进度信息会保存在该文件中。
+        uploadFileRequest.setCheckpointFile(objectPath+"CheckpointFile");
+        String checkPointFile = uploadFileRequest.getCheckpointFile();
+        System.out.println(checkPointFile);
+        // 文件的元数据。
+        uploadFileRequest.setObjectMetadata(meta);
+        // 设置上传成功回调，参数为Callback类型。
+        //uploadFileRequest.setCallback("yourCallbackEvent");
+
+        // 断点续传上传。
+        ossClient.uploadFile(uploadFileRequest);
+
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return checkPointFile;
+
+    }
+
+
+    public static void main(String[] args) throws Throwable {
         /*
                 byte[] haha = "Naruto come on".getBytes(StandardCharsets.UTF_8);
                 putString("hello onePiece", "xmsx-00o1", "hello.txt");
@@ -364,12 +509,15 @@ public class UpdateController {
                 putFile("F:\\Temp\\hhh.txt","xmsx-001","123.txt");
         */
 
-//        Map<String, String> map = new HashMap<>();
-//        map.put("123", "jsa");
-//        formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
-//        appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
-//        appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
+/*
+        Map<String, String> map = new HashMap<>();
+        map.put("123", "jsa");
+        formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
+        appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
+        appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
+        appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
+        appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
+*/
+    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
     }
-
-
 }
