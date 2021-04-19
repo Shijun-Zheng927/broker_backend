@@ -6,6 +6,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import org.springframework.stereotype.Component;
 
 
 import java.io.*;
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
+@Component
 public class UpdateController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
@@ -21,7 +23,7 @@ public class UpdateController {
     //流式上传：上传字符串、上传数组、上传
 
     //上传字符串
-    public static String putString(String content, String bucketName, String objectPath){
+    public String putString(String content, String bucketName, String objectPath){
         //objectPath:字符串的保存路径，例如： test.txt(不要带存储空间名称）
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
