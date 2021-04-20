@@ -150,29 +150,31 @@ public class BucketController {
     }
 
     //获取存储空间的信息
-    public Map<String,String> getBucketInfo(String bucketName){
+    public BucketInfo getBucketInfo(String bucketName){
         //输入参数：bucketName
         //返回值：包含地域、创建日期、拥有者信息、权限信息、容灾类型的一个map集合
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
 
         BucketInfo info = ossClient.getBucketInfo(bucketName);
-        String location = info.getBucket().getLocation();
-        String creationDate = info.getBucket().getCreationDate().toString();
-        String owner = info.getBucket().getOwner().toString();
-        String grants = info.getGrants().toString();
-        String dataRedundancyType = info.getDataRedundancyType().toString();
+        return info;
 
-
-        Map<String, String> map = new HashMap<>();
-        map.put("Location", location);
-        map.put("CreationDate", creationDate);
-        map.put("Owner", owner);
-        map.put("Grants", grants);
-        map.put("DataRedundancyType", dataRedundancyType);
-
-        ossClient.shutdown();
-
-        return map;
+//        String location = info.getBucket().getLocation();
+//        String creationDate = info.getBucket().getCreationDate().toString();
+//        String owner = info.getBucket().getOwner().toString();
+//        String grants = info.getGrants().toString();
+//        String dataRedundancyType = info.getDataRedundancyType().toString();
+//
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("Location", location);
+//        map.put("CreationDate", creationDate);
+//        map.put("Owner", owner);
+//        map.put("Grants", grants);
+//        map.put("DataRedundancyType", dataRedundancyType);
+//
+//        ossClient.shutdown();
+//
+//        return map;
     }
 
     //获取存储空间访问权限

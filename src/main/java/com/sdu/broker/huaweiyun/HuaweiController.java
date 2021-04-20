@@ -10,7 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class HuaweiController {
@@ -81,7 +83,7 @@ public class HuaweiController {
     }
 
     /* 列举桶 */
-    public static List<ObsBucket> listBucket()
+    public List<ObsBucket> listBucket()
     {
         System.out.println("start listing all bucket");
         ListBucketsRequest request = new ListBucketsRequest();
@@ -98,13 +100,18 @@ public class HuaweiController {
     }
 
     /* 删除桶 */
-    public int removeBucket(String bucketName) throws IOException
+    public int removeBucket(String bucketName)
     {
         boolean exist = existBucket(bucketName);
         if (exist) {
             obsClient.deleteBucket(bucketName);
             System.out.println("delete bucket : " + bucketName + "success");
-            obsClient.close();
+            try {
+                obsClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return 0;
+            }
             return 1;
         } else {
             System.out.println("Not exist:" + bucketName);
@@ -163,9 +170,10 @@ public class HuaweiController {
     }
 
     /* 获取桶访问权限 */
-    public AccessControlList getBucketAcl(String bucketName){
+    public String getBucketAcl(String bucketName){
         AccessControlList acl = obsClient.getBucketAcl(bucketName);
-        return acl;
+        String result = acl.toString();
+        return result;
     }
 
     /* 设置桶策略 */
@@ -201,11 +209,14 @@ public class HuaweiController {
     }
 
     /* 获取桶存量信息 */
-    public BucketStorageInfo getBucketStorageInfo(String bucketName){
+    public Map<String, String> getBucketStorageInfo(String bucketName){
         BucketStorageInfo storageInfo = obsClient.getBucketStorageInfo(bucketName);
+        Map<String, String> result = new HashMap<>();
+        result.put("objectNmuber", Long.toString(storageInfo.getObjectNumber()));
+        result.put("size", Long.toString(storageInfo.getSize()));
         System.out.println("\t" + storageInfo.getObjectNumber());
         System.out.println("\t" + storageInfo.getSize());
-        return storageInfo;
+        return result;
     }
 
     /* 设置桶配额 */
