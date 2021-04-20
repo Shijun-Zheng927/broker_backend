@@ -32,7 +32,8 @@ public class huaweitest  {
 //        hwc.getBucketStorageClass(bucketname);
 //        hwc.getresult(bucketname);
 //        System.out.println(hwc.getBucketAcl(bucketname));
-        System.out.println(hwc.getBucketPolicy(bucketname));
+//        System.out.println(hwc.getBucketPolicy(bucketname));
+        System.out.println(hwc.getBucketQuota(bucketname));
         hwc.closeObsClient();
 
     }
