@@ -5,6 +5,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.*;
+import org.springframework.stereotype.Component;
 
 
 import javax.activation.MimetypesFileTypeMap;
@@ -12,12 +13,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
+@Component
 public class UpdateController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
@@ -452,7 +451,7 @@ public class UpdateController {
 
     //断点续传上传
 
-    public static String checkPointUpload(String bucketName, String objectPath, String localFilePath, String contentType) throws Throwable {
+    public static String checkPointUpload(String bucketName, String objectPath, String localFilePath, String contentType,int taskNum,int partSize) throws Throwable {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
 
         ObjectMetadata meta = new ObjectMetadata();
@@ -473,9 +472,9 @@ public class UpdateController {
         // 填写本地文件的完整路径。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
         uploadFileRequest.setUploadFile(localFilePath);
         // 指定上传并发线程数，默认值为1。
-        uploadFileRequest.setTaskNum(5);
+        uploadFileRequest.setTaskNum(taskNum);
         // 指定上传的分片大小。
-        uploadFileRequest.setPartSize( 1024 * 200);
+        uploadFileRequest.setPartSize(partSize);
         // 开启断点续传，默认关闭。
         uploadFileRequest.setEnableCheckpoint(true);
         // 记录本地分片上传结果的文件。上传过程中的进度信息会保存在该文件中。
@@ -499,6 +498,336 @@ public class UpdateController {
     }
 
 
+    //分片上传
+    public static String multipartUpload(String bucketName,String objectName,String localFilePath ){
+
+        //objectName: 上传文件到oss时需要制定包含文件后缀在内的完整路径
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, objectName);
+        /*
+         如果需要在初始化分片时设置文件存储类型，请参考以下示例代码。
+         ObjectMetadata metadata = new ObjectMetadata();
+         metadata.setHeader(OSSHeaders.OSS_STORAGE_CLASS, StorageClass.Standard.toString());
+         request.setObjectMetadata(metadata);
+        */
+
+        //初始化分片
+        InitiateMultipartUploadResult uploadResult = ossClient.initiateMultipartUpload(request);
+        //返回uploadId 分片上传的唯一标识
+        String uploadId = uploadResult.getUploadId();
+
+        //partEtags是partETag的集合 PartFTag由分片的ETag和分片号组成
+        ArrayList<PartETag> partETags = new ArrayList<>();
+
+        //计算文件有多少分片
+        final long partSize = 1*1024*1024L;//1MB
+        final File sampleFile = new File(localFilePath);
+        long fileLength = sampleFile.length();
+        int partCount = (int) (fileLength/partSize);
+        if(fileLength % partSize != 0){
+            partCount++;
+        }
+        //遍历分片上传
+        try {
+            for(int i = 0;i<partCount; i++){
+                long startPos = i*partSize;
+                long curPartSize = (i+1==partCount)?(fileLength -startPos):partSize;
+                InputStream inputStream = new FileInputStream(sampleFile);
+                inputStream.skip(startPos);
+                UploadPartRequest uploadPartRequest = new UploadPartRequest();
+                uploadPartRequest.setBucketName(bucketName);
+                uploadPartRequest.setKey(objectName);
+                uploadPartRequest.setUploadId(uploadId);
+                uploadPartRequest.setInputStream(inputStream);
+                // 设置分片大小。除了最后一个分片没有大小限制，其他的分片最小为100 KB。
+                uploadPartRequest.setPartSize(curPartSize);
+                // 设置分片号。每一个上传的分片都有一个分片号，取值范围是1~10000，如果超出这个范围，OSS将返回InvalidArgument的错误码。
+                uploadPartRequest.setPartNumber( i + 1);
+                // 每个分片不需要按顺序上传，甚至可以在不同客户端上传，OSS会按照分片号排序组成完整的文件。
+                UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
+                // 每次上传分片之后，OSS的返回结果包含PartETag。PartETag将被保存在partETags中。
+                partETags.add(uploadPartResult.getPartETag());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        // 创建CompleteMultipartUploadRequest对象。
+        // 在执行完成分片上传操作时，需要提供所有有效的partETags。OSS收到提交的partETags后，会逐一验证每个分片的有效性。当所有的数据分片验证通过后，OSS将把这些分片组合成一个完整的文件。
+        CompleteMultipartUploadRequest completeMultipartUploadRequest =
+                new CompleteMultipartUploadRequest(bucketName, objectName, uploadId, partETags);
+
+        // 如果需要在完成文件上传的同时设置文件访问权限，请参考以下示例代码。
+        // completeMultipartUploadRequest.setObjectACL(CannedAccessControlList.PublicRead);
+
+        // 完成上传。
+        CompleteMultipartUploadResult completeMultipartUploadResult = ossClient.completeMultipartUpload(completeMultipartUploadRequest);
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        
+        return uploadId;
+    }
+
+    //取消分片上传
+    public static String abortMultipartUpload(String bucketName,String objectName,String uploadId){
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
+        AbortMultipartUploadRequest abortMultipartUploadRequest =
+                new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
+        ossClient.abortMultipartUpload(abortMultipartUploadRequest);
+
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return "success";
+    }
+
+    //列举已上传分片
+    //简单列举已上传的分片
+    public static List<Map<String,String>> simpleListParts(String bucketName,String objectName, String uploadId){
+        //maxParts:每个分页的分片数量
+        //marker: 分片的起始位置
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        ListPartsRequest listPartsRequest = new ListPartsRequest(bucketName,objectName,uploadId);
+        // 设置uploadId。
+        //listPartsRequest.setUploadId(uploadId);
+        //设置分页时每一个分页的分片数量，默认值为1000
+        listPartsRequest.setMaxParts(100);
+        //指定列举的起始位置，只有分片号大于此参数值得分片会被列举
+        listPartsRequest.setPartNumberMarker(0);
+
+        PartListing partListing = ossClient.listParts(listPartsRequest);
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        for(PartSummary part : partListing.getParts()) {
+            //获取分片号
+            String partNumber = String.valueOf(part.getPartNumber());
+            //获取分片数据大小
+            String size = String.valueOf(part.getSize());
+            //获取分片的最后修改时间
+            String lastModified = String.valueOf(part.getLastModified());
+
+            Map<String, String> map = new HashMap<>();
+            map.put("partNumber",partNumber);
+            map.put("size",size);
+            map.put("lastModified",lastModified);
+            list.add(map);
+        }
+
+        ossClient.shutdown();
+        return list;
+    }
+    //列举所有已上传分片
+    //默认情况下，listParts()方法一次只能列举1000个分片，当分片数大于1000时，需要以下方法
+    public static List<Map<String,String>> listPartsAll(String bucketName,String objectName,String uploadId){
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 列举所有已上传的分片。
+        PartListing partListing;
+        ListPartsRequest listPartsRequest = new ListPartsRequest(bucketName,objectName,uploadId);
+        List<Map<String, String>> list = new ArrayList<>();
+        do {
+            partListing = ossClient.listParts(listPartsRequest);
+
+            for (PartSummary part : partListing.getParts()) {
+                //获取分片号
+                String partNumber = String.valueOf(part.getPartNumber());
+                //获取分片数据大小
+                String size = String.valueOf(part.getSize());
+                //获取分片的最后修改时间
+                String lastModified = String.valueOf(part.getLastModified());
+                // 获取分片的ETag。
+                String eTag = part.getETag();
+
+                Map<String, String> map = new HashMap<>();
+                map.put("partNumber",partNumber);
+                map.put("size",size);
+                map.put("lastModified",lastModified);
+                map.put("eTag",eTag);
+                list.add(map);
+            }
+        // 指定List的起始位置，只有分片号大于此参数值的分片会被列出。
+            listPartsRequest.setPartNumberMarker(partListing.getNextPartNumberMarker());
+        } while (partListing.isTruncated());
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return list;
+    }
+
+    //分页列举符合要求的已上传分片
+    public static List<Map<String,String>> listPartsByPaper(String bucketName,String objectName, String uploadId,int maxParts,int marker){
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 列举已上传的分片，其中uploadId来自于InitiateMultipartUpload返回的结果。
+        ListPartsRequest listPartsRequest = new ListPartsRequest("<yourBucketName>", "<yourObjectName>", "<uploadId>");
+        // 设置uploadId。
+        //listPartsRequest.setUploadId(uploadId);
+        // 设置分页时每一页中分片数量为100个。默认列举1000个分片。
+        listPartsRequest.setMaxParts(maxParts);
+        // 指定List的起始位置。只有分片号大于此参数值的分片会被列举。
+        listPartsRequest.setPartNumberMarker(marker);
+        PartListing partListing = ossClient.listParts(listPartsRequest);
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        for (PartSummary part : partListing.getParts()) {
+            //获取分片号
+            String partNumber = String.valueOf(part.getPartNumber());
+            //获取分片数据大小
+            String size = String.valueOf(part.getSize());
+            //获取分片的最后修改时间
+            String lastModified = String.valueOf(part.getLastModified());
+            // 获取分片的ETag。
+            String eTag = part.getETag();
+
+            Map<String, String> map = new HashMap<>();
+            map.put("partNumber",partNumber);
+            map.put("size",size);
+            map.put("lastModified",lastModified);
+            map.put("eTag",eTag);
+            list.add(map);
+
+
+        }
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return list;
+    }
+    //列举分片上传事件 包括已初始化但尚未完成或已取消的分片上传事件 这是对一个存储空间的分片上传事件进行的操作
+    //简单列举分片上传事件
+    public static List<Map<String, String>> simpleListMultipartUploads(String bucketName){
+
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 列举分片上传事件。默认列举1000个分片。
+        ListMultipartUploadsRequest listMultipartUploadsRequest = new ListMultipartUploadsRequest(bucketName);
+        MultipartUploadListing multipartUploadListing = ossClient.listMultipartUploads(listMultipartUploadsRequest);
+
+        List<Map<String, String>> list = new ArrayList<>();
+        for (MultipartUpload multipartUpload : multipartUploadListing.getMultipartUploads()) {
+            // 获取uploadId。
+            String uploadId = multipartUpload.getUploadId();
+
+            // 获取文件名称。
+            String key = multipartUpload.getKey();
+
+            // 获取分片上传的初始化时间。
+            String initDate = multipartUpload.getInitiated().toString();
+
+            Map<String, String> map = new HashMap<>();
+            map.put("uploadId",uploadId);
+            map.put("key",key);
+            map.put("initDate",initDate);
+            list.add(map);
+        }
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return list;
+    }
+    //列举全部分片上传事件
+    //大于1000时调用此方法
+    public static List<Map<String, String>> listMultipartUploads(String bucketName){
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 列举分片上传事件。
+        MultipartUploadListing multipartUploadListing;
+        ListMultipartUploadsRequest listMultipartUploadsRequest = new ListMultipartUploadsRequest(bucketName);
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        do {
+            multipartUploadListing = ossClient.listMultipartUploads(listMultipartUploadsRequest);
+
+            for (MultipartUpload multipartUpload : multipartUploadListing.getMultipartUploads()) {
+
+                // 获取uploadId。
+                String uploadId = multipartUpload.getUploadId();
+
+                // 获取文件名称。
+                String key = multipartUpload.getKey();
+
+                // 获取分片上传的初始化时间。
+                String initDate = multipartUpload.getInitiated().toString();
+
+                Map<String, String> map = new HashMap<>();
+                map.put("uploadId",uploadId);
+                map.put("key",key);
+                map.put("initDate",initDate);
+                list.add(map);
+            }
+
+            listMultipartUploadsRequest.setKeyMarker(multipartUploadListing.getNextKeyMarker());
+
+            listMultipartUploadsRequest.setUploadIdMarker(multipartUploadListing.getNextUploadIdMarker());
+        } while (multipartUploadListing.isTruncated());
+
+        // 关闭OSSClient。
+//        System.out.println("111");
+        ossClient.shutdown();
+        return list;
+    }
+
+
+    //分页列举所有上传事件
+    //可以规定每页列举的分片上传事件数目
+
+    public static List<Map<String,String>> listMultipartUploadsByPapper(String bucketName,int maxUploads){
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 列举分片上传事件。
+        MultipartUploadListing multipartUploadListing;
+        ListMultipartUploadsRequest listMultipartUploadsRequest = new ListMultipartUploadsRequest(bucketName);
+        // 设置每页列举的分片上传事件数目。
+        listMultipartUploadsRequest.setMaxUploads(maxUploads);
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        do {
+            multipartUploadListing = ossClient.listMultipartUploads(listMultipartUploadsRequest);
+
+            for (MultipartUpload multipartUpload : multipartUploadListing.getMultipartUploads()) {
+                // 获取uploadId。
+                String uploadId = multipartUpload.getUploadId();
+
+                // 获取文件名称。
+                String key = multipartUpload.getKey();
+
+                // 获取分片上传的初始化时间。
+                String initDate = multipartUpload.getInitiated().toString();
+
+                Map<String, String> map = new HashMap<>();
+                map.put("uploadId",uploadId);
+                map.put("key",key);
+                map.put("initDate",initDate);
+                list.add(map);
+            }
+
+            listMultipartUploadsRequest.setKeyMarker(multipartUploadListing.getNextKeyMarker());
+            listMultipartUploadsRequest.setUploadIdMarker(multipartUploadListing.getNextUploadIdMarker());
+
+        } while (multipartUploadListing.isTruncated());
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+
+        return list;
+    }
+
     public static void main(String[] args) throws Throwable {
         /*
                 byte[] haha = "Naruto come on".getBytes(StandardCharsets.UTF_8);
@@ -518,6 +847,8 @@ public class UpdateController {
         appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
         appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
 */
-    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
+//    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
+//        multipartUpload("xmsx-001","操作系统.pdf","F:\\Download\\[操作系统概念(第7版)].(Operating.System.Concepts).((美)西尔伯查茨).扫描版(ED2000.COM).pdf");
+        listMultipartUploads("xmsx-001");
     }
 }
