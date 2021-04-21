@@ -21,7 +21,7 @@ public class UpdateController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
-
+    //    Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
     //流式上传：上传字符串、上传数组、上传
 
     //上传字符串
@@ -42,38 +42,41 @@ public class UpdateController {
 
             //上传字符串
             ossClient.putObject(putObjectRequest);
-            ossClient.shutdown();
 
             System.out.println(content);
         } catch (OSSException ossException) {
             System.out.println("出错了智障");
             return "false";
         }
-        
-        return "上传字符串成功";
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+        ossClient.shutdown();
+        //返回上传地址
+        return url;
     }
     
     //上传Byte数组
     public static String putBytes(byte[] bytes,String bucketName, String objectPath){
         //输入参数：bytes 需要上传的byte数组
         //        objectPath 存储路径（不包含存储空间名称）
+        // 创建ossClient实例
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
-            //创建ossClient实例
-            OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+
             //填写输入参数
             ossClient.putObject(bucketName, objectPath, new ByteArrayInputStream(bytes));
-            //关闭ossClient
-            ossClient.shutdown();
+
         } catch (OSSException ossException) {
             ossException.printStackTrace();
             return "false";
         }
-//        catch (ClientException e) {
-//            e.printStackTrace();
-//            return "false";
-//        }
 
-        return "上传Byte数组成功";
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+            //关闭ossClient
+        ossClient.shutdown();
+
+        return url;
     }
 
     //上传网络流
@@ -92,8 +95,11 @@ public class UpdateController {
             return "false";
         }
 
+
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
         ossClient.shutdown();
-        return "上传网络流成功";
+        return url;
     }
 
     //上传文件流
@@ -110,8 +116,11 @@ public class UpdateController {
             return "false";
         }
 
+
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
         ossClient.shutdown();
-        return "上传文件流成功！";
+        return url;
     }
 
     //文件上传
@@ -354,6 +363,7 @@ public class UpdateController {
 
     //追加上传（文件）
     //创建
+    //追加上传文件（第一次）
     public static  String appendObjectFileFirst(String bucketName,String objectPath,String contentType,String localPath){
         //contentType 常用值如下
         //纯文本：Content-Type text/plain
@@ -574,17 +584,26 @@ public class UpdateController {
 
     //取消分片上传
     public static String abortMultipartUpload(String bucketName,String objectName,String uploadId){
-        // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        try{
+            // 创建OSSClient实例。
+            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
-        // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
-        AbortMultipartUploadRequest abortMultipartUploadRequest =
-                new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
-        ossClient.abortMultipartUpload(abortMultipartUploadRequest);
+            // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
+            AbortMultipartUploadRequest abortMultipartUploadRequest =
+                    new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
+            ossClient.abortMultipartUpload(abortMultipartUploadRequest);
+            ossClient.shutdown();
+        } catch (OSSException ossException) {
+            ossException.printStackTrace();
+            return "false";
+        } catch (ClientException e) {
+            e.printStackTrace();
+            return "false";
+        }
 
 
         // 关闭OSSClient。
-        ossClient.shutdown();
+
 
         return "success";
     }
@@ -838,17 +857,17 @@ public class UpdateController {
                 putFile("F:\\Temp\\hhh.txt","xmsx-001","123.txt");
         */
 
-/*
-        Map<String, String> map = new HashMap<>();
-        map.put("123", "jsa");
-        formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
-        appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
-        appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
-        appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
-        appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
-*/
-//    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
-//        multipartUpload("xmsx-001","操作系统.pdf","F:\\Download\\[操作系统概念(第7版)].(Operating.System.Concepts).((美)西尔伯查茨).扫描版(ED2000.COM).pdf");
+        /*
+                Map<String, String> map = new HashMap<>();
+                map.put("123", "jsa");
+                formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
+                appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
+                appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
+                appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
+                appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
+        */
+        //    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
+        //        multipartUpload("xmsx-001","操作系统.pdf","F:\\Download\\[操作系统概念(第7版)].(Operating.System.Concepts).((美)西尔伯查茨).扫描版(ED2000.COM).pdf");
         listMultipartUploads("xmsx-001");
     }
 }
