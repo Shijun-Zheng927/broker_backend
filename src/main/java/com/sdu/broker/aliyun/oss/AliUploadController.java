@@ -22,7 +22,7 @@ public class AliUploadController {
     //流式上传：上传字符串、上传数组、上传
 
     //上传字符串
-    public static String putString(String content, String bucketName, String objectPath){
+    public String putString(String content, String bucketName, String objectPath){
         //objectPath:字符串的保存路径，例如： test.txt(不要带存储空间名称）
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);

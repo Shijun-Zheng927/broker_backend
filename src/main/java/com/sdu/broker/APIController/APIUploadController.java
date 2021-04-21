@@ -51,8 +51,8 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = aliUploadController.putString(content, bucketName, objectPath);
-            return s;
+            String result = aliUploadController.putString(content, bucketName, objectPath);
+            return result;
         } else {
             return null;
         }
@@ -80,8 +80,8 @@ public class APIUploadController {
             }
             byte[] bytes;
             bytes = content.getBytes(StandardCharsets.UTF_8);
-            String s = aliUploadController.putBytes(bytes, bucketName, objectPath);
-            return s;
+            String result = aliUploadController.putBytes(bytes, bucketName, objectPath);
+            return result;
         } else {
             return null;
         }
@@ -107,8 +107,8 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = aliUploadController.putStream(inputUrl, bucketName, objectPath);
-            return s;
+            String result = aliUploadController.putStream(inputUrl, bucketName, objectPath);
+            return result;
         } else {
             return null;
         }
@@ -150,7 +150,7 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.putFileStream(path, bucketName, objectPath);
-            return null;
+            return result;
         } else {
             return null;
         }
@@ -192,7 +192,7 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.putFile(path, bucketName, objectPath);
-            return null;
+            return result;
         } else {
             return null;
         }
@@ -220,8 +220,8 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = aliUploadController.appendObjectStreamFirst(bucketName, objectPath, contentType, content);
-            return s;
+            String result = aliUploadController.appendObjectStreamFirst(bucketName, objectPath, contentType, content);
+            return result;
         } else {
             return null;
         }
@@ -250,8 +250,8 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = aliUploadController.appendObjectStream(bucketName, objectPath, contentType, content, givenPosition);
-            return s;
+            String result = aliUploadController.appendObjectStream(bucketName, objectPath, contentType, content, givenPosition);
+            return result;
         } else {
             return null;
         }
@@ -293,7 +293,7 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.appendObjectFileFirst(bucketName, objectPath, contentType, path);
-            return null;
+            return result;
         } else {
             return null;
         }
@@ -337,7 +337,7 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.appendObjectFile(bucketName, objectPath, contentType, path, givenPosition);
-            return null;
+            return result;
         } else {
             return null;
         }
@@ -450,8 +450,8 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = aliUploadController.abortMultipartUpload(bucketName, objectName, uploadId);
-            return s;
+            String result = aliUploadController.abortMultipartUpload(bucketName, objectName, uploadId);
+            return result;
         } else {
             return null;
         }
