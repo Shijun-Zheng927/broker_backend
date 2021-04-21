@@ -27,28 +27,28 @@ public class HuaweiUploadController {
         obsClient.putObject(bucketName, objname, new ByteArrayInputStream(content.getBytes()));
     }
 
-    public int putStream(String s,String bucketName,String objname) {
+    public String putStream(String s,String bucketName,String objname) {
         InputStream inputStream = null;
         try {
             inputStream = new URL(s).openStream();
         } catch (IOException e) {
             e.printStackTrace();
-            return 0;
+            return "fail";
         }
         obsClient.putObject(bucketName, objname, inputStream);
-        return 1;
+        return null;
     }
 
-    public int putFile(String s,String bucketName,String objname) {
+    public String putFile(String s,String bucketName,String objname) {
         FileInputStream fis = null;  // 待上传的本地文件路径，需要指定到具体的文件名
         try {
             fis = new FileInputStream(new File(s));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return 0;
+            return "fail";
         }
         obsClient.putObject(bucketName, objname, fis);
-        return 1;
+        return null;
     }
 
 
