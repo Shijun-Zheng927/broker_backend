@@ -1,6 +1,6 @@
 package com.sdu.broker.APIController;
 
-import com.sdu.broker.aliyun.oss.UpdateController;
+import com.sdu.broker.aliyun.oss.AliUploadController;
 import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
@@ -19,7 +19,7 @@ public class APIUploadController {
     @Autowired
     private BucketService bucketService;
     @Autowired
-    private UpdateController updateController;
+    private AliUploadController aliUploadController;
     @Autowired
     private PlatformService platformService;
 
@@ -43,7 +43,7 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
-            String s = updateController.putString(content, bucketName, objectPath);
+            String s = aliUploadController.putString(content, bucketName, objectPath);
             return s;
         } else {
             return null;

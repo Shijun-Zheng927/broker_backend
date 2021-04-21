@@ -8,16 +8,13 @@ import com.aliyun.oss.model.*;
 import org.springframework.stereotype.Component;
 
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Component
-public class UpdateController {
+public class AliUploadController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
@@ -46,7 +43,7 @@ public class UpdateController {
 
             System.out.println(content);
         } catch (OSSException ossException) {
-            System.out.println("出错了智障");
+            System.out.println("出错了");
             return "false";
         }
         
