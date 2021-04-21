@@ -509,7 +509,7 @@ public class UpdateController {
 
 
     //分片上传
-    public static String multipartUpload(String bucketName,String objectName,String localFilePath ){
+    public static String multipartUpload(String bucketName,String objectName,String localFilePath )  {
 
         //objectName: 上传文件到oss时需要制定包含文件后缀在内的完整路径
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -596,11 +596,7 @@ public class UpdateController {
         } catch (OSSException ossException) {
             ossException.printStackTrace();
             return "false";
-        } catch (ClientException e) {
-            e.printStackTrace();
-            return "false";
         }
-
 
         // 关闭OSSClient。
 
@@ -847,7 +843,7 @@ public class UpdateController {
         return list;
     }
 
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args)  {
         /*
                 byte[] haha = "Naruto come on".getBytes(StandardCharsets.UTF_8);
                 putString("hello onePiece", "xmsx-00o1", "hello.txt");
