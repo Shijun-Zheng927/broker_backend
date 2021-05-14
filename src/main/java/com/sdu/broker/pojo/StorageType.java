@@ -18,7 +18,16 @@ public class StorageType {
     private String designAvailabilitySingle;// 设计可用性（单AZ）
     private String designPersistenceMulti;  // 设计持久性（多AZ）
     private String designAvailabilityMulti; // 设计可用性（多AZ）
+    private String responseTime;            // 响应时间
     private Double huaweiPrice;             // 华为云价格 (/月/GB)
+
+    public String getResponseTime() {
+        return responseTime;
+    }
+
+    public void setResponseTime(String responseTime) {
+        this.responseTime = responseTime;
+    }
 
     public Integer getId() {
         return id;

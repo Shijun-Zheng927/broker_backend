@@ -8,24 +8,21 @@ import com.aliyun.oss.model.*;
 import org.springframework.stereotype.Component;
 
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Component
-public class UpdateController {
+public class AliUploadController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
-
+    //    Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
     //流式上传：上传字符串、上传数组、上传
 
     //上传字符串
-    public static String putString(String content, String bucketName, String objectPath){
+    public String putString(String content, String bucketName, String objectPath){
         //objectPath:字符串的保存路径，例如： test.txt(不要带存储空间名称）
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
@@ -42,42 +39,45 @@ public class UpdateController {
 
             //上传字符串
             ossClient.putObject(putObjectRequest);
-            ossClient.shutdown();
 
             System.out.println(content);
         } catch (OSSException ossException) {
-            System.out.println("出错了智障");
+            System.out.println("出错了");
             return "false";
         }
-        
-        return "上传字符串成功";
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+        ossClient.shutdown();
+        //返回上传地址
+        return url;
     }
     
     //上传Byte数组
-    public static String putBytes(byte[] bytes,String bucketName, String objectPath){
+    public String putBytes(byte[] bytes,String bucketName, String objectPath){
         //输入参数：bytes 需要上传的byte数组
         //        objectPath 存储路径（不包含存储空间名称）
+        // 创建ossClient实例
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
-            //创建ossClient实例
-            OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+
             //填写输入参数
             ossClient.putObject(bucketName, objectPath, new ByteArrayInputStream(bytes));
-            //关闭ossClient
-            ossClient.shutdown();
+
         } catch (OSSException ossException) {
             ossException.printStackTrace();
             return "false";
         }
-//        catch (ClientException e) {
-//            e.printStackTrace();
-//            return "false";
-//        }
 
-        return "上传Byte数组成功";
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+            //关闭ossClient
+        ossClient.shutdown();
+
+        return url;
     }
 
     //上传网络流
-    public static String putStream(String inputUrl, String bucketName, String objectPath){
+    public String putStream(String inputUrl, String bucketName, String objectPath){
         //输入参数：inputUrl  网络流对应的URL地址
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
@@ -92,12 +92,15 @@ public class UpdateController {
             return "false";
         }
 
+
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
         ossClient.shutdown();
-        return "上传网络流成功";
+        return url;
     }
 
     //上传文件流
-    public static String putFileStream(String fileStreamPath, String bucketName, String objectPath){
+    public String putFileStream(String fileStreamPath, String bucketName, String objectPath){
         //输入参数: fileStreamPath 所上传文件流的本地路径 格式如下：F:\\数值计算\\实验一截图1.png
         //注意是双斜线
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -110,12 +113,15 @@ public class UpdateController {
             return "false";
         }
 
+
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
         ossClient.shutdown();
-        return "上传文件流成功！";
+        return url;
     }
 
     //文件上传
-    public static String putFile(String filePath, String bucketName, String objectPath){
+    public String putFile(String filePath, String bucketName, String objectPath){
         //输入参数:filePath:所上传文件在本地的绝对路径
         //格式也是双右斜线\\
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -250,7 +256,7 @@ public class UpdateController {
 
     //追加上传流
     //第一次追加上传（创建一个追加类型的文件）
-    public static  String appendObjectStreamFirst(String bucketName,String objectPath,String contentType,String content){
+    public String appendObjectStreamFirst(String bucketName, String objectPath, String contentType, String content){
         //contentType 常用值如下
         //纯文本：Content-Type text/plain
         // JPG:image/jpeg  gif:image/gif png:image/png  word:application/msword
@@ -354,7 +360,8 @@ public class UpdateController {
 
     //追加上传（文件）
     //创建
-    public static  String appendObjectFileFirst(String bucketName,String objectPath,String contentType,String localPath){
+    //追加上传文件（第一次）
+    public String appendObjectFileFirst(String bucketName,String objectPath,String contentType,String localPath){
         //contentType 常用值如下
         //纯文本：Content-Type text/plain
         // JPG:image/jpeg  gif:image/gif png:image/png  word:application/msword
@@ -400,7 +407,7 @@ public class UpdateController {
 
 
     //追加上传文件
-    public static  String appendObjectFile(String bucketName,String objectPath,String contentType,String localPath,String givenPosition){
+    public String appendObjectFile(String bucketName,String objectPath,String contentType,String localPath,String givenPosition){
 
         OSS ossClient = new OSSClientBuilder().
                 build(endpoint,accessKeyId,accessKeySecret);
@@ -451,7 +458,7 @@ public class UpdateController {
 
     //断点续传上传
 
-    public static String checkPointUpload(String bucketName, String objectPath, String localFilePath, String contentType,int taskNum,int partSize) throws Throwable {
+    public String checkPointUpload(String bucketName, String objectPath, String localFilePath, String contentType,int taskNum,int partSize) {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
 
         ObjectMetadata meta = new ObjectMetadata();
@@ -487,7 +494,11 @@ public class UpdateController {
         //uploadFileRequest.setCallback("yourCallbackEvent");
 
         // 断点续传上传。
-        ossClient.uploadFile(uploadFileRequest);
+        try {
+            ossClient.uploadFile(uploadFileRequest);
+        } catch (Throwable throwable) {
+            return null;
+        }
 
 
         // 关闭OSSClient。
@@ -499,7 +510,7 @@ public class UpdateController {
 
 
     //分片上传
-    public static String multipartUpload(String bucketName,String objectName,String localFilePath ){
+    public String multipartUpload(String bucketName,String objectName,String localFilePath){
 
         //objectName: 上传文件到oss时需要制定包含文件后缀在内的完整路径
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -573,25 +584,30 @@ public class UpdateController {
     }
 
     //取消分片上传
-    public static String abortMultipartUpload(String bucketName,String objectName,String uploadId){
-        // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+    public String abortMultipartUpload(String bucketName,String objectName,String uploadId){
+        try{
+            // 创建OSSClient实例。
+            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
-        // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
-        AbortMultipartUploadRequest abortMultipartUploadRequest =
-                new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
-        ossClient.abortMultipartUpload(abortMultipartUploadRequest);
-
+            // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
+            AbortMultipartUploadRequest abortMultipartUploadRequest =
+                    new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
+            ossClient.abortMultipartUpload(abortMultipartUploadRequest);
+            ossClient.shutdown();
+        } catch (OSSException ossException) {
+            ossException.printStackTrace();
+            return "false";
+        }
 
         // 关闭OSSClient。
-        ossClient.shutdown();
+
 
         return "success";
     }
 
     //列举已上传分片
     //简单列举已上传的分片
-    public static List<Map<String,String>> simpleListParts(String bucketName,String objectName, String uploadId){
+    public List<Map<String,String>> simpleListParts(String bucketName,String objectName, String uploadId){
         //maxParts:每个分页的分片数量
         //marker: 分片的起始位置
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -627,7 +643,7 @@ public class UpdateController {
     }
     //列举所有已上传分片
     //默认情况下，listParts()方法一次只能列举1000个分片，当分片数大于1000时，需要以下方法
-    public static List<Map<String,String>> listPartsAll(String bucketName,String objectName,String uploadId){
+    public List<Map<String,String>> listPartsAll(String bucketName,String objectName,String uploadId){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         // 列举所有已上传的分片。
@@ -665,11 +681,11 @@ public class UpdateController {
     }
 
     //分页列举符合要求的已上传分片
-    public static List<Map<String,String>> listPartsByPaper(String bucketName,String objectName, String uploadId,int maxParts,int marker){
+    public List<Map<String,String>> listPartsByPaper(String bucketName,String objectName, String uploadId,int maxParts,int marker){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         // 列举已上传的分片，其中uploadId来自于InitiateMultipartUpload返回的结果。
-        ListPartsRequest listPartsRequest = new ListPartsRequest("<yourBucketName>", "<yourObjectName>", "<uploadId>");
+        ListPartsRequest listPartsRequest = new ListPartsRequest(bucketName, objectName, uploadId);
         // 设置uploadId。
         //listPartsRequest.setUploadId(uploadId);
         // 设置分页时每一页中分片数量为100个。默认列举1000个分片。
@@ -706,7 +722,7 @@ public class UpdateController {
     }
     //列举分片上传事件 包括已初始化但尚未完成或已取消的分片上传事件 这是对一个存储空间的分片上传事件进行的操作
     //简单列举分片上传事件
-    public static List<Map<String, String>> simpleListMultipartUploads(String bucketName){
+    public List<Map<String, String>> simpleListMultipartUploads(String bucketName){
 
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
@@ -740,7 +756,7 @@ public class UpdateController {
     }
     //列举全部分片上传事件
     //大于1000时调用此方法
-    public static List<Map<String, String>> listMultipartUploads(String bucketName){
+    public List<Map<String, String>> listMultipartUploads(String bucketName){
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
@@ -786,7 +802,7 @@ public class UpdateController {
     //分页列举所有上传事件
     //可以规定每页列举的分片上传事件数目
 
-    public static List<Map<String,String>> listMultipartUploadsByPapper(String bucketName,int maxUploads){
+    public List<Map<String,String>> listMultipartUploadsByPapper(String bucketName,int maxUploads){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         // 列举分片上传事件。
@@ -828,7 +844,7 @@ public class UpdateController {
         return list;
     }
 
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args)  {
         /*
                 byte[] haha = "Naruto come on".getBytes(StandardCharsets.UTF_8);
                 putString("hello onePiece", "xmsx-00o1", "hello.txt");
@@ -838,17 +854,17 @@ public class UpdateController {
                 putFile("F:\\Temp\\hhh.txt","xmsx-001","123.txt");
         */
 
-/*
-        Map<String, String> map = new HashMap<>();
-        map.put("123", "jsa");
-        formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
-        appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
-        appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
-        appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
-        appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
-*/
-//    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
-//        multipartUpload("xmsx-001","操作系统.pdf","F:\\Download\\[操作系统概念(第7版)].(Operating.System.Concepts).((美)西尔伯查茨).扫描版(ED2000.COM).pdf");
-        listMultipartUploads("xmsx-001");
+        /*
+                Map<String, String> map = new HashMap<>();
+                map.put("123", "jsa");
+                formUpload("xmsx-001", map, "F:\\Temp\\hhh.txt");
+                appendObjectStreamFirst("xmsx-001", "append1.txt", "text/plain", "i am the first");
+                appendObjectStream("xmsx-001", "append1.txt", "text/plain", "i am the first", "14");
+                appendObjectFileFirst("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt");
+                appendObjectFile("xmsx-001", "append2.txt", "text/plain", "F:\\Download\\testStream.txt","124223");
+        */
+        //    checkPointUpload("xmsx-001","car.jpg", "C:\\Users\\DELL\\Pictures\\runningcar.jpg","image.jpeg" );
+        //        multipartUpload("xmsx-001","操作系统.pdf","F:\\Download\\[操作系统概念(第7版)].(Operating.System.Concepts).((美)西尔伯查茨).扫描版(ED2000.COM).pdf");
+        //listMultipartUploads("xmsx-001");
     }
 }
