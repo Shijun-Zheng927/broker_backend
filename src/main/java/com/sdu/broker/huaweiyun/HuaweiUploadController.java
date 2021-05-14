@@ -21,10 +21,28 @@ public class HuaweiUploadController {
     private static final String default_bucketLoc  = "cn-north-1";
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
+    //生成url
+    public String getUrl(String bucketName, String objectKey) {
+        TemporarySignatureRequest request = new TemporarySignatureRequest();
+        request.setBucketName("bucketName");
+        request.setObjectKey("objectKey");
+        request.setRequestDate(new Date());
+        // 90天失效
+        request.setExpires(60 * 60 * 24 * 90);
+//        ObsClient obsClient = obsBiz.getObsClient();
+        // 通过临时授权,直接访问链接下载
+        TemporarySignatureResponse signature = obsClient.createTemporarySignature(request);
+        String url = signature.getSignedUrl();
+        System.out.println("url:" + url);
+        return url;
+    }
+
     /* 流式上传 */
-    public void putString(String s,String bucketName,String objname){
+    public String putString(String s,String bucketName,String objname){
         String content = s;
         obsClient.putObject(bucketName, objname, new ByteArrayInputStream(content.getBytes()));
+
+        return getUrl(bucketName, objname);
     }
 
     public String putStream(String s,String bucketName,String objname) {
@@ -36,7 +54,8 @@ public class HuaweiUploadController {
             return "fail";
         }
         obsClient.putObject(bucketName, objname, inputStream);
-        return null;
+
+        return getUrl(bucketName, objname);
     }
 
     public String putFile(String s,String bucketName,String objname) {
@@ -48,7 +67,7 @@ public class HuaweiUploadController {
             return "fail";
         }
         obsClient.putObject(bucketName, objname, fis);
-        return null;
+        return getUrl(bucketName, objname);
     }
 
 
@@ -78,23 +97,24 @@ public class HuaweiUploadController {
     }
 
     /*创建文件夹*/
-    public void createFolder(String pathname,String bucketName){
+    public String createFolder(String pathname,String bucketName){
         final String keySuffixWithSlash = pathname;
         obsClient.putObject(bucketName, keySuffixWithSlash, new ByteArrayInputStream(new byte[0]));
-
+        return "success";
     }
 
     /* 分段上传 */
-    public void InitiateMultipartUpload(String bucketName,String objectKey){
+    public String InitiateMultipartUpload(String bucketName, String objectKey, String contentType){
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, objectKey);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.addUserMetadata("property", "property-value");
-        metadata.setContentType("text/plain");
+        metadata.setContentType(contentType);
         request.setMetadata(metadata);
         InitiateMultipartUploadResult result = obsClient.initiateMultipartUpload(request);
 
         String uploadId = result.getUploadId();
         System.out.println("\t" + uploadId);
+        return uploadId;
     }
     public void uploadPart(String pathname,String bucketName,String objectKey,String uploadId){
 
@@ -149,7 +169,7 @@ public class HuaweiUploadController {
         obsClient.completeMultipartUpload(request);
     }
 
-    public void concurrentMultipartUpload(String pathname,String bucketName,String objectKey){
+    public String concurrentMultipartUpload(String pathname,String bucketName,String objectKey){
         // 初始化线程池
         ExecutorService executorService = Executors.newFixedThreadPool(20);
         final File largeFile = new File(pathname);
@@ -224,20 +244,26 @@ public class HuaweiUploadController {
 // 合并段
         CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketName, objectKey, uploadId, partEtags);
         obsClient.completeMultipartUpload(completeMultipartUploadRequest);
+
+        return uploadId;
     }
 
     /* 取消分段上传 */
-    public void AbortMultipartUpload(String bucketName,String objectKey,String uploadId){
+    public String AbortMultipartUpload(String bucketName,String objectKey,String uploadId){
         AbortMultipartUploadRequest request = new AbortMultipartUploadRequest(bucketName, objectKey, uploadId);
 
         obsClient.abortMultipartUpload(request);
+
+        return "success";
     }
 
     /*列举已经上传的段*/
-    public void ListParts(String bucketName,String objectKey,String uploadId){
+    public List<Map<String,String>> ListParts(String bucketName,String objectKey,String uploadId){
         ListPartsRequest request = new ListPartsRequest(bucketName, objectKey);
         request.setUploadId(uploadId);
         ListPartsResult result = obsClient.listParts(request);
+
+        List<Map<String, String>> list = new ArrayList<>();
 
         for(Multipart part : result.getMultipartList()){
             // 分段号，上传时候指定
@@ -248,7 +274,14 @@ public class HuaweiUploadController {
             System.out.println("\t"+part.getEtag());
             // 段的最后上传时间
             System.out.println("\t"+part.getLastModified());
+
+            Map<String, String> map = new HashMap<>();
+            map.put("partName", part.getPartNumber().toString());
+            map.put("size", part.getSize().toString());
+            map.put("Etag", part.getEtag());
+            map.put("lastModified", part.getLastModified().toString());
         }
+        return list;
     }
 
     /* 追加上传 */
@@ -274,7 +307,7 @@ public class HuaweiUploadController {
     }
 
     /*断点续传*/
-    public void CheckpointUpload(String pathname,String bucketName,String objectKey){
+    public String CheckpointUpload(String pathname,String bucketName,String objectKey){
         UploadFileRequest request = new UploadFileRequest(bucketName, objectKey);
 // 设置待上传的本地文件，localfile为待上传的本地文件路径，需要指定到具体的文件名
         request.setUploadFile(pathname);
@@ -290,6 +323,7 @@ public class HuaweiUploadController {
         }catch (ObsException e) {
             // 发生异常时可再次调用断点续传上传接口进行重新上传
         }
+        return "success";
     }
 
     /*基于表单上传*/
