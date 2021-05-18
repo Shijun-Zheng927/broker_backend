@@ -72,10 +72,11 @@ public class HuaweiUploadController {
     }
 
     /* 文件上传 */
-    public void uploadFile(String pathname,String BucketName,String objectKey) throws ObsException
+    public String uploadFile(String pathname,String BucketName,String objectKey)
     {
         File newfile = new File(pathname);
         obsClient.putObject(BucketName, objectKey, newfile);
+        return "success";
     }
 
     /* 获取上传进度 */
@@ -118,9 +119,11 @@ public class HuaweiUploadController {
     }
 
     /* 上传第一段 */
-    public List<PartEtag> uploadPartFirst(String pathname,String bucketName,String objectKey,String uploadId){
+    public String uploadPartFirst(String pathname,String bucketName,String objectKey,String uploadId){
 
-        List<PartEtag> partEtags = new ArrayList<PartEtag>();
+//        List<PartEtag> partEtags = new ArrayList<PartEtag>();
+        PartEtag partEtag = new PartEtag();
+
         // 上传第一段
         UploadPartRequest request = new UploadPartRequest(bucketName,objectKey );
         // 设置Upload ID
@@ -133,13 +136,13 @@ public class HuaweiUploadController {
         // 设置分段大小
         request.setPartSize(5 * 1024 * 1024L);
         UploadPartResult result = obsClient.uploadPart(request);
-        partEtags.add(new PartEtag(result.getEtag(), result.getPartNumber()));
+        partEtag = new PartEtag(result.getEtag(), result.getPartNumber());
 
-        return partEtags;
+        return partEtag.toString();
     }
 
     /*上传后续段*/
-    public PartEtag uploadParts(int partNum,String pathname,String bucketName,String objectKey,String uploadId){
+    public String uploadParts(int partNum,String pathname,String bucketName,String objectKey,String uploadId){
 
         UploadPartRequest request = new UploadPartRequest(bucketName, objectKey);
         PartEtag partEtag = new PartEtag();
@@ -164,7 +167,7 @@ public class HuaweiUploadController {
 
         UploadPartResult result = obsClient.uploadPart(request);
         partEtag = new PartEtag(result.getEtag(), result.getPartNumber());
-        return partEtag;
+        return partEtag.toString();
     }
     /* 合并分段 */
     public String CompleteMultipartUpload(List<PartEtag> partEtags,String bucketName,String objectKey,String uploadId){
@@ -378,7 +381,7 @@ public class HuaweiUploadController {
     }
 
     /* 第一次追加上传 */
-    public Map<String ,String > appendObjectStreamFirst(String bucketName,String objectKey,String add1){
+    public String appendObjectStreamFirst(String bucketName,String objectKey,String add1){
         AppendObjectRequest request = new AppendObjectRequest();
         request.setBucketName(bucketName);
         request.setObjectKey(objectKey);
@@ -392,11 +395,12 @@ public class HuaweiUploadController {
         Map<String, String> map = new HashMap<>();
         map.put("NextPosition" , String.valueOf(result.getNextPosition()));
         map.put("Etag" , result.getEtag());
-        return map;
+        String str = "NextPosition:" + result.getNextPosition() + "Etag" + result.getEtag();
+        return str;
     }
 
     /* 非第一次追加上传 */
-    public Map<String ,String > appendObjectStream(int position,String bucketName,String objectKey,String add1){
+    public String appendObjectStream(int position,String bucketName,String objectKey,String add1){
         AppendObjectRequest request = new AppendObjectRequest();
         request.setBucketName(bucketName);
         request.setObjectKey(objectKey);
@@ -410,7 +414,8 @@ public class HuaweiUploadController {
         Map<String, String> map = new HashMap<>();
         map.put("NextPosition" , String.valueOf(result.getNextPosition()));
         map.put("Etag" , result.getEtag());
-        return map;
+        String str = "NextPosition:" + result.getNextPosition() + "Etag" + result.getEtag();
+        return str;
     }
 
     /*断点续传*/
