@@ -1,7 +1,10 @@
 package com.sdu.broker.APIController;
 
+import com.obs.services.model.PartEtag;
 import com.sdu.broker.aliyun.oss.AliUploadController;
+import com.sdu.broker.huaweiyun.HuaweiUploadController;
 import com.sdu.broker.pojo.Bucket;
+import com.sdu.broker.pojo.req.CompleteMultipartUpload;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.BucketUtils;
@@ -16,10 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @CrossOrigin
@@ -28,6 +28,8 @@ public class APIUploadController {
     private BucketService bucketService;
     @Autowired
     private AliUploadController aliUploadController;
+    @Autowired
+    private HuaweiUploadController huaweiUploadController;
     @Autowired
     private PlatformService platformService;
 
@@ -54,7 +56,18 @@ public class APIUploadController {
             String result = aliUploadController.putString(content, bucketName, objectPath);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String content = map.get("content");
+            String objectPath = map.get("objectPath");
+            if ("".equals(content) || "".equals(objectPath)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.putString(content, bucketName, objectPath);
+            return result;
         }
     }
 
@@ -110,7 +123,18 @@ public class APIUploadController {
             String result = aliUploadController.putStream(inputUrl, bucketName, objectPath);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String inputUrl = map.get("inputUrl");
+            String objectPath = map.get("objectPath");
+            if ("".equals(inputUrl) || "".equals(objectPath)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.putStream(inputUrl, bucketName, objectPath);
+            return result;
         }
     }
 
@@ -152,7 +176,16 @@ public class APIUploadController {
             String result = aliUploadController.putFileStream(path, bucketName, objectPath);
             return result;
         } else {
-            return null;
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if (objectPath == null || objectPath.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.uploadFile(path, bucketName, objectPath);
+            return result;
         }
     }
 
@@ -181,7 +214,7 @@ public class APIUploadController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(bn);
+//        System.out.println(bn);
         if (platform.equals("ALI")) {
             String bucketName = bn;
             if (verifyBucketName(response, userId, platform, bucketName)) {
@@ -194,7 +227,16 @@ public class APIUploadController {
             String result = aliUploadController.putFile(path, bucketName, objectPath);
             return result;
         } else {
-            return null;
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if ("".equals(objectPath)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.putFile(path, bucketName, objectPath);
+            return result;
         }
     }
 
@@ -223,7 +265,20 @@ public class APIUploadController {
             String result = aliUploadController.appendObjectStreamFirst(bucketName, objectPath, contentType, content);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectPath = map.get("objectPath");
+            String contentType = map.get("contentType");
+            String content = map.get("content");
+            if (objectPath == null || objectPath.equals("") || contentType == null || contentType.equals("")
+                    || content == null || content.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.appendObjectStreamFirst(bucketName, objectPath, content);
+            return result;
         }
     }
 
@@ -253,13 +308,27 @@ public class APIUploadController {
             String result = aliUploadController.appendObjectStream(bucketName, objectPath, contentType, content, givenPosition);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectPath = map.get("objectPath");
+            String contentType = map.get("contentType");
+            String content = map.get("content");
+            String givenPosition = map.get("givenPosition");
+            if (objectPath == null || objectPath.equals("") || contentType == null || contentType.equals("")
+                    || content == null || content.equals("") || givenPosition == null || givenPosition.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.appendObjectStream(Integer.parseInt(givenPosition), bucketName, objectPath,content);
+            return result;
         }
     }
 
     @RequestMapping(value = "/appendObjectFileFirst")
     public String appendObjectFileFirst(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                        @RequestParam("contentType") String contentType,
+                                        @RequestParam("contentType") String contentType, @RequestParam("uploadId") String uploadId,
                           @RequestParam("file") MultipartFile file,
                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
@@ -295,14 +364,23 @@ public class APIUploadController {
             String result = aliUploadController.appendObjectFileFirst(bucketName, objectPath, contentType, path);
             return result;
         } else {
-            return null;
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if ("".equals(objectPath) || "".equals(contentType) || "".equals(uploadId)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.uploadPartFirst(path, bucketName, objectPath, uploadId);
+            return result;
         }
     }
 
     @RequestMapping(value = "/appendObjectFile")
     public String appendObjectFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                        @RequestParam("contentType") String contentType,
-                                   @RequestParam("givenPosition") String givenPosition,
+                                        @RequestParam("contentType") String contentType, @RequestParam("uploadId") String uploadId,
+                                   @RequestParam("givenPosition") String givenPosition, @RequestParam("partNum") String partNum,
                                         @RequestParam("file") MultipartFile file,
                                         @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
@@ -337,6 +415,48 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.appendObjectFile(bucketName, objectPath, contentType, path, givenPosition);
+            return result;
+        } else {
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if ("".equals(objectPath) || "".equals(contentType) || "".equals(uploadId) || "".equals(partNum)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.uploadParts(Integer.parseInt(partNum), path, bucketName, objectPath, uploadId);
+            return result;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/completeMultipartUpload", method = RequestMethod.POST)
+    public String completeMultipartUpload(@RequestBody CompleteMultipartUpload req,
+                                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String bucketName = req.getBucketName();
+        if (verifyBucketName(response, userId, platform, bucketName)) {
+            return null;
+        }
+        if (platform.equals("HUAWEI")) {
+            List<String> etags = req.getEtag();
+            List<Integer> partNumber = req.getPartNumber();
+            if ("".equals(req.getUploadId()) || "".equals(req.getObjectKey()) ||
+                    etags.size() == 0 || partNumber.size() == 0) {
+                response.setStatus(777);
+                return null;
+            }
+            List<PartEtag> partEtags = new ArrayList<>();
+            for (int i = 0; i < etags.size(); i++) {
+                PartEtag p = new PartEtag(etags.get(i), partNumber.get(i));
+                partEtags.add(p);
+            }
+            String result = huaweiUploadController.CompleteMultipartUpload(partEtags, bucketName, req.getObjectKey(), req.getUploadId());
             return result;
         } else {
             return null;
@@ -385,6 +505,42 @@ public class APIUploadController {
                     Integer.parseInt(taskNum), Integer.parseInt(partSize));
             return result;
         } else {
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if (objectPath == null || objectPath.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.CheckpointUpload(path, bucketName, objectPath);
+            return result;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/initiateMultipartUpload", method = RequestMethod.POST)
+    public String initiateMultipartUpload(@RequestBody Map<String, String> map,
+                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        if (platform.equals("HUAWEI")) {
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectPath = map.get("objectPath");
+            String contentType = map.get("contentType");
+            if ("".equals(objectPath) || "".equals(contentType)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.InitiateMultipartUpload(bucketName, objectPath, contentType);
+            return result;
+        } else {
             return null;
         }
     }
@@ -426,7 +582,16 @@ public class APIUploadController {
             String result = aliUploadController.multipartUpload(bucketName, objectName, path);
             return result;
         } else {
-            return null;
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if ("".equals(objectName)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.concurrentMultipartUpload(path, bucketName, objectName);
+            return result;
         }
     }
 
@@ -453,7 +618,18 @@ public class APIUploadController {
             String result = aliUploadController.abortMultipartUpload(bucketName, objectName, uploadId);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectName = map.get("objectName");
+            String uploadId = map.get("uploadId");
+            if (objectName == null || objectName.equals("") || uploadId == null || uploadId.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.AbortMultipartUpload(bucketName, objectName, uploadId);
+            return result;
         }
     }
 
@@ -480,7 +656,18 @@ public class APIUploadController {
             List<Map<String,String>> result = aliUploadController.simpleListParts(bucketName, objectName, uploadId);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectName = map.get("objectName");
+            String uploadId = map.get("uploadId");
+            if (objectName == null || objectName.equals("") || uploadId == null || uploadId.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            List<Map<String,String>> result = huaweiUploadController.simpleListPart(bucketName, objectName, uploadId);
+            return result;
         }
     }
 
@@ -507,7 +694,18 @@ public class APIUploadController {
             List<Map<String,String>> result = aliUploadController.listPartsAll(bucketName, objectName, uploadId);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String objectName = map.get("objectName");
+            String uploadId = map.get("uploadId");
+            if (objectName == null || objectName.equals("") || uploadId == null || uploadId.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            List<Map<String,String>> result = huaweiUploadController.listPartsAll(bucketName, objectName, uploadId);
+            return result;
         }
     }
 
@@ -560,7 +758,12 @@ public class APIUploadController {
             List<Map<String, String>> result = aliUploadController.simpleListMultipartUploads(bucketName);
             return result;
         } else {
-            return null;
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            List<Map<String, String>> result = huaweiUploadController.simpleListMultipartUploads(bucketName);
+            return result;
         }
     }
 
@@ -605,6 +808,42 @@ public class APIUploadController {
                 return null;
             }
             List<Map<String, String>> result = aliUploadController.listMultipartUploadsByPapper(bucketName, Integer.parseInt(maxUploads));
+            return result;
+        } else {
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String maxUploads = map.get("maxUploads");
+            if (maxUploads == null || maxUploads.equals("") || !BucketUtils.isNumber(maxUploads)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<Map<String, String>> result = huaweiUploadController.listMultipartUploadsByPapper(bucketName);
+            return result;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/createFolder", method = RequestMethod.POST)
+    public String createFolder(@RequestBody Map<String, String> map,
+                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        if (platform.equals("HUAWEI")) {
+            String bucketName = map.get("bucketName");
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            String pathname = map.get("pathname");
+            if ("".equals(pathname)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.createFolder(pathname, bucketName);
             return result;
         } else {
             return null;
