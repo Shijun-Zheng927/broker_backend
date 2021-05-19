@@ -14,12 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
-public class AliUploadController {
+public class                 AliUploadController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
     //    Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
-    //流式上传：上传字符串、上传数组、上传
+    //流式上传：上传字符串、上传数组、上传网络流
 
     //上传字符串
     public String putString(String content, String bucketName, String objectPath){
@@ -33,7 +33,7 @@ public class AliUploadController {
              如果需要上传时设置存储类型和访问权限，请参考以下示例代码。
              ObjectMetadata metadata = new ObjectMetadata();
              metadata.setHeader(OSSHeaders.OSS_STORAGE_CLASS, StorageClass.Standard.toString());
-             metadata.setObjectAcl(CannedAccessControlList.Private);
+             metadata.setObjectAc    l(CannedAccessControlList.Private);
              putObjectRequest.setMetadata(metadata);
             */
 
@@ -795,9 +795,9 @@ public class AliUploadController {
         // 关闭OSSClient。
 //        System.out.println("111");
         ossClient.shutdown();
+
         return list;
     }
-
 
     //分页列举所有上传事件
     //可以规定每页列举的分片上传事件数目
