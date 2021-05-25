@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class HuaweiUploadController {
     /* 初始化OBS客户端所需的参数 */
-    private static final String endPoint     = "https://obs.cn-north-4.myhuaweicloud.com";
+    private static final String endPoint     = "https://obs.cn-north-1.myhuaweicloud.com";
     private static final String ak           = "XR4PD1I3LLF52K1KDRRG";
     private static final String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
     private static final String default_bucketLoc  = "cn-north-4";
@@ -80,9 +80,10 @@ public class HuaweiUploadController {
     }
 
     /* 获取上传进度 */
-    public void status(String pathname,String bucketName,String objectKey){
+    public Map<String,String> status(String pathname,String bucketName,String objectKey){
         PutObjectRequest request = new PutObjectRequest(bucketName, objectKey);
         request.setFile(new File(pathname));
+        Map<String,String> map = new HashMap<>();
         request.setProgressListener(new ProgressListener() {
             @Override
             public void progressChanged(ProgressStatus status) {
@@ -90,11 +91,13 @@ public class HuaweiUploadController {
                 System.out.println("AverageSpeed:" + status.getAverageSpeed());
                 // 获取上传进度百分比
                 System.out.println("TransferPercentage:" + status.getTransferPercentage());
+                map.put(String.format("%.3f",status.getAverageSpeed()),String.format("%.3f",status.getTransferPercentage()));
             }
         });
 // 每上传1MB数据反馈上传进度
         request.setProgressInterval(1024 * 1024L);
         obsClient.putObject(request);
+        return map;
     }
 
     /*创建文件夹*/
@@ -169,6 +172,7 @@ public class HuaweiUploadController {
         partEtag = new PartEtag(result.getEtag(), result.getPartNumber());
         return partEtag.toString();
     }
+
     /* 合并分段 */
     public String CompleteMultipartUpload(List<PartEtag> partEtags,String bucketName,String objectKey,String uploadId){
         CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(bucketName, objectKey, uploadId, partEtags);

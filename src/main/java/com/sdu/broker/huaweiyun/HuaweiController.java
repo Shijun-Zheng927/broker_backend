@@ -260,10 +260,6 @@ public class HuaweiController {
         return storagePolicy.getBucketStorageClass().toString();
     }
 
-
-
-
-
     /* 列举对象（文件）的信息 */
     public static void listFile(String BucketName) throws ObsException
     {
@@ -274,7 +270,6 @@ public class HuaweiController {
             System.out.println("--:"+obj.getObjectKey()+" (size=" + obj.getMetadata().getContentLength()+")");
         }
     }
-
 
     /* 删除对象 */
     public static void deleteObject(String BucketName,String objectKey)
@@ -290,30 +285,6 @@ public class HuaweiController {
         }
         else{
             System.out.println("object : "+ objectKey + "not found");
-        }
-    }
-
-
-    /* 下载文件 */
-    public static void getFile(String BucketName,String objectKey,String downloadPath) throws IOException {
-        System.out.println("now downloading file");
-        ObsObject object = null;
-        boolean exist = obsClient.doesObjectExist(BucketName, objectKey);
-        if (exist) {
-            object = obsClient.getObject(BucketName, objectKey);
-        }
-        if (object != null) {
-            InputStream is = object.getObjectContent();
-            FileOutputStream fos = new FileOutputStream(new File(downloadPath));
-            byte[] bytes = new byte[1024];
-            int len = 0;
-            while ((len = is.read(bytes)) != -1) {
-                fos.write(bytes, 0, len);
-            }
-            System.out.println("download success!");
-            is.close();
-            fos.close();
-            return;
         }
     }
 
