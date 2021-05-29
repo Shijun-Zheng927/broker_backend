@@ -16,7 +16,7 @@ public class HuaweiDownloadController {
     private static final String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
-    //生成下载请求
+    //生成获取请求
     public GetObjectRequest request(String bucketName,String objectKey){
         GetObjectRequest request = new GetObjectRequest(bucketName, objectKey);
         return request;
@@ -153,5 +153,67 @@ public class HuaweiDownloadController {
         replaceMetadata.setContentEncoding(c);
         request.setReplaceMetadata(replaceMetadata);
         return "success";
+    }
+
+    /* 获取对象自定义元数据 */
+    public String getMetadata(GetObjectRequest request,String property){
+        ObsObject obsObject = obsClient.getObject(request);
+        return String.valueOf(obsObject.getMetadata().getUserMetadata(property));
+    }
+
+    /* 取回归档存储对象 */
+    public String getRestoreObject(String bucketName,String objectKey,int restoreTierEnum,int time){
+        try {
+            RestoreObjectRequest request = new RestoreObjectRequest();
+            request.setBucketName(bucketName);
+            request.setObjectKey(objectKey);
+            request.setDays(time);
+            if (restoreTierEnum == 0) {
+                request.setRestoreTier(RestoreTierEnum.EXPEDITED);
+            }
+            if (restoreTierEnum == 1) {
+                request.setRestoreTier(RestoreTierEnum.STANDARD);
+            }
+            obsClient.restoreObject(request);
+        }catch (ObsException e){
+            return "restore failed";
+        }
+        return "success";
+    }
+
+    /* 断点续传下载 */
+    public String checkpointDownload(String bucketName,String objectKey,String localfile){
+        DownloadFileRequest request = new DownloadFileRequest(bucketName, objectKey);
+        // 设置下载对象的本地文件路径
+        request.setDownloadFile(localfile);
+        // 设置分段下载时的最大并发数
+        request.setTaskNum(5);
+        // 设置分段大小为10MB
+        request.setPartSize(10 * 1024 * 1024);
+        // 开启断点续传模式
+        request.setEnableCheckpoint(true);
+        try{
+            // 进行断点续传下载
+            DownloadFileResult result = obsClient.downloadFile(request);
+        }catch (ObsException e) {
+            // 发生异常时可再次调用断点续传下载接口进行重新下载
+            return "download failed";
+        }
+        return "success";
+    }
+
+    /* 关闭客户端 */
+    public static void closeObsClient()
+    {
+        try
+        {
+            obsClient.close();
+            System.out.println("close obs client success");
+        }
+        catch (IOException e)
+        {
+            System.out.println("close obs client error.");
+        }
+
     }
 }
