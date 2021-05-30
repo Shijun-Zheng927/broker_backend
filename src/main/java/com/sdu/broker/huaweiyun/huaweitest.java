@@ -10,14 +10,18 @@ import java.util.Map;
 
 public class huaweitest  {
     public static void main(String [] args){
-//        HuaweiController hwc = new HuaweiController();
-//        String bucketname = "brokertest-demo";
-//        String bucketname1 = "brokertest-demo5";
-//        String pathname1 = "D:\\ ProjectTraining\\brokertest.txt";
-//        String objectKey = "test5";
-//        String objectKey1 = "test.mp4";
-//        String downloadPath = "D:\\ ProjectTraining\\download\\download2.txt";
-//
+        HuaweiController hwc = new HuaweiController();
+        String bucketname = "brokertest-demo";
+        String bucketname1 = "brokertest-demo5";
+        String pathname1 = "D:\\ ProjectTraining\\brokertest.txt";
+        String objectKey = "test5";
+        String objectKey1 = "test.mp4";
+        String pathname = "";
+        String downloadPath = "D:\\ ProjectTraining\\download\\download3.txt";
+        HuaweiDownloadController h = new HuaweiDownloadController();
+        GetObjectRequest r = h.request(bucketname,objectKey);
+        h.rangeDownload(r,pathname,0,1000);
+        hwc.listFile(bucketname);
 //        HuaweiDownloadController hdc = new HuaweiDownloadController();
 //        GetObjectRequest request = hdc.request(bucketname,objectKey);
 //        String s = hdc.streamDownload(request);
