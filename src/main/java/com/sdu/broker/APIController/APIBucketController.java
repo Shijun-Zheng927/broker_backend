@@ -49,6 +49,12 @@ public class APIBucketController {
                 response.setStatus(777);
                 return null;
             }
+
+            Integer haveName = bucketService.haveName(bucketName);
+            if (haveName == null) {
+                return "already have bucket";
+            }
+
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null && !bucketName.equals("")) {
                 result = bucketController.createBucket(BucketUtils.addPrefix(bucketName), Integer.parseInt(storageClass) + 1,
@@ -77,6 +83,12 @@ public class APIBucketController {
                 response.setStatus(777);
                 return null;
             }
+
+            Integer haveName = bucketService.haveName(bucketName);
+            if (haveName == null) {
+                return "already have bucket";
+            }
+
             int result;
             if (BucketUtils.regex(0, 4, rwPolicy) && BucketUtils.regex(0, 2, storageClass)) {
                 result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy), Integer.parseInt(storageClass));

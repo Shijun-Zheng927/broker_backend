@@ -23,4 +23,7 @@ public interface BucketMapper {
 
     @Select("select platform from bucket where name = #{name}")
     String getPlatform(String name);
+
+    @Select("select id from bucket where name = #{name}")
+    Integer haveName(String name);
 }

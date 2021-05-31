@@ -10,6 +10,15 @@ public class History {
     private Integer type;
     private String bucketName;
     private String platform;
+    private String ud;
+
+    public String getUd() {
+        return ud;
+    }
+
+    public void setUd(String ud) {
+        this.ud = ud;
+    }
 
     public String getBucketName() {
         return bucketName;

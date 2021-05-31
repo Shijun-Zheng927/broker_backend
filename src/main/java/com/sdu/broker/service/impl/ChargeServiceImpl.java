@@ -25,7 +25,7 @@ public class ChargeServiceImpl implements ChargeService {
     private AccountMapper accountMapper;
 
     @Override
-    public Integer operate(String bucketName, double size, String url, Integer user) {
+    public Integer operate(String bucketName, double size, String url, Integer user, String ud) {
         Integer type = bucketMapper.getType(bucketName);
         String platform = bucketMapper.getPlatform(bucketName);
         Price p = new Price();
@@ -41,9 +41,10 @@ public class ChargeServiceImpl implements ChargeService {
         h.setBucketName(bucketName);
         h.setPlatform(bucketMapper.getPlatform(bucketName));
         Date today=new Date();
-        SimpleDateFormat f=new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
+        SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time=f.format(today);
         h.setTime(time);
+        h.setUd(ud);
         historyMapper.addHistory(h);
 
         Double money = accountMapper.getAccount(user);

@@ -60,7 +60,7 @@ public class APIUploadController {
             String result = aliUploadController.putString(content, bucketName, objectPath);
 
             double stringSize = FileUtils.getStringSize(content);
-            chargeService.operate(bucketName, stringSize, "/putString", userId);
+            chargeService.operate(bucketName, stringSize, "/putString", userId, "upload");
 
             return result;
         } else {
@@ -77,7 +77,7 @@ public class APIUploadController {
             String result = huaweiUploadController.putString(content, bucketName, objectPath);
 
             double stringSize = FileUtils.getStringSize(content);
-            chargeService.operate(bucketName, stringSize, "/putString", userId);
+            chargeService.operate(bucketName, stringSize, "/putString", userId, "upload");
 
             return result;
         }

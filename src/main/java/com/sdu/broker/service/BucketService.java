@@ -10,4 +10,6 @@ public interface BucketService {
     Integer addBucket(Bucket bucket);
 
     Integer deleteBucket(Bucket bucket);
+
+    Integer haveName(String name);
 }
