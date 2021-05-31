@@ -5,6 +5,7 @@ public class Bucket {
     private Integer userId;
     private String platform;
     private String name;
+    private Integer type;
 
     public Bucket() {
     }
@@ -18,6 +19,14 @@ public class Bucket {
         this.userId = userId;
         this.platform = platform;
         this.name = name;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Integer getId() {

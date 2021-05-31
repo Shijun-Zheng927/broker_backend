@@ -51,7 +51,7 @@ public class APIBucketController {
             }
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null && !bucketName.equals("")) {
-                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName), Integer.parseInt(storageClass),
+                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName), Integer.parseInt(storageClass) + 1,
                         Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
             } else {
                 response.setStatus(777);
@@ -62,6 +62,7 @@ public class APIBucketController {
                 bucket.setName(bucketName);
                 bucket.setUserId(userId);
                 bucket.setPlatform(platform);
+                bucket.setType(Integer.parseInt(storageClass));
                 bucketService.addBucket(bucket);
                 return "success";
             } else {
