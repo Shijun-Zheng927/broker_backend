@@ -7,6 +7,9 @@ import com.obs.services.model.GrantAndPermission;
 import com.obs.services.model.GroupGrantee;
 import com.obs.services.model.Permission;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HuaweiBuckectLoggingController {
     /* 初始化OBS客户端所需的参数 */
     private static final String endPoint     = "https://obs.cn-north-1.myhuaweicloud.com";
@@ -50,6 +53,27 @@ public class HuaweiBuckectLoggingController {
             obsClient.setBucketLogging(bucketName, config);
         }catch (ObsException e){
             return "obsException";
+        }
+        return "success";
+    }
+
+    /* 查看桶日志配置 */
+    public Map<String,String> getBucketLogging(String bucketName){
+        BucketLoggingConfiguration config = obsClient.getBucketLogging(bucketName);
+        Map<String,String> map = new HashMap<>();
+        map.put(config.getTargetBucketName(),config.getLogfilePrefix());
+        System.out.println("\t" + config.getTargetBucketName());
+        System.out.println("\t" + config.getLogfilePrefix());
+        return map;
+    }
+
+    /* 关闭桶日志 */
+    public String shutdownBucketLogging(String bucketName){
+        // 对桶设置空的日志配置
+        try{
+            obsClient.setBucketLogging(bucketName, new BucketLoggingConfiguration());
+        }catch (ObsException e ){
+            return "failed";
         }
         return "success";
     }
