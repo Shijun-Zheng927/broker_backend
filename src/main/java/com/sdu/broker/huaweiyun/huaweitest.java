@@ -18,10 +18,10 @@ public class huaweitest  {
         String objectKey1 = "test.mp4";
         String pathname = "";
         String downloadPath = "D:\\ ProjectTraining\\download\\download3.txt";
-        HuaweiDownloadController h = new HuaweiDownloadController();
-        GetObjectRequest r = h.request(bucketname,objectKey);
-        h.rangeDownload(r,pathname,0,1000);
-        hwc.listFile(bucketname);
+//        HuaweiDownloadController h = new HuaweiDownloadController();
+//        GetObjectRequest r = h.newObjectRequest(bucketname,objectKey);
+//        h.rangeDownload(r,pathname,0,1000);
+//        hwc.listFile(bucketname);
 //        HuaweiDownloadController hdc = new HuaweiDownloadController();
 //        GetObjectRequest request = hdc.request(bucketname,objectKey);
 //        String s = hdc.streamDownload(request);
