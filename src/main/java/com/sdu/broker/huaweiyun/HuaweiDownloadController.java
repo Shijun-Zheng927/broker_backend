@@ -16,8 +16,8 @@ public class HuaweiDownloadController {
     private static final String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
-    //生成获取请求
-    public GetObjectRequest request(String bucketName,String objectKey){
+    //新建获取请求
+    public GetObjectRequest newObjectRequest(String bucketName,String objectKey){
         GetObjectRequest request = new GetObjectRequest(bucketName, objectKey);
         return request;
     }
@@ -101,57 +101,131 @@ public class HuaweiDownloadController {
 
     //限定条件下载
     public String setIfModifiedSince(GetObjectRequest request, Date date){
-        request.setIfModifiedSince(date);
+        try {
+            request.setIfModifiedSince(date);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
-    public String setIfUnModifiedSince(GetObjectRequest request, Date date){
-        request.setIfUnmodifiedSince(date);
-        return "success";
-    }
-    public String setIfMatchTag(GetObjectRequest request, PartEtag etag){
-        request.setIfMatchTag(etag.getEtag());
-        return "success";
-    }
-    public String setIfNoneMatchTag(GetObjectRequest request, PartEtag etag){
-        request.setIfNoneMatchTag(etag.getEtag());
+    public String setIfModifiedSince(DownloadFileRequest request, Date date){
+        try {
+            request.setIfModifiedSince(date);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
 
+    public String setIfUnModifiedSince(GetObjectRequest request, Date date){
+        try {
+        request.setIfUnmodifiedSince(date);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
+    public String setIfUnModifiedSince(DownloadFileRequest request, Date date){
+        try {
+            request.setIfUnmodifiedSince(date);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
+
+    public String setIfMatchTag(GetObjectRequest request, String etag){
+        try {
+            request.setIfMatchTag(etag);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
+    public String setIfMatchTag(DownloadFileRequest request, String etag){
+        try {
+            request.setIfMatchTag(etag);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
+
+    public String setIfNoneMatchTag(GetObjectRequest request, String etag){
+        try {
+            request.setIfNoneMatchTag(etag);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
+    public String setIfNoneMatchTag(DownloadFileRequest request, String etag){
+        try {
+            request.setIfNoneMatchTag(etag);
+        }catch (ObsException e){
+            return "false";
+        }
+        return "success";
+    }
     //重写HTTP/HTTPS响应头信息
     public String setContentType(GetObjectRequest request,String c){
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentType(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
-    public String setContentLanguage(GetObjectRequest request,String c){
+    public String setContentLanguage(GetObjectRequest request,String c) {
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentLanguage(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
     public String setExpires(GetObjectRequest request,String c){
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setExpires(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
     public String setCacheControl(GetObjectRequest request,String c){
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setCacheControl(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
     public String setContentDisposition(GetObjectRequest request,String c){
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentDisposition(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
     public String setContentEncoding(GetObjectRequest request,String c){
+        try{
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentEncoding(c);
         request.setReplaceMetadata(replaceMetadata);
+        }catch (ObsException e){
+            return "false";
+        }
         return "success";
     }
 
@@ -181,11 +255,16 @@ public class HuaweiDownloadController {
         return "success";
     }
 
-    /* 断点续传下载 */
-    public String checkpointDownload(String bucketName,String objectKey,String localfile){
+    /* 新建断点续传下载请求 */
+    public DownloadFileRequest newDownloadRequest(String bucketName,String objectKey,String localfile){
         DownloadFileRequest request = new DownloadFileRequest(bucketName, objectKey);
-        // 设置下载对象的本地文件路径
         request.setDownloadFile(localfile);
+        return request;
+    }
+    /* 断点续传下载 */
+    public String checkpointDownload(DownloadFileRequest request){
+        // 设置下载对象的本地文件路径
+
         // 设置分段下载时的最大并发数
         request.setTaskNum(5);
         // 设置分段大小为10MB
@@ -199,7 +278,7 @@ public class HuaweiDownloadController {
             // 发生异常时可再次调用断点续传下载接口进行重新下载
             return "download failed";
         }
-        return "success";
+        return request.getDownloadFile();
     }
 
     /* 关闭客户端 */

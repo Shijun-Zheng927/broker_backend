@@ -6,6 +6,7 @@ import com.obs.services.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HuaweiObjectController {
     /* 初始化OBS客户端所需的参数 */
@@ -13,6 +14,7 @@ public class HuaweiObjectController {
     private static final String ak           = "XR4PD1I3LLF52K1KDRRG";
     private static final String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
+    public static ObjectMetadata newObjectMetadata = new ObjectMetadata();
 
     /* 设置对象属性 */
     /* 新建设置属性请求 */
@@ -132,10 +134,16 @@ public class HuaweiObjectController {
     }
 
     /* 复制对象 */
+    /* 新建复制请求 */
+    public CopyObjectRequest newCopyRequest(String sourceBucketName,String sourceObjectName,String destBucketName,String destObjectName){
+        CopyObjectRequest request = new CopyObjectRequest(sourceBucketName,sourceObjectName,destBucketName,destObjectName);
+        request.setReplaceMetadata(false);
+        return request;
+    }
     /* 简单复制 */
-    public String copyObject(String sourceBucketName,String sourceObjectName,String destBucketName,String destObjectName){
+    public String copyObject(CopyObjectRequest request){
         try{
-            CopyObjectResult result = obsClient.copyObject(sourceBucketName, sourceObjectName, destBucketName,destObjectName);
+            CopyObjectResult result = obsClient.copyObject(request);
 
             System.out.println("\t" + result.getStatusCode());
             System.out.println("\t" + result.getEtag());
@@ -144,14 +152,49 @@ public class HuaweiObjectController {
         catch (ObsException e)
         {
             // 复制失败
-            System.out.println("HTTP Code: " + e.getResponseCode());
-            System.out.println("Error Code:" + e.getErrorCode());
-            System.out.println("Error Message: " + e.getErrorMessage());
-
-            System.out.println("Request ID:" + e.getErrorRequestId());
-            System.out.println("Host ID:" + e.getErrorHostId());
+//            System.out.println("HTTP Code: " + e.getResponseCode());
+//            System.out.println("Error Code:" + e.getErrorCode());
+//            System.out.println("Error Message: " + e.getErrorMessage());
+//
+//            System.out.println("Request ID:" + e.getErrorRequestId());
+//            System.out.println("Host ID:" + e.getErrorHostId());
             return "copy failed";
         }
     }
+
+    /* 复制时重写对象属性 */
+    //重写类型
+    public String resetContentType(CopyObjectRequest request,String type){
+        request.setReplaceMetadata(true);
+        newObjectMetadata.setContentType(type);
+        return "success";
+    }
+    //重写自定义元数据
+    public String resetUserMetadata(CopyObjectRequest request,String property,String propertyValue){
+        request.setReplaceMetadata(true);
+        newObjectMetadata.addUserMetadata(property,propertyValue);
+        return "success";
+    }
+    //重写存储类型
+    public String resetContentType(CopyObjectRequest request,int type){
+        request.setReplaceMetadata(true);
+        switch (type){
+            case 0:
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.STANDARD);}
+            case 1:
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.COLD);}
+            case 2:
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.WARM);}
+        }
+        return "success";
+    }
+    //重写属性后的复制
+    public String resetCopyObject(CopyObjectRequest request){
+        request.setNewObjectMetadata(newObjectMetadata);
+        newObjectMetadata = new ObjectMetadata();
+        copyObject(request);
+        return "success";
+    }
+
 
 }
