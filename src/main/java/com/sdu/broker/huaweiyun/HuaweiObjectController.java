@@ -5,6 +5,7 @@ import com.obs.services.exception.ObsException;
 import com.obs.services.model.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,15 +26,21 @@ public class HuaweiObjectController {
 
     /* 设置对象HTTP头域 */
     public String setHttp(SetObjectMetadataRequest request,String contentType,String expires){
-        request.setContentType("ContentType");
-        request.setExpires("Expires");
-        obsClient.setObjectMetadata(request);
+        try {
+            request.setContentType(contentType);
+            request.setExpires(expires);
+            obsClient.setObjectMetadata(request);
+        }catch (ObsException e ){
+
+        }
+
         return "success";
     }
 
     /* 设置自定义元数据 */
     public String addUserMetadata(SetObjectMetadataRequest request,String property,String propertyValue){
         request.addUserMetadata(property, propertyValue);
+        obsClient.setObjectMetadata(request);
         return "success";
     }
 
@@ -162,21 +169,22 @@ public class HuaweiObjectController {
         }
     }
 
+
     /* 复制时重写对象属性 */
     //重写类型
-    public String resetContentType(CopyObjectRequest request,String type){
+    public CopyObjectRequest resetContentType(CopyObjectRequest request,String type){
         request.setReplaceMetadata(true);
         newObjectMetadata.setContentType(type);
-        return "success";
+        return request;
     }
     //重写自定义元数据
-    public String resetUserMetadata(CopyObjectRequest request,String property,String propertyValue){
+    public CopyObjectRequest resetUserMetadata(CopyObjectRequest request,String property,String propertyValue){
         request.setReplaceMetadata(true);
         newObjectMetadata.addUserMetadata(property,propertyValue);
-        return "success";
+        return request;
     }
     //重写存储类型
-    public String resetContentType(CopyObjectRequest request,int type){
+    public CopyObjectRequest resetContentType(CopyObjectRequest request,int type){
         request.setReplaceMetadata(true);
         switch (type){
             case 0:
@@ -186,15 +194,56 @@ public class HuaweiObjectController {
             case 2:
             {newObjectMetadata.setObjectStorageClass(StorageClassEnum.WARM);}
         }
-        return "success";
+        return request;
     }
     //重写属性后的复制
-    public String resetCopyObject(CopyObjectRequest request){
+    public CopyObjectRequest resetCopyObject(CopyObjectRequest request){
         request.setNewObjectMetadata(newObjectMetadata);
         newObjectMetadata = new ObjectMetadata();
         copyObject(request);
-        return "success";
+        return request;
     }
+
+    /* 限定条件复制 */
+    public CopyObjectRequest  setIfModifiedSince(CopyObjectRequest request, Date date){
+        request.setIfModifiedSince(date);
+        return request;
+    }
+    public CopyObjectRequest  setIfUnModifiedSince(CopyObjectRequest request, Date date){
+        request.setIfUnmodifiedSince(date);
+        return request;
+    }
+    public CopyObjectRequest  setIfMatchTag(CopyObjectRequest request,String etag){
+        request.setIfMatchTag(etag);
+        return request;
+    }
+    public CopyObjectRequest  setIfNoneMatchTag(CopyObjectRequest request,String etag){
+        request.setIfNoneMatchTag(etag);
+        return request;
+    }
+
+    /* 重写对象访问权限 */
+    public CopyObjectRequest setAcl(CopyObjectRequest request,int acl){
+        switch (acl){
+            case 0:{
+                request.setAcl(AccessControlList.REST_CANNED_PRIVATE);
+            }
+            case 1:{
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
+            }
+            case 2:{
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_DELIVERED);
+            }
+            case 3:{
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE);
+            }
+            case 4:{
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE_DELIVERED);
+            }
+        }
+        return request;
+    }
+
 
 
 }

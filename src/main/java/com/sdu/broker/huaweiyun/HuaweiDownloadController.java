@@ -100,133 +100,77 @@ public class HuaweiDownloadController {
     */
 
     //限定条件下载
-    public String setIfModifiedSince(GetObjectRequest request, Date date){
-        try {
-            request.setIfModifiedSince(date);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public GetObjectRequest setIfModifiedSince(GetObjectRequest request, Date date){
+        request.setIfModifiedSince(date);
+        return request;
     }
-    public String setIfModifiedSince(DownloadFileRequest request, Date date){
-        try {
-            request.setIfModifiedSince(date);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public DownloadFileRequest setIfModifiedSince(DownloadFileRequest request, Date date){
+        request.setIfModifiedSince(date);
+        return request;
     }
 
-    public String setIfUnModifiedSince(GetObjectRequest request, Date date){
-        try {
+    public GetObjectRequest setIfUnModifiedSince(GetObjectRequest request, Date date){
         request.setIfUnmodifiedSince(date);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setIfUnModifiedSince(DownloadFileRequest request, Date date){
-        try {
-            request.setIfUnmodifiedSince(date);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public DownloadFileRequest setIfUnModifiedSince(DownloadFileRequest request, Date date){
+        request.setIfUnmodifiedSince(date);
+        return request;
     }
 
-    public String setIfMatchTag(GetObjectRequest request, String etag){
-        try {
-            request.setIfMatchTag(etag);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public GetObjectRequest setIfMatchTag(GetObjectRequest request, String etag){
+        request.setIfMatchTag(etag);
+        return request;
     }
-    public String setIfMatchTag(DownloadFileRequest request, String etag){
-        try {
-            request.setIfMatchTag(etag);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public DownloadFileRequest setIfMatchTag(DownloadFileRequest request, String etag){
+        request.setIfMatchTag(etag);
+        return request;
     }
 
-    public String setIfNoneMatchTag(GetObjectRequest request, String etag){
-        try {
-            request.setIfNoneMatchTag(etag);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public GetObjectRequest setIfNoneMatchTag(GetObjectRequest request, String etag){
+        request.setIfNoneMatchTag(etag);
+        return request;
     }
-    public String setIfNoneMatchTag(DownloadFileRequest request, String etag){
-        try {
-            request.setIfNoneMatchTag(etag);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+    public DownloadFileRequest setIfNoneMatchTag(DownloadFileRequest request, String etag){
+        request.setIfNoneMatchTag(etag);
+        return request;
     }
     //重写HTTP/HTTPS响应头信息
-    public String setContentType(GetObjectRequest request,String c){
-        try{
+    public GetObjectRequest setContentType(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentType(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setContentLanguage(GetObjectRequest request,String c) {
-        try{
+    public GetObjectRequest setContentLanguage(GetObjectRequest request,String c) {
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentLanguage(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setExpires(GetObjectRequest request,String c){
-        try{
+    public GetObjectRequest setExpires(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setExpires(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setCacheControl(GetObjectRequest request,String c){
-        try{
+    public GetObjectRequest setCacheControl(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setCacheControl(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setContentDisposition(GetObjectRequest request,String c){
-        try{
+    public GetObjectRequest setContentDisposition(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentDisposition(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
-    public String setContentEncoding(GetObjectRequest request,String c){
-        try{
+    public GetObjectRequest setContentEncoding(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentEncoding(c);
         request.setReplaceMetadata(replaceMetadata);
-        }catch (ObsException e){
-            return "false";
-        }
-        return "success";
+        return request;
     }
 
     /* 获取对象自定义元数据 */
