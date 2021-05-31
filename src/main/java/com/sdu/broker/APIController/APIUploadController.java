@@ -6,8 +6,10 @@ import com.sdu.broker.huaweiyun.HuaweiUploadController;
 import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.pojo.req.CompleteMultipartUpload;
 import com.sdu.broker.service.BucketService;
+import com.sdu.broker.service.ChargeService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.BucketUtils;
+import com.sdu.broker.utils.FileUtils;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,8 @@ public class APIUploadController {
     private HuaweiUploadController huaweiUploadController;
     @Autowired
     private PlatformService platformService;
+    @Autowired
+    private ChargeService chargeService;
 
     @ResponseBody
     @RequestMapping(value = "/putString", method = RequestMethod.POST)
@@ -54,6 +58,10 @@ public class APIUploadController {
                 return null;
             }
             String result = aliUploadController.putString(content, bucketName, objectPath);
+
+            double stringSize = FileUtils.getStringSize(content);
+            chargeService.operate(bucketName, stringSize, "/putString", userId);
+
             return result;
         } else {
             String bucketName = map.get("bucketName");
@@ -67,6 +75,10 @@ public class APIUploadController {
                 return null;
             }
             String result = huaweiUploadController.putString(content, bucketName, objectPath);
+
+            double stringSize = FileUtils.getStringSize(content);
+            chargeService.operate(bucketName, stringSize, "/putString", userId);
+
             return result;
         }
     }

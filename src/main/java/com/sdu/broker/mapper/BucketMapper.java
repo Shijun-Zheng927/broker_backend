@@ -17,4 +17,10 @@ public interface BucketMapper {
 
     @Delete("delete from bucket where platform = #{platform} and name = #{name}")
     Integer deleteBucket(Bucket bucket);
+
+    @Select("select type from bucket where name = #{name}")
+    Integer getType(String name);
+
+    @Select("select platform from bucket where name = #{name}")
+    String getPlatform(String name);
 }
