@@ -19,7 +19,7 @@ public class huaweitest  {
         String pathname = "";
         String downloadPath = "D:\\ ProjectTraining\\download\\download3.txt";
         HuaweiDownloadController h = new HuaweiDownloadController();
-        GetObjectRequest r = h.request(bucketname,objectKey);
+        GetObjectRequest r = h.newObjectRequest(bucketname,objectKey);
         h.rangeDownload(r,pathname,0,1000);
         hwc.listFile(bucketname);
 //        HuaweiDownloadController hdc = new HuaweiDownloadController();
