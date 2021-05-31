@@ -37,22 +37,27 @@ public class HuaweiController {
             case 0:{
                 //私有读写
                 obsBucket.setAcl(AccessControlList.REST_CANNED_PRIVATE);
+                break;
             }
             case 1:{
                 //公共读私有写
                 obsBucket.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
+                break;
             }
             case 2:{
                 //桶公共读，桶内对象公共读
                 obsBucket.setAcl(AccessControlList.	REST_CANNED_PUBLIC_READ_DELIVERED);
+                break;
             }
             case 3:{
                 //公共读写
                 obsBucket.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE);
+                break;
             }
             case 4:{
                 //桶公共读写，桶内对象公共读写
                 obsBucket.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE_DELIVERED);
+                break;
             }
         }
         // 设置桶的存储类型为归档存储
@@ -60,14 +65,17 @@ public class HuaweiController {
             case 0:{
                 //标准
                 obsBucket.setBucketStorageClass(StorageClassEnum.STANDARD);
+                break;
             }
             case 1:{
                 //低频访问
                 obsBucket.setBucketStorageClass(StorageClassEnum.WARM);
+                break;
             }
             case 2:{
                 //归档
                 obsBucket.setBucketStorageClass(StorageClassEnum.COLD);
+                break;
             }
         }
 
@@ -151,22 +159,27 @@ public class HuaweiController {
             case 0: {
                 //私有读写
                 obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_PRIVATE);
+                break;
             }
             case 1: {
                 //公共读私有写
                 obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_PUBLIC_READ);
+                break;
             }
             case 2: {
                 //桶公共读，桶内对象公共读
                 obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_PUBLIC_READ_DELIVERED);
+                break;
             }
             case 3: {
                 //公共读写
                 obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_PUBLIC_READ_WRITE);
+                break;
             }
             case 4: {
                 //桶公共读写，桶内对象公共读写
                 obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_PUBLIC_READ_WRITE_DELIVERED);
+                break;
             }
         }
     }
@@ -242,12 +255,15 @@ public class HuaweiController {
         switch (policy){
             case 0:{
                 storgePolicy.setBucketStorageClass(StorageClassEnum.STANDARD);
+                break;
             }
             case 1:{
                 storgePolicy.setBucketStorageClass(StorageClassEnum.WARM);
+                break;
             }
             case 2:{
                 storgePolicy.setBucketStorageClass(StorageClassEnum.COLD);
+                break;
             }
         }
         obsClient.setBucketStoragePolicy(bucketName, storgePolicy);

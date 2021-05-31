@@ -188,11 +188,11 @@ public class HuaweiObjectController {
         request.setReplaceMetadata(true);
         switch (type){
             case 0:
-            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.STANDARD);}
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.STANDARD);                    break;}
             case 1:
-            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.COLD);}
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.COLD);                    break;}
             case 2:
-            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.WARM);}
+            {newObjectMetadata.setObjectStorageClass(StorageClassEnum.WARM);                    break;}
         }
         return request;
     }
@@ -226,19 +226,19 @@ public class HuaweiObjectController {
     public CopyObjectRequest setAcl(CopyObjectRequest request,int acl){
         switch (acl){
             case 0:{
-                request.setAcl(AccessControlList.REST_CANNED_PRIVATE);
+                request.setAcl(AccessControlList.REST_CANNED_PRIVATE);                    break;
             }
             case 1:{
-                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);                    break;
             }
             case 2:{
-                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_DELIVERED);
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_DELIVERED);                    break;
             }
             case 3:{
-                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE);
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE);                    break;
             }
             case 4:{
-                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE_DELIVERED);
+                request.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ_WRITE_DELIVERED);                    break;
             }
         }
         return request;
