@@ -30,4 +30,9 @@ public class BucketServiceImpl implements BucketService {
     public Integer deleteBucket(Bucket bucket) {
         return bucketMapper.deleteBucket(bucket);
     }
+
+    @Override
+    public Integer haveName(String name) {
+        return bucketMapper.haveName(name);
+    }
 }
