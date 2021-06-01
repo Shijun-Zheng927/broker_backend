@@ -4,6 +4,7 @@ import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.BucketTagInfo;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,5 +53,20 @@ public class HuaweiTagController {
             return "failed";
         }
         return "success";
+    }
+
+    /* 关闭客户端 */
+    public static void closeObsClient()
+    {
+        try
+        {
+            obsClient.close();
+            System.out.println("close obs client success");
+        }
+        catch (IOException e)
+        {
+            System.out.println("close obs client error.");
+        }
+
     }
 }

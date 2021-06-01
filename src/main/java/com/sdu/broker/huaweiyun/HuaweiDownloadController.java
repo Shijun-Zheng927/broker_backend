@@ -58,12 +58,11 @@ public class HuaweiDownloadController {
             ObsObject obsObject = obsClient.getObject(request);
             OutputStream out = new FileOutputStream(localFile);
 
-            // 读取数据
-            byte[] buf = new byte[1024];
             InputStream in = obsObject.getObjectContent();
-            for (int n = 0; n != -1; ) {
-                n = in.read(buf, 0, buf.length);
-                out.write(buf);
+            byte[] buffer = new byte[1024];
+            int len = -1;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
             }
             out.close();
             in.close();
@@ -91,7 +90,7 @@ public class HuaweiDownloadController {
                 map.put(String.format("%.3f",status.getAverageSpeed()),String.format("%.3f",status.getTransferPercentage()));
             }
         });
-// 每下载1MB数据反馈下载进度
+        // 每下载1MB数据反馈下载进度
         request.setProgressInterval(1024 * 1024L);
         ObsObject obsObject = obsClient.getObject(request);
         return map;
@@ -200,15 +199,14 @@ public class HuaweiDownloadController {
     }
 
     /* 新建断点续传下载请求 */
-    public DownloadFileRequest newDownloadRequest(String bucketName,String objectKey,String localfile){
+    public DownloadFileRequest newDownloadRequest(String bucketName,String objectKey){
         DownloadFileRequest request = new DownloadFileRequest(bucketName, objectKey);
-        request.setDownloadFile(localfile);
         return request;
     }
     /* 断点续传下载 */
-    public String checkpointDownload(DownloadFileRequest request){
+    public String checkpointDownload(DownloadFileRequest request,String localfile){
         // 设置下载对象的本地文件路径
-
+        request.setDownloadFile(localfile);
         // 设置分段下载时的最大并发数
         request.setTaskNum(5);
         // 设置分段大小为10MB

@@ -4,6 +4,7 @@ import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,11 @@ public class HuaweiObjectController {
         return metadata;
     }
 
+    /* 获取对象权限 */
+    public AccessControlList getObjectAcl(String bucketName,String objectKey){
+        AccessControlList acl = obsClient.getObjectAcl(bucketName, objectKey);
+        return acl;
+    }
     /* 列举对象 */
     /* 新建列举请求 */
     public ListObjectsRequest newListRequest(String bucketName){
@@ -184,7 +190,7 @@ public class HuaweiObjectController {
         return request;
     }
     //重写存储类型
-    public CopyObjectRequest resetContentType(CopyObjectRequest request,int type){
+    public CopyObjectRequest resetStorageClass(CopyObjectRequest request,int type){
         request.setReplaceMetadata(true);
         switch (type){
             case 0:
@@ -244,6 +250,19 @@ public class HuaweiObjectController {
         return request;
     }
 
+    /* 关闭客户端 */
+    public static void closeObsClient()
+    {
+        try
+        {
+            obsClient.close();
+            System.out.println("close obs client success");
+        }
+        catch (IOException e)
+        {
+            System.out.println("close obs client error.");
+        }
 
+    }
 
 }

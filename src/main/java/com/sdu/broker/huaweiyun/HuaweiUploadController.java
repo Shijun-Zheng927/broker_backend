@@ -193,8 +193,8 @@ public class HuaweiUploadController {
         final String uploadId = result.getUploadId();
         System.out.println("\t"+ uploadId + "\n");
 
-        // 每段上传100MB
-        long partSize = 100 * 1024 * 1024L;
+        // 每段上传10MB
+        long partSize = 10 * 1024 * 1024L;
         long fileSize = largeFile.length();
 
         // 计算需要上传的段数
