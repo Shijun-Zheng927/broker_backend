@@ -61,7 +61,8 @@ public class IntroduceController {
         if (file != null) {
             try {
                 String filePath = "D:/IDEA/broker/src/main/resources/static/img/";
-                String fileName = file.getOriginalFilename();
+                String uuid = UUID.randomUUID().toString();
+                String fileName = uuid + file.getOriginalFilename();
 //                System.out.println(filePath);
 //                System.out.println(fileName);
                 File f = new File(filePath + fileName);
