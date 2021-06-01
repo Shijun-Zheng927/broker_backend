@@ -13,6 +13,10 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     public Integer addIntroduce(String name, String path) {
+        String isExist = introduceMapper.getPath(name);
+        if (isExist != null) {
+            return null;
+        }
         Introduce introduce = new Introduce();
         introduce.setName(name);
         introduce.setFile(path);

@@ -49,4 +49,30 @@ public class IntroduceController {
         String path = introduceService.getPath(name);
         return path;
     }
+
+    @CrossOrigin
+    @RequestMapping("/uploadImg")
+    public String uploadImg(@RequestParam("file") MultipartFile file) {
+        if (file == null) {
+            System.out.println("file is null");
+            return null;
+        }
+        String result = "";
+        if (file != null) {
+            try {
+                String filePath = "D:/IDEA/broker/src/main/resources/static/img/";
+                String fileName = file.getOriginalFilename();
+//                System.out.println(filePath);
+//                System.out.println(fileName);
+                File f = new File(filePath + fileName);
+                result = "http://localhost:8443/img/" + fileName;
+                System.out.println(result);
+                file.transferTo(f);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return result;
+    }
 }
