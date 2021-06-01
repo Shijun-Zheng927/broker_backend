@@ -52,4 +52,10 @@ public class BucketServiceTest {
         Integer result = bucketService.deleteBucket(bucket);
         System.out.println(result);
     }
+
+    @Test
+    public void getPlatform() {
+        String result = bucketService.getPlatform("haha");
+        System.out.println(result);
+    }
 }

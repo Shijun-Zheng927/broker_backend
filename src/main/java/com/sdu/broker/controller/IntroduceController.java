@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -17,22 +17,22 @@ public class IntroduceController {
 
     @CrossOrigin
     @RequestMapping("/uploadIntroduce")
-    public String uploadIntroduce(@RequestParam("file") MultipartFile file, @RequestParam("name") String name) {
-        if (file == null) {
-            System.out.println("file is null");
-            return null;
-        }
+    @ResponseBody
+    public String uploadIntroduce(@RequestBody Map<String, String> map) {
+        String file = map.get("file");
+        String name = map.get("name");
         String result = "";
-        if (file != null && !"".equals(name)) {
+        if (!"".equals(file) && !"".equals(name)) {
             try {
                 String filePath = "D:/IDEA/broker/src/main/resources/static/md/";
-                String fileName = file.getOriginalFilename();
+                String path = filePath + name + ".txt";
+                result = path;
 //                System.out.println(filePath);
 //                System.out.println(fileName);
-                File f = new File(filePath + fileName);
-                result = "http://localhost:8443/md/" + fileName;
-                System.out.println(result);
-                file.transferTo(f);
+                File f = new File(path);
+                BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+                bw.write(file);
+                bw.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -42,16 +42,29 @@ public class IntroduceController {
         return result;
     }
 
-//    @CrossOrigin
+    @CrossOrigin
     @GetMapping(value = "/getIntroduceName", params = {"name"})
     @ResponseBody
     public String uploadIntroduce(@RequestParam String name) {
         String path = introduceService.getPath(name);
-        return path;
+        String markdown = "";
+        String thisLine;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            while((thisLine = br.readLine()) != null) {
+                markdown += thisLine + "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(markdown);
+
+        return markdown;
     }
 
     @CrossOrigin
     @RequestMapping("/uploadImg")
+    @ResponseBody
     public String uploadImg(@RequestParam("file") MultipartFile file) {
         if (file == null) {
             System.out.println("file is null");
@@ -66,7 +79,7 @@ public class IntroduceController {
 //                System.out.println(filePath);
 //                System.out.println(fileName);
                 File f = new File(filePath + fileName);
-                result = "http://localhost:8443/img/" + fileName;
+                result = "http://192.168.1.109:8443/img/" + fileName;
                 System.out.println(result);
                 file.transferTo(f);
             } catch (IOException e) {

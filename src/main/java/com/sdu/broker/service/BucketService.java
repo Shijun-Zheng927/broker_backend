@@ -12,4 +12,6 @@ public interface BucketService {
     Integer deleteBucket(Bucket bucket);
 
     Integer haveName(String name);
+
+    String getPlatform(String name);
 }
