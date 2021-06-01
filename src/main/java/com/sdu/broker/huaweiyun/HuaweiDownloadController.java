@@ -16,8 +16,8 @@ public class HuaweiDownloadController {
     private static final String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
-    //生成下载请求
-    public GetObjectRequest request(String bucketName,String objectKey){
+    //新建获取请求
+    public GetObjectRequest newObjectRequest(String bucketName,String objectKey){
         GetObjectRequest request = new GetObjectRequest(bucketName, objectKey);
         return request;
     }
@@ -100,58 +100,143 @@ public class HuaweiDownloadController {
     */
 
     //限定条件下载
-    public String setIfModifiedSince(GetObjectRequest request, Date date){
+    public GetObjectRequest setIfModifiedSince(GetObjectRequest request, Date date){
         request.setIfModifiedSince(date);
-        return "success";
+        return request;
     }
-    public String setIfUnModifiedSince(GetObjectRequest request, Date date){
-        request.setIfUnmodifiedSince(date);
-        return "success";
-    }
-    public String setIfMatchTag(GetObjectRequest request, PartEtag etag){
-        request.setIfMatchTag(etag.getEtag());
-        return "success";
-    }
-    public String setIfNoneMatchTag(GetObjectRequest request, PartEtag etag){
-        request.setIfNoneMatchTag(etag.getEtag());
-        return "success";
+    public DownloadFileRequest setIfModifiedSince(DownloadFileRequest request, Date date){
+        request.setIfModifiedSince(date);
+        return request;
     }
 
+    public GetObjectRequest setIfUnModifiedSince(GetObjectRequest request, Date date){
+        request.setIfUnmodifiedSince(date);
+        return request;
+    }
+    public DownloadFileRequest setIfUnModifiedSince(DownloadFileRequest request, Date date){
+        request.setIfUnmodifiedSince(date);
+        return request;
+    }
+
+    public GetObjectRequest setIfMatchTag(GetObjectRequest request, String etag){
+        request.setIfMatchTag(etag);
+        return request;
+    }
+    public DownloadFileRequest setIfMatchTag(DownloadFileRequest request, String etag){
+        request.setIfMatchTag(etag);
+        return request;
+    }
+
+    public GetObjectRequest setIfNoneMatchTag(GetObjectRequest request, String etag){
+        request.setIfNoneMatchTag(etag);
+        return request;
+    }
+    public DownloadFileRequest setIfNoneMatchTag(DownloadFileRequest request, String etag){
+        request.setIfNoneMatchTag(etag);
+        return request;
+    }
     //重写HTTP/HTTPS响应头信息
-    public String setContentType(GetObjectRequest request,String c){
+    public GetObjectRequest setContentType(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentType(c);
         request.setReplaceMetadata(replaceMetadata);
-        return "success";
+        return request;
     }
-    public String setContentLanguage(GetObjectRequest request,String c){
+    public GetObjectRequest setContentLanguage(GetObjectRequest request,String c) {
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentLanguage(c);
         request.setReplaceMetadata(replaceMetadata);
-        return "success";
+        return request;
     }
-    public String setExpires(GetObjectRequest request,String c){
+    public GetObjectRequest setExpires(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setExpires(c);
         request.setReplaceMetadata(replaceMetadata);
-        return "success";
+        return request;
     }
-    public String setCacheControl(GetObjectRequest request,String c){
+    public GetObjectRequest setCacheControl(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setCacheControl(c);
         request.setReplaceMetadata(replaceMetadata);
-        return "success";
+        return request;
     }
-    public String setContentDisposition(GetObjectRequest request,String c){
+    public GetObjectRequest setContentDisposition(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentDisposition(c);
         request.setReplaceMetadata(replaceMetadata);
-        return "success";
+        return request;
     }
-    public String setContentEncoding(GetObjectRequest request,String c){
+    public GetObjectRequest setContentEncoding(GetObjectRequest request,String c){
         ObjectRepleaceMetadata replaceMetadata = new ObjectRepleaceMetadata();
         replaceMetadata.setContentEncoding(c);
         request.setReplaceMetadata(replaceMetadata);
+        return request;
+    }
+
+    /* 获取对象自定义元数据 */
+    public String getMetadata(GetObjectRequest request,String property){
+        ObsObject obsObject = obsClient.getObject(request);
+        return String.valueOf(obsObject.getMetadata().getUserMetadata(property));
+    }
+
+    /* 取回归档存储对象 */
+    public String getRestoreObject(String bucketName,String objectKey,int restoreTierEnum,int time){
+        try {
+            RestoreObjectRequest request = new RestoreObjectRequest();
+            request.setBucketName(bucketName);
+            request.setObjectKey(objectKey);
+            request.setDays(time);
+            if (restoreTierEnum == 0) {
+                request.setRestoreTier(RestoreTierEnum.EXPEDITED);
+            }
+            if (restoreTierEnum == 1) {
+                request.setRestoreTier(RestoreTierEnum.STANDARD);
+            }
+            obsClient.restoreObject(request);
+        }catch (ObsException e){
+            return "restore failed";
+        }
         return "success";
+    }
+
+    /* 新建断点续传下载请求 */
+    public DownloadFileRequest newDownloadRequest(String bucketName,String objectKey,String localfile){
+        DownloadFileRequest request = new DownloadFileRequest(bucketName, objectKey);
+        request.setDownloadFile(localfile);
+        return request;
+    }
+    /* 断点续传下载 */
+    public String checkpointDownload(DownloadFileRequest request){
+        // 设置下载对象的本地文件路径
+
+        // 设置分段下载时的最大并发数
+        request.setTaskNum(5);
+        // 设置分段大小为10MB
+        request.setPartSize(10 * 1024 * 1024);
+        // 开启断点续传模式
+        request.setEnableCheckpoint(true);
+        try{
+            // 进行断点续传下载
+            DownloadFileResult result = obsClient.downloadFile(request);
+        }catch (ObsException e) {
+            // 发生异常时可再次调用断点续传下载接口进行重新下载
+            return "download failed";
+        }
+        return request.getDownloadFile();
+    }
+
+    /* 关闭客户端 */
+    public static void closeObsClient()
+    {
+        try
+        {
+            obsClient.close();
+            System.out.println("close obs client success");
+        }
+        catch (IOException e)
+        {
+            System.out.println("close obs client error.");
+        }
+
     }
 }
