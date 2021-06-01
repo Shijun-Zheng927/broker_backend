@@ -26,4 +26,10 @@ public interface BucketMapper {
 
     @Select("select id from bucket where name = #{name}")
     Integer haveName(String name);
+
+    @Select("select id from bucket where user_id = #{userId} and name = #{name}")
+    Integer verify(String userId, String name);
+
+    @Update("update bucket set type = #{type} where name = #{bucketName} ")
+    Integer setStorageClass(String bucketName, Integer type);
 }

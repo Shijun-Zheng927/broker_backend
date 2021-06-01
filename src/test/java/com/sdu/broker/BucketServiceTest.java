@@ -58,4 +58,16 @@ public class BucketServiceTest {
         String result = bucketService.getPlatform("haha");
         System.out.println(result);
     }
+
+    @Test
+    public void verify() {
+        Integer result = bucketService.verify("1", "aaa");
+        System.out.println(result);
+    }
+
+    @Test
+    public void setStorageClass() {
+        Integer result = bucketService.setStorageClass("haha", 1);
+        System.out.println(result);
+    }
 }

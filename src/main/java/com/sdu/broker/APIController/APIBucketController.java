@@ -37,18 +37,33 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
-        if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
-            String storageClass = map.get("storageClass");
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String storageClass = map.get("storageClass");
+        if ("".equals(bucketName) || "".equals(storageClass) || !BucketUtils.regex(0, 7, storageClass)) {
+            response.setStatus(777);
+            return null;
+        }
+//        String platform = "";
+//        if (!"".equals(bucketName)) {
+//            platform = bucketService.getPlatform(bucketName);
+//        }
+        if (Integer.parseInt(storageClass) < 4) {
+//            String bucketName = map.get("bucketName");
+//            String storageClass = map.get("storageClass");
             String dataRedundancyType = map.get("dataRedundancyType");
-            String cannedACL = map.get("cannedACL");
+            String cannedACL = map.get("rwPolicy");
             int result;
-            if (storageClass == null || dataRedundancyType == null || cannedACL == null || storageClass.equals("") 
-                    || dataRedundancyType.equals("") || cannedACL.equals("")) {
-                response.setStatus(777);
-                return null;
+            if ("".equals(dataRedundancyType)) {
+                dataRedundancyType = "0";
             }
+            if ("".equals(cannedACL)) {
+                dataRedundancyType = "0";
+            }
+//            if (dataRedundancyType == null || cannedACL == null || dataRedundancyType.equals("") || cannedACL.equals("")) {
+//                response.setStatus(777);
+//                return null;
+//            }
 
             Integer haveName = bucketService.haveName(bucketName);
             if (haveName == null) {
@@ -56,8 +71,9 @@ public class APIBucketController {
             }
 
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
-                    && BucketUtils.regex(0, 2, cannedACL) && bucketName != null && !bucketName.equals("")) {
-                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName), Integer.parseInt(storageClass) + 1,
+                    && BucketUtils.regex(0, 2, cannedACL) && bucketName != null) {
+                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName),
+                        Integer.parseInt(storageClass) + 1,
                         Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
             } else {
                 response.setStatus(777);
@@ -67,7 +83,7 @@ public class APIBucketController {
                 Bucket bucket = new Bucket();
                 bucket.setName(bucketName);
                 bucket.setUserId(userId);
-                bucket.setPlatform(platform);
+                bucket.setPlatform("ALI");
                 bucket.setType(Integer.parseInt(storageClass));
                 bucketService.addBucket(bucket);
                 return "success";
@@ -75,13 +91,13 @@ public class APIBucketController {
                 return "fail";
             }
         } else {
-            String bucketName = map.get("bucketName");
+//            bucketName = map.get("bucketName");
             String rwPolicy = map.get("rwPolicy");
-            String storageClass = map.get("storageClass");
-            if (bucketName == null || rwPolicy == null || storageClass == null || bucketName.equals("")
-                    || rwPolicy.equals("") || storageClass.equals("")) {
-                response.setStatus(777);
-                return null;
+//            String storageClass = map.get("storageClass");
+            if (rwPolicy == null ||  rwPolicy.equals("")) {
+                rwPolicy = "0";
+//                response.setStatus(777);
+//                return null;
             }
 
             Integer haveName = bucketService.haveName(bucketName);
@@ -90,8 +106,9 @@ public class APIBucketController {
             }
 
             int result;
-            if (BucketUtils.regex(0, 4, rwPolicy) && BucketUtils.regex(0, 2, storageClass)) {
-                result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy), Integer.parseInt(storageClass));
+            if (BucketUtils.regex(0, 4, rwPolicy)) {
+                result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy),
+                        Integer.parseInt(storageClass) - 3);
             } else {
                 response.setStatus(777);
                 return null;
@@ -100,7 +117,7 @@ public class APIBucketController {
                 Bucket bucket = new Bucket();
                 bucket.setName(bucketName);
                 bucket.setUserId(userId);
-                bucket.setPlatform(platform);
+                bucket.setPlatform("HUAWEI");
                 bucketService.addBucket(bucket);
                 return "success";
             } else {
@@ -118,21 +135,37 @@ public class APIBucketController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
-        if (platform.equals("ALI")) {
-            List<com.aliyun.oss.model.Bucket> result = bucketController.listAllBuckets();
-            if (result.size() == 0) {
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, platform, result);
-            return bucketToStringAli(buckets);
-        } else {
-            List<ObsBucket> result = huaweiController.listBucket();
-            if (result.size() == 0) {
-                return null;
-            }
-            List<ObsBucket> buckets = getBucketHuawei(userId, platform, result);
-            return bucketToStringHuawei(buckets);
+
+        List<com.aliyun.oss.model.Bucket> result1 = bucketController.listAllBuckets();
+        if (result1.size() == 0) {
+            return null;
         }
+        List<com.aliyun.oss.model.Bucket> buckets1 = getBucketsAli(userId, platform, result1);
+        List<ObsBucket> result2 = huaweiController.listBucket();
+        if (result2.size() == 0) {
+            return null;
+        }
+        List<ObsBucket> buckets2 = getBucketHuawei(userId, platform, result2);
+
+        List<String> result0 = new ArrayList<>();
+        result0.addAll(bucketToStringAli(buckets1));
+        result0.addAll(bucketToStringHuawei(buckets2));
+        return result0;
+//        if (platform.equals("ALI")) {
+//            List<com.aliyun.oss.model.Bucket> result = bucketController.listAllBuckets();
+//            if (result.size() == 0) {
+//                return null;
+//            }
+//            List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, platform, result);
+//            return bucketToStringAli(buckets);
+//        } else {
+//            List<ObsBucket> result = huaweiController.listBucket();
+//            if (result.size() == 0) {
+//                return null;
+//            }
+//            List<ObsBucket> buckets = getBucketHuawei(userId, platform, result);
+//            return bucketToStringHuawei(buckets);
+//        }
 
     }
 
@@ -178,12 +211,14 @@ public class APIBucketController {
             return false;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return false;
         }
         boolean result;
+        String platform = bucketService.getPlatform(bucketName);
+
         if (platform.equals("ALI")) {
             result = bucketController.doesBucketExist(bucketName);
         } else {
@@ -200,11 +235,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         String result;
         if (platform.equals("ALI")) {
             result = bucketController.getBucketLocation(bucketName);
@@ -222,11 +258,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             BucketInfo result = bucketController.getBucketInfo(bucketName);
             return result;
@@ -244,11 +281,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         String result;
         if (platform.equals("ALI")) {
             result = bucketController.getBucketAcl(bucketName);
@@ -266,13 +304,14 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            String acl = map.get("acl");
+            String acl = map.get("rwPolicy");
             if (acl == null || !BucketUtils.regex(0, 3, acl)) {
                 response.setStatus(777);
                 return null;
@@ -298,11 +337,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             String policy = map.get("policy");
             if (policy == null || policy.equals("")) {
@@ -324,11 +364,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             String result = huaweiController.getBucketPolicy(bucketName);
             return result;
@@ -345,11 +386,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             huaweiController.deleteBucketPolicy(bucketName);
             return "success";
@@ -366,11 +408,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             Map<String, String> result = huaweiController.getBucketStorageInfo(bucketName);
             return result;
@@ -387,11 +430,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             String size = map.get("size");
             if (size == null || !BucketUtils.isNumber(size)) {
@@ -413,11 +457,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             long result = huaweiController.getBucketQuota(bucketName);
             return Long.toString(result);
@@ -434,11 +479,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             String storageClass = map.get("storageClass");
             if (storageClass == null || !BucketUtils.regex(0, 2, storageClass)) {
@@ -446,6 +492,8 @@ public class APIBucketController {
                 return null;
             }
             huaweiController.setBucketStoragePolicy(bucketName, Integer.parseInt(storageClass));
+
+            bucketService.setStorageClass(bucketName, Integer.parseInt(storageClass));
             return "success";
         } else {
             return null;
@@ -460,11 +508,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("HUAWEI")) {
             String result = huaweiController.getBucketStorageClass(bucketName);
             return result;
@@ -481,11 +530,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             String result = bucketController.deleteBucket(bucketName);
             if (result.equals("删除存储空间成功")) {
@@ -513,11 +563,12 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
-        if (verifyBucketName(response, userId, platform, bucketName)) {
+        if (verify(response, userId, bucketName)) {
             return null;
         }
+        String platform = bucketService.getPlatform(bucketName);
         String inventoryId = map.get("inventoryId");
         if (inventoryId == null || inventoryId.equals("")) {
             System.out.println(inventoryId);
@@ -595,6 +646,20 @@ public class APIBucketController {
         }
         Bucket bucket = new Bucket(userId, platform, bucketName);
         Integer legal = bucketService.isLegal(bucket);
+        if (legal == null) {
+            response.setStatus(666);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean verify(HttpServletResponse response, Integer userId, String bucketName) {
+        if ("".equals(bucketName)) {
+            response.setStatus(777);
+            return true;
+        }
+//        Bucket bucket = new Bucket(userId, platform, bucketName);
+        Integer legal = bucketService.verify(userId.toString(), bucketName);
         if (legal == null) {
             response.setStatus(666);
             return true;
