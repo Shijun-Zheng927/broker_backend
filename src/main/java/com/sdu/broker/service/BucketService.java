@@ -12,4 +12,10 @@ public interface BucketService {
     Integer deleteBucket(Bucket bucket);
 
     Integer haveName(String name);
+
+    String getPlatform(String name);
+
+    Integer verify(String userId, String name);
+
+    Integer setStorageClass(String bucketName, Integer type);
 }

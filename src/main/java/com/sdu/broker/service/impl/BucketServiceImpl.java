@@ -35,4 +35,19 @@ public class BucketServiceImpl implements BucketService {
     public Integer haveName(String name) {
         return bucketMapper.haveName(name);
     }
+
+    @Override
+    public String getPlatform(String name) {
+        return bucketMapper.getPlatform(name);
+    }
+
+    @Override
+    public Integer verify(String userId, String name) {
+        return bucketMapper.verify(userId, name);
+    }
+
+    @Override
+    public Integer setStorageClass(String bucketName, Integer type) {
+        return bucketMapper.setStorageClass(bucketName, type);
+    }
 }
