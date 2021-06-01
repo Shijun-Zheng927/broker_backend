@@ -2,11 +2,9 @@ package com.sdu.broker.huaweiyun;
 
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
-import com.obs.services.model.BucketLoggingConfiguration;
-import com.obs.services.model.GrantAndPermission;
-import com.obs.services.model.GroupGrantee;
-import com.obs.services.model.Permission;
+import com.obs.services.model.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,15 +16,23 @@ public class HuaweiBuckectLoggingController {
     public static ObsClient obsClient = new ObsClient(ak,sk,endPoint);
 
     /* 开启桶日志 */
-    public BucketLoggingConfiguration setBuckectLogging(String agency,String targetBucketName,String targetPrefix,String bucketName){
+    public String setBuckectLogging(String targetBucketName,String targetPrefix,String bucketName){
         BucketLoggingConfiguration config = new BucketLoggingConfiguration();
-        config.setAgency(agency);
+//        config.setAgency(agency);
         config.setTargetBucketName(targetBucketName);
         config.setLogfilePrefix(targetPrefix);
 
-        obsClient.setBucketLogging(bucketName, config);
-        return config;
+        // 为所有用户设置对日志对象的读权限
+        GrantAndPermission grant1 = new GrantAndPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_FULL_CONTROL);
+        config.setTargetGrants(new GrantAndPermission[]{grant1});
+        try{
+            obsClient.setBucketLogging(bucketName, config);
+        }catch (ObsException e){
+            return "ObsException";
+        }
+        return "success";
     }
+
     /* 为所有用户设置对日志对象权限 */
     public String setGrantAndPermission(BucketLoggingConfiguration config,String bucketName,int permission){
         try{
@@ -76,5 +82,20 @@ public class HuaweiBuckectLoggingController {
             return "failed";
         }
         return "success";
+    }
+
+    /* 关闭客户端 */
+    public static void closeObsClient()
+    {
+        try
+        {
+            obsClient.close();
+            System.out.println("close obs client success");
+        }
+        catch (IOException e)
+        {
+            System.out.println("close obs client error.");
+        }
+
     }
 }
