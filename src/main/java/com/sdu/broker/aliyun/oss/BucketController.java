@@ -17,12 +17,11 @@ public class BucketController {
 
     //创建一个Bucket
     public int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
-//        System.out.println(bucketName + " " + storageClass + " " + dataRedundancyType + " " + cannedACL);
-        //1,参数列表：bucketName:桶名称   storageClass:存储类型
+        //        System.out.println(bucketName + " " + storageClass + " " + dataRedundancyType + " " + cannedACL);
+        //        1,参数列表：bucketName:桶名称   storageClass:存储类型
         //          dataRedundancyType:数据容灾类型
         //          cannedACL:数据读写权限
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-
         try{
             if(ossClient.doesBucketExist(bucketName)){
                 System.out.println("您已创建Bucket:" + bucketName + "。");
@@ -378,15 +377,54 @@ public class BucketController {
     }
 
 
+    //访问日志
+    //开启访问日志
+    public static int openBucketLogging(String bucketName,String logBucketName,String logPath){
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
+        SetBucketLoggingRequest request = new SetBucketLoggingRequest(bucketName);
+        // 设置存放日志文件的存储空间。
+        request.setTargetBucket(logBucketName);
+        // 设置日志文件存放的目录。
+        request.setTargetPrefix(logPath);
+        ossClient.setBucketLogging(request);
 
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return 0;
 
-    public static void main(String[] args) {
-//        listAllBuckets();
-//        listRequestBuckets("xmsx","",2);
-//        Map<String, String> result = getBucketInfo("xmsx-001");
-//        System.out.println(result);
     }
+
+    //查看访问日志
+    public static Map<String,String> checkBucketLogging(String bucketName){
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        Map<String,String> map = new HashMap<>();
+        BucketLoggingResult result = ossClient.getBucketLogging(bucketName);
+        map.put(result.getTargetBucket(),result.getTargetPrefix());
+        System.out.println(result.getTargetBucket());
+        System.out.println(result.getTargetPrefix());
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return map;
+    }
+
+    //关闭访问日志
+    public static int closeBucketLogging(String bucketName){
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        SetBucketLoggingRequest request = new SetBucketLoggingRequest(bucketName);
+        request.setTargetBucket(null);
+        request.setTargetPrefix(null);
+        ossClient.setBucketLogging(request);
+
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return 0;
+
+    }
+
 
 }
 
