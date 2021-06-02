@@ -35,6 +35,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Integer selectPhone(String str) {
+        return userMapper.selectPhone(str);
+    }
+
+    @Override
     public Integer setHead(String head, Integer id) {
         return userMapper.setHead(head, id);
     }

@@ -2,14 +2,14 @@ package com.sdu.broker.pojo.req;
 
 public class DownloadFile {
     private String name;
-    private byte[] bytes;
+    private String url;
 
     public DownloadFile() {
     }
 
-    public DownloadFile(String name, byte[] bytes) {
+    public DownloadFile(String name, String url) {
         this.name = name;
-        this.bytes = bytes;
+        this.url = url;
     }
 
     public String getName() {
@@ -20,11 +20,11 @@ public class DownloadFile {
         this.name = name;
     }
 
-    public byte[] getBytes() {
-        return bytes;
+    public String getUrl() {
+        return url;
     }
 
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

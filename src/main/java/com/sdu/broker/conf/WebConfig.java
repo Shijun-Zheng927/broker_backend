@@ -11,7 +11,11 @@ public class WebConfig implements WebMvcConfigurer {
 //        System.out.println("shengxiao");
         String path = "D:/IDEA/broker/src/main/resources/static/img/";
         registry.addResourceHandler("/img/**").addResourceLocations("file:" + path);
-        String path1 = "D:/IDEA/broker/src/main/resources/static/avatar/";
-        registry.addResourceHandler("/avatar/**").addResourceLocations("file:" + path1);
+        String path1 = "D:/IDEA/broker/src/main/resources/static/head/";
+        registry.addResourceHandler("/head/**").addResourceLocations("file:" + path1);
+        String path2 = "D:/IDEA/broker/src/main/resources/static/file/";
+        registry.addResourceHandler("/file/**").addResourceLocations("file:" + path2);
+        String path3 = "D:/IDEA/broker/src/main/resources/static/md/";
+        registry.addResourceHandler("/md/**").addResourceLocations("file:" + path3);
     }
 }

@@ -7,5 +7,7 @@ public interface UserService {
 
     Integer register(User user);
 
+    Integer selectPhone(String str);
+
     Integer setHead(String head, Integer id);
 }
