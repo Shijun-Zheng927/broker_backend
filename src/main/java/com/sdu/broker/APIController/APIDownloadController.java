@@ -1,5 +1,6 @@
 package com.sdu.broker.APIController;
 
+import com.sdu.broker.pojo.req.DownloadFile;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Map;
 import java.util.Objects;
 
@@ -55,6 +57,25 @@ public class APIDownloadController {
             //返回结果
             return "result";
         }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/downloadTest")
+    public byte[] downloadTest() {
+        byte[] bytes = null;
+        try {
+            File f = new File("D:\\IDEA\\broker\\src\\main\\resources\\static\\head\\groot.jpg");
+            FileInputStream inputStream = new FileInputStream(f);
+            bytes = new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+            FileOutputStream fos = new FileOutputStream(f);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        return new DownloadFile("groot.jpg", bytes);
+        return bytes;
     }
 
 
