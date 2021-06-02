@@ -187,15 +187,7 @@ public class HuaweiController {
     /* 设置log组访问策略 */
     public String setBucketAclForLog(String bucketName){
         try {
-            AccessControlList acl = new AccessControlList();
-            // 为所有用户设置读权限
-            Owner owner = new Owner();
-            owner.setId("0a841c8b7700250e0fc9c01d8c081820");
-            acl.setOwner(owner);
-            // 为指定用户设置完全控制权限
-            acl.grantPermission(new CanonicalGrantee("0a841c8b7700250e0fc9c01d8c081820"), Permission.PERMISSION_FULL_CONTROL);
-            acl.grantPermission(GroupGrantee.LOG_DELIVERY, Permission.PERMISSION_WRITE_ACP);
-            obsClient.setBucketAcl(bucketName, acl);
+            obsClient.setBucketAcl(bucketName, AccessControlList.REST_CANNED_LOG_DELIVERY_WRITE);
         }catch (ObsException e){
             return "ObsException";
         }

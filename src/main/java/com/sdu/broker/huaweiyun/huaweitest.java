@@ -35,10 +35,10 @@ public class huaweitest  {
 //        System.out.println(hwc.getBucketAcl(bucketname2));
 
 //        System.out.println(hwc.setBucketAclForLog(bucketname1));
-
+        System.out.println(hblc.shutdownBucketLogging(bucketname1));
 //        hwc.setBucketAcl(bucketname1,4);
 //        hwc.setBucketAcl(bucketname2,4);
-//        String targetprefix = new String("/prefix/");
+//        String targetprefix = new String("prefix/");
 //        System.out.println(hblc.setBuckectLogging(bucketname1,targetprefix,bucketname1));
 
 //        BucketTagInfo.TagSet tagSet = htc.newTagSet();
