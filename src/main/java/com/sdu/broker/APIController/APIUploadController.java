@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -390,7 +391,7 @@ public class APIUploadController {
 
     @RequestMapping(value = "/appendObjectFileFirst")
     public String appendObjectFileFirst(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                        @RequestParam("contentType") String contentType, @RequestParam("uploadId") String uploadId,
+                                        @RequestParam("contentType") String contentType, HttpServletRequest request,
                           @RequestParam("file") MultipartFile file,
                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
@@ -433,6 +434,7 @@ public class APIUploadController {
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
+            String uploadId = request.getParameter("uploadId");
             if ("".equals(objectPath) || "".equals(contentType) || "".equals(uploadId)) {
                 response.setStatus(777);
                 return null;
@@ -447,8 +449,8 @@ public class APIUploadController {
 
     @RequestMapping(value = "/appendObjectFile")
     public String appendObjectFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                        @RequestParam("contentType") String contentType, @RequestParam("uploadId") String uploadId,
-                                   @RequestParam("givenPosition") String givenPosition, @RequestParam("partNum") String partNum,
+                                        @RequestParam("contentType") String contentType,
+                                   @RequestParam("givenPosition") String givenPosition, HttpServletRequest request,
                                         @RequestParam("file") MultipartFile file,
                                         @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
@@ -492,6 +494,8 @@ public class APIUploadController {
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
+            String uploadId = request.getParameter("uploadId");
+            String partNum = request.getParameter("partNum");
             if ("".equals(objectPath) || "".equals(contentType) || "".equals(uploadId) || "".equals(partNum)) {
                 response.setStatus(777);
                 return null;

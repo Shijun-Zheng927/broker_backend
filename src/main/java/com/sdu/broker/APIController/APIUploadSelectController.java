@@ -10,7 +10,9 @@ import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
@@ -218,6 +220,19 @@ public class APIUploadSelectController {
             return result;
         }
     }
+
+//    @RequestMapping(value = "/testc", method = RequestMethod.POST)
+//    @ResponseBody
+//    public String testc(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+//        if (file == null) {
+//            System.out.println("jfdlsaj");
+//        } else {
+//            System.out.println("sjdf");
+//        }
+//        System.out.println(request.getParameter("a"));
+//        System.out.println(request.getParameter("b"));
+//        return "su";
+//    }
 
 
     //工具方法
