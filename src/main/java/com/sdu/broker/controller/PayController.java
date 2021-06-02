@@ -6,6 +6,7 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.sdu.broker.service.AccountService;
+import com.sdu.broker.service.UserService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ import java.util.Map;
 
 @RestController
 public class PayController {
+    @Autowired
+    private UserService userService;
+
 //    private final String APP_ID = "2021000117637728";
     private final String APP_ID = "2021000117637649";
 //    private final String APP_PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDCC7lWtWETdo9GMVTvWn8q4Tx+pU5B+/qY+RwTcKEliC6yoFRV2N++6wOuQIFLfZBuX2AwA8N6+jM0P12cCNTctNJG8k7yt5ELUzX3dTg3MsUbkM6WceK2Uusav7A44wAZnGNzbYbNonrqh7X+A0YAzDmISVooa/JVxAnKVWJmhS0irAGva2BE7xauk0SYWZ5Qm6g64+NecZROwEfBU2mT7X2de4hEqyjzP2hnTIQ0lq1wtLtNnzaNl9EZ+LhxIChTBKZvleasciwz/UboLnlTt5jYkMu3sznRuEpAHh6sKnsPxek+zKiL+2jmOkx0coXMHT5U91iK3G3nXvRbaxiLAgMBAAECggEAeiTxHGB948d8dl21LhlT9QTklH+vnB9l5gbgomgCN+LaKjx7+bHTXZUHsxcNjBxU3vUQUgj8cputwZSlcwOoIel8d4YtJeFg3rUZQlQ595zwr+Jd+Btl7wiQzzycS6KwPG7RtyXZdfVx09FrQKKE3RmwmVY69zjDyTLmSsOmdgsDycdlrGoG5Q3kcy8Hiwf3GiKysRmlhuM0dgPQEsz/AZbThKQKG28ECDSSBcOQ4j6d7TYlC2tqoHPHzFnrlTvfjg45DwPdVP0XFLykkjmqwZWTF7LkXoM7wZF+J/RnwvT31AodhEQv/o/ku9WyN+sEqCt0VaHoLV/9XQUR4KoKSQKBgQDnqDtPc/MqpIODep/NiBiXpTADfThvvyh48yjl43c10IczfVRT2zJzO+fMzEzSow0j1AUkHWFG/O7yGLllfHRBEt37jFcWMLPNybWKFODKrOKmvn6lOqDnjBDil0OmUk9/P2ckSrA2MJIhwr2ubZrXz1p6i+2G4hRXq4d0QObunQKBgQDWb7c9IJ6oUwzMwNcYQPowLaV8sO8Idd75851Z/n66cjmbxq70OXU87cfBEqbWcxoSQrkFgh2qlZcwlT8mlBc8ok55zlhpDi5UeY9l530i+wCtu6JP+6Mu9qFRpUArXkAq3WVn6RXpG/J50k78s6+U5ZtjFsZHP2Wa/xrU94knRwKBgQDixpGpKfz11a7Y2wXtEjng2diy0baZziw0mvWCdraQe96ezSXsITy2CgLVPXpHCU8nr7qIrCo6cAkJ/qIfc0HrIikkwzHNi0e5QKjyz5VvUudeDEW2QjqZ8UfmSeXzv8gK7Wpu4J63rbygSB+fzbQzZ81PAgQ4csEvQb+MUqy/EQKBgHuylARaBcvZpJ+Uej/Oc8RJAJZuRmUeAZM0OcfJK/eHnr3CnffaEUwlaj5w8PbyDM8N2EdaKJzXkBCBd51cfg8HHbfcFVn8yTMHsHW7VI9SNbECdP4ojZiwwpwjdGHQC7nuXunTJkWDTpuBevkA+j8tODav048T/husHyFM7bxPAoGAObeOHaxu/LFw9/CApEzLFYR9DULSXGuuDEG6DQgK7XEae2HgQWAH8ioRE+eDArNRBz+Jyp9sLsKd0WbRScKjv4YgsmLbAH8vqMXBqpuMs6afqCkYrOEYbZs1kOwGsBky8ACrY5UokXOYijCGO9wchkZJwxAy1z+IEdxZdDABiMc=";
@@ -38,7 +42,7 @@ public class PayController {
     //支付宝异步通知路径,付款完毕后会异步调用本项目的方法,必须为公网地址
     private final String NOTIFY_URL = "http://127.0.0.1/";
     //支付宝同步通知路径,也就是当付款完毕后跳转本项目的页面,可以不是公网地址
-    private final String RETURN_URL = "http://localhost:8443/returnUrl";
+    private final String RETURN_URL = "http://192.168.1.109:8443/returnUrl";
 
     @GetMapping(value = "/alipay", params = {"amount", "token"})
     public void alipay(HttpServletResponse httpResponse, @RequestParam String amount, @RequestParam String token) throws IOException {
@@ -61,6 +65,7 @@ public class PayController {
         //商户订单号，商户网站订单系统中唯一订单号，必填
         //生成随机Id
         String out_trade_no = UUID.randomUUID() + "_" + token;
+//        String out_trade_no = UUID.randomUUID().toString();
         //付款金额，必填
 //        String total_amount =Integer.toString(r.nextInt(9999999)+1000000);
         String total_amount = Integer.toString(Integer.parseInt(amount));
@@ -132,15 +137,17 @@ public class PayController {
             System.out.println("付款金额="+total_amount);
 
             String[] s = out_trade_no.split("_");
-            String token = s[1];
-            System.out.println(s[1]);
+            String phone = s[1];
+            System.out.println(phone);
+            String userId = userService.selectPhone(phone).toString();
+            System.out.println(userId);
 
-            if (!TokenUtils.verify(token)) {
-                System.out.println("充值失败");
-                response.setStatus(999);
-                return "no";
-            }
-            accountService.recharge(TokenUtils.getUserId(token), Double.parseDouble(total_amount));
+//            if (!TokenUtils.verify(token)) {
+//                System.out.println("充值失败");
+//                response.setStatus(999);
+//                return "no";
+//            }
+            accountService.recharge(userId, Double.parseDouble(total_amount));
 
             //支付成功，修复支付状态
 //            payService.updateById(Integer.valueOf(out_trade_no));
