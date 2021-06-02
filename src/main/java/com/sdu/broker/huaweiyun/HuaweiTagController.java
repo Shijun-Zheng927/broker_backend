@@ -3,9 +3,13 @@ package com.sdu.broker.huaweiyun;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.BucketTagInfo;
+import com.obs.services.model.ListBucketsRequest;
+import com.obs.services.model.ObsBucket;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HuaweiTagController {
@@ -36,6 +40,13 @@ public class HuaweiTagController {
         return "success";
     }
 
+
+    public String setOneTag(String bucketName, String key , String value){
+        BucketTagInfo.TagSet tag = newTagSet();
+        tag.addTag(key,value);
+        String result = setBucketTag(tag,bucketName);
+        return result;
+    }
     public Map<String,String> getBucketTagging(String bucketName){
         BucketTagInfo bucketTagInfo = obsClient.getBucketTagging(bucketName);
         Map<String,String> map = new HashMap<>();
@@ -46,6 +57,21 @@ public class HuaweiTagController {
         return map;
     }
 
+    public List<ObsBucket> listBucketByTag(String tagKey, String tagValue){
+        ListBucketsRequest request = new ListBucketsRequest();
+        request.setQueryLocation(true);
+        List<ObsBucket> buckets = obsClient.listBuckets(request);
+        List<ObsBucket> result = new ArrayList<>();
+        for (ObsBucket bucket : buckets){
+            Map<String,String> map = getBucketTagging(bucket.getBucketName());
+            String Value = map.get(tagKey);
+            if (Value.equals(tagValue)){
+                result.add(bucket);
+            }
+        }
+        return result;
+
+    }
     public String deleteBucketTagging(String bucketName){
         try {
             obsClient.deleteBucketTagging(bucketName);

@@ -99,15 +99,10 @@ public class HuaweiController {
         ListBucketsRequest request = new ListBucketsRequest();
         request.setQueryLocation(true);
         List<ObsBucket> buckets = obsClient.listBuckets(request);
-        for (ObsBucket bucket : buckets) {
-            System.out.println("Bucket Name:" + bucket.getBucketName());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            System.out.println("Create Date:" + bucket.getCreationDate());
-            System.out.println("Location:" + bucket.getLocation());
-            System.out.println();
-        }
         return buckets;
     }
+
+
 
     /* 删除桶 */
     public int removeBucket(String bucketName)

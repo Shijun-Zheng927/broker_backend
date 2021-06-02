@@ -1,6 +1,8 @@
 package com.sdu.broker.APIController;
 
+import com.obs.services.model.ObsBucket;
 import com.sdu.broker.aliyun.oss.BucketController;
+import com.sdu.broker.huaweiyun.HuaweiTagController;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.ControllerUtils;
 import com.sdu.broker.utils.TokenUtils;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,6 +23,8 @@ public class APITagController {
     private PlatformService platformService;
     @Autowired
     private BucketController bucketController;
+    private HuaweiTagController huaweiTagController = new HuaweiTagController();
+
 
     @ResponseBody
     @RequestMapping(value = "/setBucketTagging", method = RequestMethod.POST)
@@ -44,7 +49,8 @@ public class APITagController {
             String result = bucketController.setBucketTagging(bucketName, tagKey, tagValue);
             return result;
         } else {
-            return null;
+            String result = huaweiTagController.setOneTag(bucketName, tagKey, tagValue);
+            return result;
         }
     }
 
@@ -65,7 +71,8 @@ public class APITagController {
             Map<String, String> result = bucketController.getBucketTagging(bucketName);
             return result;
         } else {
-            return null;
+            Map<String, String> result = huaweiTagController.getBucketTagging(bucketName);
+            return result;
         }
     }
 
@@ -91,7 +98,15 @@ public class APITagController {
             List<com.aliyun.oss.model.Bucket> buckets = ControllerUtils.getBucketsAli(userId, platform, result);
             return ControllerUtils.bucketToStringAli(buckets);
         } else {
-            return null;
+            List<ObsBucket> result0 = huaweiTagController.listBucketByTag(tagKey, tagValue);
+            if (result0.size() == 0) {
+                return null;
+            }
+            List<String> result = new ArrayList<>();
+            for (ObsBucket o : result0){
+                result.add(o.getBucketName());
+            }
+            return result;
         }
     }
 
@@ -112,7 +127,8 @@ public class APITagController {
             String result = bucketController.deleteBucketTagging(bucketName);
             return result;
         } else {
-            return null;
+            String result = huaweiTagController.deleteBucketTagging(bucketName);
+            return result;
         }
     }
 }
