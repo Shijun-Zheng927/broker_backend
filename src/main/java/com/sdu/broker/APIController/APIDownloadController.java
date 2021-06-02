@@ -1,5 +1,6 @@
 package com.sdu.broker.APIController;
 
+import com.sdu.broker.pojo.req.DownloadFile;
 import com.obs.services.model.DownloadFileRequest;
 import com.obs.services.model.GetObjectRequest;
 import com.sdu.broker.huaweiyun.HuaweiDownloadController;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,8 +21,6 @@ import java.util.Objects;
 public class APIDownloadController {
     @Autowired
     private BucketService bucketService;
-    private HuaweiDownloadController huaweiDownloadController = new HuaweiDownloadController();
-    private HuaweiObjectController huaweiObjectController = new HuaweiObjectController();
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -54,9 +54,6 @@ public class APIDownloadController {
                 //设置默认值
                 rwPolicy = "0";
             }
-
-
-
 
             //华为云在此进行方法调用
 //            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
@@ -188,6 +185,25 @@ public class APIDownloadController {
             }
         }
     }
+    @ResponseBody
+    @RequestMapping(value = "/downloadTest")
+    public byte[] downloadTest() {
+        byte[] bytes = null;
+        try {
+            File f = new File("D:\\IDEA\\broker\\src\\main\\resources\\static\\head\\groot.jpg");
+            FileInputStream inputStream = new FileInputStream(f);
+            bytes = new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+            FileOutputStream fos = new FileOutputStream(f);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        return new DownloadFile("groot.jpg", bytes);
+        return bytes;
+    }
+
 
     //工具方法
     public boolean verify(HttpServletResponse response, Integer userId, String bucketName) {

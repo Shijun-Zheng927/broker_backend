@@ -6,4 +6,6 @@ public interface UserService {
     User login(User user);
 
     Integer register(User user);
+
+    Integer setHead(String head, Integer id);
 }

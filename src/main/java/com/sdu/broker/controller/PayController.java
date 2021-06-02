@@ -8,10 +8,8 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.sdu.broker.service.AccountService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -38,27 +36,38 @@ public class PayController {
     //签名方式
     private final String SIGN_TYPE = "RSA2";
     //支付宝异步通知路径,付款完毕后会异步调用本项目的方法,必须为公网地址
-    private final String NOTIFY_URL = "http://127.0.0.1/notifyUrl";
+    private final String NOTIFY_URL = "http://127.0.0.1/";
     //支付宝同步通知路径,也就是当付款完毕后跳转本项目的页面,可以不是公网地址
     private final String RETURN_URL = "http://localhost:8443/returnUrl";
 
-    @RequestMapping("/alipay")
-    public void alipay(HttpServletResponse httpResponse) throws IOException {
+    @GetMapping(value = "/alipay", params = {"amount", "token"})
+    public void alipay(HttpServletResponse httpResponse, @RequestParam String amount, @RequestParam String token) throws IOException {
+//        String amount = map.get("amount");
+//        String token = map.get("token");
+        System.out.println(amount);
+        System.out.println(token);
+        if ("".equals(amount) || "".equals(token)) {
+            return;
+        }
+
+
         SecureRandom r= new SecureRandom();
         //实例化客户端,填入所需参数
         AlipayClient alipayClient = new DefaultAlipayClient(GATEWAY_URL, APP_ID, APP_PRIVATE_KEY, FORMAT, CHARSET, ALIPAY_PUBLIC_KEY, SIGN_TYPE);
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         //在公共参数中设置回跳和通知地址
         request.setReturnUrl(RETURN_URL);
-        request.setNotifyUrl(NOTIFY_URL);
+//        request.setNotifyUrl(NOTIFY_URL);
         //商户订单号，商户网站订单系统中唯一订单号，必填
         //生成随机Id
-        String out_trade_no = UUID.randomUUID().toString();
+        String out_trade_no = UUID.randomUUID() + "_" + token;
         //付款金额，必填
 //        String total_amount =Integer.toString(r.nextInt(9999999)+1000000);
-        String total_amount = Integer.toString(30);
+        String total_amount = Integer.toString(Integer.parseInt(amount));
+
+        String user_token = token;
         //订单名称，必填
-        String subject ="平台充值30元";
+        String subject ="平台充值" + amount + "元";
         //商品描述，可空
         String body = "尊敬的用户, 欢迎续费";
         request.setBizContent("{\"out_trade_no\":\""+ out_trade_no +"\","
@@ -67,6 +76,7 @@ public class PayController {
                 + "\"body\":\""+ body +"\","
                 + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
         String form = "";
+        System.out.println(request.getBizContent());
 //        System.out.println(request.getBizContent());
         try {
             form = alipayClient.pageExecute(request).getBody(); // 调用SDK生成表单
@@ -85,8 +95,7 @@ public class PayController {
     private AccountService accountService;
 
     @RequestMapping(value = "/returnUrl", method = RequestMethod.GET)
-    public String returnUrl(HttpServletRequest request, HttpServletResponse response,
-                            @RequestHeader("Authorization") String authorization)
+    public String returnUrl(HttpServletRequest request, HttpServletResponse response)
             throws IOException, AlipayApiException {
         System.out.println("=================================同步回调=====================================");
 
@@ -122,11 +131,16 @@ public class PayController {
             System.out.println("支付宝交易号="+trade_no);
             System.out.println("付款金额="+total_amount);
 
-            if (!TokenUtils.verify(authorization)) {
+            String[] s = out_trade_no.split("_");
+            String token = s[1];
+            System.out.println(s[1]);
+
+            if (!TokenUtils.verify(token)) {
+                System.out.println("充值失败");
                 response.setStatus(999);
                 return "no";
             }
-            accountService.recharge(TokenUtils.getUserId(authorization), Double.parseDouble(total_amount));
+            accountService.recharge(TokenUtils.getUserId(token), Double.parseDouble(total_amount));
 
             //支付成功，修复支付状态
 //            payService.updateById(Integer.valueOf(out_trade_no));

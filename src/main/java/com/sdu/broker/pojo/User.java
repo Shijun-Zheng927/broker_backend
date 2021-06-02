@@ -9,6 +9,30 @@ public class User {
     private String company;         //公司
     private String introduction;    //个人简介
     private String occupation;      //职业
+    private String head;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", company='" + company + '\'' +
+                ", introduction='" + introduction + '\'' +
+                ", occupation='" + occupation + '\'' +
+                ", head='" + head + '\'' +
+                '}';
+    }
+
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
+    }
 
     public Integer getId() {
         return id;

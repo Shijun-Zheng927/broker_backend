@@ -45,9 +45,12 @@ public class APIUploadController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        System.out.println(platform);
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -64,7 +67,7 @@ public class APIUploadController {
 
             return result;
         } else {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -154,51 +157,63 @@ public class APIUploadController {
     public String putFileStream(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                 @RequestParam("file") MultipartFile file,
                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!verifyIdentity(response, authorization)) {
-            return null;
-        }
+//        if (!verifyIdentity(response, authorization)) {
+//            return null;
+//        }
         if (file == null) {
             System.out.println("file is null");
             return null;
         }
-        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
-        String path = "";
+        System.out.println(bn);
+        System.out.println(objectPath);
+        String filePath = "D:/IDEA/broker/src/main/resources/file/";
+//        String uuid = UUID.randomUUID().toString();
+        String fileName = file.getOriginalFilename();
+        File f = new File(filePath + fileName);
         try {
-            String filePath = "D:/IDEA/broker/src/main/resources/file/";
-            String uuid = UUID.randomUUID().toString();
-            String fileName = uuid + file.getOriginalFilename();
-            File f = new File(filePath + fileName);
-//                result = "http://localhost:8443/imgs/" + fileName;
-            path = filePath + fileName;
             file.transferTo(f);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(bn);
-        if (platform.equals("ALI")) {
-            String bucketName = bn;
-            if (verifyBucketName(response, userId, platform, bucketName)) {
-                return null;
-            }
-            if (objectPath == null || objectPath.equals("")) {
-                response.setStatus(777);
-                return null;
-            }
-            String result = aliUploadController.putFileStream(path, bucketName, objectPath);
-            return result;
-        } else {
-            String bucketName = bn;
-            if (verifyBucketName(response, userId, platform, bucketName)) {
-                return null;
-            }
-            if (objectPath == null || objectPath.equals("")) {
-                response.setStatus(777);
-                return null;
-            }
-            String result = huaweiUploadController.uploadFile(path, bucketName, objectPath);
-            return result;
-        }
+        return null;
+//        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+//        String platform = platformService.getPlatform(userId);
+//        String path = "";
+//        try {
+//            String filePath = "D:/IDEA/broker/src/main/resources/file/";
+//            String uuid = UUID.randomUUID().toString();
+//            String fileName = uuid + file.getOriginalFilename();
+//            File f = new File(filePath + fileName);
+////                result = "http://localhost:8443/imgs/" + fileName;
+//            path = filePath + fileName;
+//            file.transferTo(f);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(bn);
+//        if (platform.equals("ALI")) {
+//            String bucketName = bn;
+//            if (verifyBucketName(response, userId, platform, bucketName)) {
+//                return null;
+//            }
+//            if (objectPath == null || objectPath.equals("")) {
+//                response.setStatus(777);
+//                return null;
+//            }
+//            String result = aliUploadController.putFileStream(path, bucketName, objectPath);
+//            return result;
+//        } else {
+//            String bucketName = bn;
+//            if (verifyBucketName(response, userId, platform, bucketName)) {
+//                return null;
+//            }
+//            if (objectPath == null || objectPath.equals("")) {
+//                response.setStatus(777);
+//                return null;
+//            }
+//            String result = huaweiUploadController.uploadFile(path, bucketName, objectPath);
+//            return result;
+//        }
     }
 
     @RequestMapping(value = "/putFile")

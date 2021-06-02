@@ -25,11 +25,17 @@ public class UserServiceImpl implements UserService {
         Integer hasPhone = userMapper.selectPhone(user.getPhone());
 //        System.out.println(hasPhone);
         if (hasPhone == null) {
+            user.setHead("null");
             userMapper.register(user);
             accountMapper.register(user.getId());
             return 1;
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public Integer setHead(String head, Integer id) {
+        return userMapper.setHead(head, id);
     }
 }
