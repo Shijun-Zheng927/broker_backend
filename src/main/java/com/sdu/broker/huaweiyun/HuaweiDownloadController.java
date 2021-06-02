@@ -204,13 +204,13 @@ public class HuaweiDownloadController {
         return request;
     }
     /* 断点续传下载 */
-    public String checkpointDownload(DownloadFileRequest request,String localfile){
+    public String checkPointDownload(DownloadFileRequest request,String localfile,int partSize,int taskNum){
         // 设置下载对象的本地文件路径
         request.setDownloadFile(localfile);
         // 设置分段下载时的最大并发数
-        request.setTaskNum(5);
+        request.setTaskNum(taskNum);
         // 设置分段大小为10MB
-        request.setPartSize(10 * 1024 * 1024);
+        request.setPartSize(partSize);
         // 开启断点续传模式
         request.setEnableCheckpoint(true);
         try{
@@ -220,7 +220,7 @@ public class HuaweiDownloadController {
             // 发生异常时可再次调用断点续传下载接口进行重新下载
             return "download failed";
         }
-        return request.getDownloadFile();
+        return localfile;
     }
 
     /* 关闭客户端 */

@@ -1,5 +1,6 @@
 package com.sdu.broker.APIController;
 
+import com.obs.services.model.DownloadFileRequest;
 import com.obs.services.model.GetObjectRequest;
 import com.sdu.broker.huaweiyun.HuaweiDownloadController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
@@ -65,7 +66,7 @@ public class APIDownloadController {
         }
     }
 
-    //范围下载
+    //流式下载
     @ResponseBody
     @RequestMapping(value = "/streamDownload", method = RequestMethod.POST)
     public String streamDownload(@RequestBody Map<String, String> map,
@@ -104,6 +105,89 @@ public class APIDownloadController {
         }
     }
 
+    //范围下载
+    @ResponseBody
+    @RequestMapping(value = "/rangeDownload", method = RequestMethod.POST)
+    public String rangeDownload(@RequestBody Map<String, String> map,String localFile,int begin,int end,
+                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String bucketName = map.get("bucketName");
+        String objectKey = map.get("objectKey");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform.equals("ALI")) {
+            //在此获取其他参数并验证
+            String acl = map.get("rwPolicy");
+            if ("".equals(acl)) {
+                //设置默认值
+                acl = "0";
+            }
+
+            //阿里云在此调用方法
+//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+
+            //返回结果
+            return "result";
+        } else {
+            if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
+                GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName,objectKey);
+                String s = huaweiDownloadController.rangeDownload(request,localFile,begin,end);
+                if (s.equals("OBS exception!")||s.equals("IO exception!")){
+                    return null;
+                }
+                return s;
+            }else {
+                return null;
+            }
+        }
+    }
+
+    //断点续传下载
+    @ResponseBody
+    @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
+    public String checkPointDownload(@RequestBody Map<String, String> map,String localFile, int partSize,int taskNum,
+                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String bucketName = map.get("bucketName");
+        String objectKey = map.get("objectKey");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform.equals("ALI")) {
+            //在此获取其他参数并验证
+            String acl = map.get("rwPolicy");
+            if ("".equals(acl)) {
+                //设置默认值
+                acl = "0";
+            }
+
+            //阿里云在此调用方法
+//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+
+            //返回结果
+            return "result";
+        } else {
+            if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
+                DownloadFileRequest request = huaweiDownloadController.newDownloadRequest(bucketName, objectKey);
+                String s = huaweiDownloadController.checkPointDownload(request,localFile,partSize,taskNum);
+                if (s.equals("download failed")){
+                    return null;
+                }
+                return s;
+            }else {
+                return null;
+            }
+        }
+    }
 
     //工具方法
     public boolean verify(HttpServletResponse response, Integer userId, String bucketName) {
