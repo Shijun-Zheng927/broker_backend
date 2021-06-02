@@ -27,15 +27,18 @@ public class huaweitest  {
         String pathname2 = "D:\\ ProjectTraining\\test.mp4";
         String objectKey = "test1.txt";
         String objectKey1 = "test.mp4";
+        String objectKeynotexist = "notexist";
         String downloadPath = "D:\\ ProjectTraining\\download\\download4.txt";
         String downloadPath1 = "D:\\ ProjectTraining\\download\\test.mp4";
 
+        GetObjectRequest request = hdc.newObjectRequest(bucketname1,objectKeynotexist);
+        System.out.println(hdc.streamDownload(request));
 //        System.out.println(hblc.getBucketLogging(bucketname1));
 //        System.out.println(hwc.getBucketAcl(bucketname1));
 //        System.out.println(hwc.getBucketAcl(bucketname2));
 
 //        System.out.println(hwc.setBucketAclForLog(bucketname1));
-        System.out.println(hblc.shutdownBucketLogging(bucketname1));
+//        System.out.println(hblc.shutdownBucketLogging(bucketname1));
 //        hwc.setBucketAcl(bucketname1,4);
 //        hwc.setBucketAcl(bucketname2,4);
 //        String targetprefix = new String("prefix/");

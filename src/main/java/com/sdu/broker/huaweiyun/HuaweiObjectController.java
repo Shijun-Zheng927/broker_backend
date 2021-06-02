@@ -56,6 +56,12 @@ public class HuaweiObjectController {
         AccessControlList acl = obsClient.getObjectAcl(bucketName, objectKey);
         return acl;
     }
+
+    //对象是否存在
+    public boolean ifObjectExist(String bucketName,String objectKey){
+        boolean exist = obsClient.doesObjectExist(bucketName,objectKey);
+        return  exist;
+    }
     /* 列举对象 */
     /* 新建列举请求 */
     public ListObjectsRequest newListRequest(String bucketName){

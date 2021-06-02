@@ -1,5 +1,8 @@
 package com.sdu.broker.APIController;
 
+import com.obs.services.model.GetObjectRequest;
+import com.sdu.broker.huaweiyun.HuaweiDownloadController;
+import com.sdu.broker.huaweiyun.HuaweiObjectController;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,8 @@ import java.util.Objects;
 public class APIDownloadController {
     @Autowired
     private BucketService bucketService;
+    private HuaweiDownloadController huaweiDownloadController = new HuaweiDownloadController();
+    private HuaweiObjectController huaweiObjectController = new HuaweiObjectController();
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -49,11 +54,53 @@ public class APIDownloadController {
                 rwPolicy = "0";
             }
 
+
+
+
             //华为云在此进行方法调用
 //            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
 
             //返回结果
             return "result";
+        }
+    }
+
+    //范围下载
+    @ResponseBody
+    @RequestMapping(value = "/streamDownload", method = RequestMethod.POST)
+    public String streamDownload(@RequestBody Map<String, String> map,
+                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String bucketName = map.get("bucketName");
+        String objectKey = map.get("objectKey");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform.equals("ALI")) {
+            //在此获取其他参数并验证
+            String acl = map.get("rwPolicy");
+            if ("".equals(acl)) {
+                //设置默认值
+                acl = "0";
+            }
+
+            //阿里云在此调用方法
+//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+
+            //返回结果
+            return "result";
+        } else {
+            if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
+                GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName,objectKey);
+                String s = huaweiDownloadController.streamDownload(request);
+                return s;
+            }else {
+                return null;
+            }
         }
     }
 
