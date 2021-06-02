@@ -54,7 +54,8 @@ public class HuaweiTagController {
         Map<String,String> map = new HashMap<>();
         for(BucketTagInfo.TagSet.Tag tag : bucketTagInfo.getTagSet().getTags()){
             System.out.println("\t" + tag.getKey() + ":" + tag.getValue());
-            map.put(tag.getKey(),tag.getValue());
+            map.put("tagValue",tag.getValue());
+            map.put("tagKey",tag.getKey());
         }
         return map;
     }
@@ -66,8 +67,9 @@ public class HuaweiTagController {
         List<ObsBucket> result = new ArrayList<>();
         for (ObsBucket bucket : buckets){
             Map<String,String> map = getBucketTagging(bucket.getBucketName());
-            String Value = map.get(tagKey);
-            if (Value.equals(tagValue)){
+            String value = map.get("tagValue");
+            String key = map.get("tagKey");
+            if (value.equals(tagValue)&&key.equals(tagKey)){
                 result.add(bucket);
             }
         }
