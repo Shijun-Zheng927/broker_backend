@@ -31,18 +31,25 @@ public class huaweitest  {
         String downloadPath = "D:\\ ProjectTraining\\download\\download4.txt";
         String downloadPath1 = "D:\\ ProjectTraining\\download\\test.mp4";
 
-        GetObjectRequest request = hdc.newObjectRequest(bucketname1,objectKeynotexist);
-        System.out.println(hdc.streamDownload(request));
+
+//        ListObjectsRequest requestl1 = hoc.newListRequest(bucketname1);
+//        List<ObsObject> list1 = hoc.simpleList(requestl1,"prefix/");
+//        for (ObsObject o : list1){
+//            System.out.println("11:"+o.getObjectKey());
+//        }
+//        String targetprefix = new String("prefix/");
+//        System.out.println(hblc.setBuckectLogging(bucketname1,targetprefix,bucketname1));
+
+        System.out.println(hblc.shutdownBucketLogging(bucketname1));
+//        GetObjectRequest request = hdc.newObjectRequest(bucketname1,objectKeynotexist);
+//        System.out.println(hdc.streamDownload(request));
 //        System.out.println(hblc.getBucketLogging(bucketname1));
-//        System.out.println(hwc.getBucketAcl(bucketname1));
-//        System.out.println(hwc.getBucketAcl(bucketname2));
+
 
 //        System.out.println(hwc.setBucketAclForLog(bucketname1));
 //        System.out.println(hblc.shutdownBucketLogging(bucketname1));
 //        hwc.setBucketAcl(bucketname1,4);
 //        hwc.setBucketAcl(bucketname2,4);
-//        String targetprefix = new String("prefix/");
-//        System.out.println(hblc.setBuckectLogging(bucketname1,targetprefix,bucketname1));
 
 //        BucketTagInfo.TagSet tagSet = htc.newTagSet();
 //        htc.addTag(tagSet,"tag1","handsome");

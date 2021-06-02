@@ -6,6 +6,7 @@ import com.obs.services.model.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HuaweiBuckectLoggingController {
@@ -21,6 +22,10 @@ public class HuaweiBuckectLoggingController {
 //        config.setAgency(agency);
         config.setTargetBucketName(targetBucketName);
         config.setLogfilePrefix(targetPrefix);
+
+        HuaweiController hwc = new HuaweiController();
+        hwc.setBucketAclForLog(targetBucketName);
+        hwc.closeObsClient();
 
         // 为所有用户设置对日志对象的读权限
         GrantAndPermission grant1 = new GrantAndPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_FULL_CONTROL);
@@ -67,7 +72,8 @@ public class HuaweiBuckectLoggingController {
     public Map<String,String> getBucketLogging(String bucketName){
         BucketLoggingConfiguration config = obsClient.getBucketLogging(bucketName);
         Map<String,String> map = new HashMap<>();
-        map.put(config.getTargetBucketName(),config.getLogfilePrefix());
+        map.put("targetBucketName",config.getTargetBucketName());
+        map.put("targetPrefix",config.getLogfilePrefix());
         System.out.println("\t" + config.getTargetBucketName());
         System.out.println("\t" + config.getLogfilePrefix());
         return map;
@@ -77,9 +83,20 @@ public class HuaweiBuckectLoggingController {
     public String shutdownBucketLogging(String bucketName){
         // 对桶设置空的日志配置
         try{
+            Map<String,String> map = getBucketLogging(bucketName);
+            String targetBucketName = map.get("targetBucketName");
+            String targetPrefix = map.get("targetPrefix");
+            System.out.println(targetBucketName);
+            System.out.println(targetPrefix);
+            HuaweiObjectController hoc = new HuaweiObjectController();
+            ListObjectsRequest request = hoc.newListRequest(targetBucketName);
+            List<ObsObject> list = hoc.simpleList(request,targetPrefix);
+            for (ObsObject o : list){
+                hoc.deleteObject(targetBucketName,o.getObjectKey());
+            }
             obsClient.setBucketLogging(bucketName, new BucketLoggingConfiguration());
         }catch (ObsException e ){
-            return "failed";
+            return "ObsException";
         }
         return "success";
     }

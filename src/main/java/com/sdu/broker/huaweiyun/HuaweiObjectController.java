@@ -87,14 +87,14 @@ public class HuaweiObjectController {
     }
     /* 指定前缀列举 */
     public List<ObsObject> simpleList(ListObjectsRequest request,String prefix){
-        request.setMarker(prefix);
+        request.setPrefix(prefix);
         List<ObsObject> list = simpleList(request);
         return list;
     }
     /* 指定前缀和数目的列举 */
     public List<ObsObject> simpleList(ListObjectsRequest request,int n,String prefix){
         request.setMaxKeys(n);
-        request.setMarker(prefix);
+        request.setPrefix(prefix);
         List<ObsObject> list = simpleList(request);
         return list;
     }
