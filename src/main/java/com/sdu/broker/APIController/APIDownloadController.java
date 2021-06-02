@@ -117,8 +117,8 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         String localFile = map.get("localFile");
-        int begin = Integer.valueOf(map.get("begin"));
-        int end = Integer.valueOf(map.get("end"));
+        int begin = Integer.parseInt(map.get("begin"));
+        int end = Integer.parseInt(map.get("end"));
 
         if (verify(response, userId, bucketName)) {
             return null;
@@ -163,8 +163,8 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         String localFile = map.get("localFile");
-        int partSize = Integer.valueOf(map.get("partSize"));
-        int taskNum = Integer.valueOf(map.get("taskNum"));
+        int partSize = Integer.parseInt(map.get("partSize"));
+        int taskNum = Integer.parseInt(map.get("taskNum"));
         if (verify(response, userId, bucketName)) {
             return null;
         }
