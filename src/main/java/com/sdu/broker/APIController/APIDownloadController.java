@@ -117,7 +117,7 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         String localFile = map.get("localFile");
-        int begin = Integer.valueOf(map.get("end"));
+        int begin = Integer.valueOf(map.get("begin"));
         int end = Integer.valueOf(map.get("end"));
 
         if (verify(response, userId, bucketName)) {
