@@ -108,7 +108,7 @@ public class APIDownloadController {
     //范围下载
     @ResponseBody
     @RequestMapping(value = "/rangeDownload", method = RequestMethod.POST)
-    public String rangeDownload(@RequestBody Map<String, String> map,String localFile,int begin,int end,
+    public String rangeDownload(@RequestBody Map<String, String> map,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -116,6 +116,10 @@ public class APIDownloadController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
+        String localFile = map.get("localFile");
+        int begin = Integer.valueOf(map.get("end"));
+        int end = Integer.valueOf(map.get("end"));
+
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -150,7 +154,7 @@ public class APIDownloadController {
     //断点续传下载
     @ResponseBody
     @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
-    public String checkPointDownload(@RequestBody Map<String, String> map,String localFile, int partSize,int taskNum,
+    public String checkPointDownload(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -158,6 +162,9 @@ public class APIDownloadController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
+        String localFile = map.get("localFile");
+        int partSize = Integer.valueOf(map.get("partSize"));
+        int taskNum = Integer.valueOf(map.get("taskNum"));
         if (verify(response, userId, bucketName)) {
             return null;
         }
