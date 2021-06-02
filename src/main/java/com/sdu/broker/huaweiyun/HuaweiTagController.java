@@ -5,6 +5,7 @@ import com.obs.services.exception.ObsException;
 import com.obs.services.model.BucketTagInfo;
 import com.obs.services.model.ListBucketsRequest;
 import com.obs.services.model.ObsBucket;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class HuaweiTagController {
     /* 初始化OBS客户端所需的参数 */
     private static final String endPoint     = "https://obs.cn-north-1.myhuaweicloud.com";

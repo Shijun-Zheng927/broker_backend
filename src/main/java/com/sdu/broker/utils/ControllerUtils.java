@@ -1,5 +1,6 @@
 package com.sdu.broker.utils;
 
+import com.obs.services.model.ObsBucket;
 import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.service.BucketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,22 @@ public class ControllerUtils {
         while (iterator.hasNext()) {
             com.aliyun.oss.model.Bucket bucket = iterator.next();
             b.setName(bucket.getName());
+            Integer legal = bucketService.isLegal(b);
+            if (legal == null) {
+                iterator.remove();
+            }
+        }
+        return result;
+    }
+
+    public static List<ObsBucket> getBucketsHuawei(Integer userId, String platform, List<ObsBucket> result) {
+        Bucket b = new Bucket();
+        b.setId(userId);
+        b.setPlatform(platform);
+        Iterator<ObsBucket> iterator = result.iterator();
+        while (iterator.hasNext()) {
+            ObsBucket bucket = iterator.next();
+            b.setName(bucket.getBucketName());
             Integer legal = bucketService.isLegal(b);
             if (legal == null) {
                 iterator.remove();

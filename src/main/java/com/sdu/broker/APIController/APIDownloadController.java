@@ -6,6 +6,7 @@ import com.obs.services.model.GetObjectRequest;
 import com.sdu.broker.huaweiyun.HuaweiDownloadController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
 import com.sdu.broker.service.BucketService;
+import com.sdu.broker.utils.BucketUtils;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,10 @@ import java.util.Objects;
 public class APIDownloadController {
     @Autowired
     private BucketService bucketService;
+    @Autowired
+    private HuaweiDownloadController huaweiDownloadController;
+    @Autowired
+    private HuaweiObjectController huaweiObjectController;
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -75,16 +80,13 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
-            return null;
+            return "fail";
+        }
+        if ("".equals(objectKey)) {
+            return "fail";
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
 
             //阿里云在此调用方法
 //            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
@@ -97,7 +99,7 @@ public class APIDownloadController {
                 String s = huaweiDownloadController.streamDownload(request);
                 return s;
             }else {
-                return null;
+                return "fail";
             }
         }
     }
@@ -105,7 +107,7 @@ public class APIDownloadController {
     //范围下载
     @ResponseBody
     @RequestMapping(value = "/rangeDownload", method = RequestMethod.POST)
-    public String rangeDownload(@RequestBody Map<String, String> map,String localFile,int begin,int end,
+    public String rangeDownload(@RequestBody Map<String, String> map,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -114,16 +116,14 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
-            return null;
+            return "fail";
+        }
+        if ("".equals(objectKey)) {
+            return "fail";
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
 
             //阿里云在此调用方法
 //            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
@@ -131,15 +131,21 @@ public class APIDownloadController {
             //返回结果
             return "result";
         } else {
+            String begin = map.get("begin");
+            String end = map.get("end");
+            if ("".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
+                return "fail";
+            }
+            String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
-                GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName,objectKey);
-                String s = huaweiDownloadController.rangeDownload(request,localFile,begin,end);
+                GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName, objectKey);
+                String s = huaweiDownloadController.rangeDownload(request, path, Integer.parseInt(begin), Integer.parseInt(end));
                 if (s.equals("OBS exception!")||s.equals("IO exception!")){
-                    return null;
+                    return "fail";
                 }
-                return s;
+                return "http://localhost:8443/file/" + objectKey;
             }else {
-                return null;
+                return "fail";
             }
         }
     }
@@ -147,25 +153,19 @@ public class APIDownloadController {
     //断点续传下载
     @ResponseBody
     @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
-    public String checkPointDownload(@RequestBody Map<String, String> map,String localFile, int partSize,int taskNum,
+    public String checkPointDownload(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
-            return null;
+            return "fail";
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
-            return null;
+            return "fail";
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
 
             //阿里云在此调用方法
 //            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
@@ -173,15 +173,22 @@ public class APIDownloadController {
             //返回结果
             return "result";
         } else {
+            String partSize = map.get("partSize");
+            String taskNum = map.get("taskNum");
+            if ("".equals(partSize) || "".equals(taskNum) || !BucketUtils.isNumber(partSize) || !BucketUtils.isNumber(taskNum)) {
+                return "fail";
+            }
+            String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
                 DownloadFileRequest request = huaweiDownloadController.newDownloadRequest(bucketName, objectKey);
-                String s = huaweiDownloadController.checkPointDownload(request,localFile,partSize,taskNum);
+                String s = huaweiDownloadController.checkPointDownload(request, path,
+                        Integer.parseInt(partSize), Integer.parseInt(taskNum));
                 if (s.equals("download failed")){
-                    return null;
+                    return "fail";
                 }
-                return s;
+                return "http://localhost:8443/file/" + objectKey;
             }else {
-                return null;
+                return "fail";
             }
         }
     }
