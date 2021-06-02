@@ -1,5 +1,6 @@
 package com.sdu.broker.controller;
 
+import com.sdu.broker.pojo.UrlPath;
 import com.sdu.broker.pojo.User;
 import com.sdu.broker.service.UserService;
 import com.sdu.broker.utils.TokenUtils;
@@ -18,6 +19,8 @@ import java.util.UUID;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UrlPath urlPath;
 
     /**
      * 登录
@@ -73,7 +76,7 @@ public class UserController {
 //                System.out.println(filePath);
 //                System.out.println(fileName);
                 File f = new File(filePath + fileName);
-                result = "http://localhost:8443/head/" + fileName;
+                result = urlPath.getUrlPath() + "head/" + fileName;
                 System.out.println(result);
                 file.transferTo(f);
             } catch (IOException e) {

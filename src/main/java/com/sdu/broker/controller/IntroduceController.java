@@ -1,5 +1,6 @@
 package com.sdu.broker.controller;
 
+import com.sdu.broker.pojo.UrlPath;
 import com.sdu.broker.service.IntroduceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,8 @@ import java.util.UUID;
 public class IntroduceController {
     @Autowired
     private IntroduceService introduceService;
+    @Autowired
+    private UrlPath urlPath;
 
     @CrossOrigin
     @RequestMapping("/uploadIntroduce")
@@ -39,7 +42,7 @@ public class IntroduceController {
 
             introduceService.addIntroduce(name, result);
         }
-        return result;
+        return urlPath.getUrlPath() + "md/" + name + ".txt";
     }
 
     @CrossOrigin
@@ -79,7 +82,7 @@ public class IntroduceController {
 //                System.out.println(filePath);
 //                System.out.println(fileName);
                 File f = new File(filePath + fileName);
-                result = "http://192.168.1.109:8443/img/" + fileName;
+                result = urlPath.getUrlPath() + "img/" + fileName;
                 System.out.println(result);
                 file.transferTo(f);
             } catch (IOException e) {

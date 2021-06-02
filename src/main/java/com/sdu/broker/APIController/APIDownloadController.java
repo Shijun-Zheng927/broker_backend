@@ -1,5 +1,6 @@
 package com.sdu.broker.APIController;
 
+import com.sdu.broker.pojo.UrlPath;
 import com.sdu.broker.pojo.req.DownloadFile;
 import com.obs.services.model.DownloadFileRequest;
 import com.obs.services.model.GetObjectRequest;
@@ -26,6 +27,8 @@ public class APIDownloadController {
     private HuaweiDownloadController huaweiDownloadController;
     @Autowired
     private HuaweiObjectController huaweiObjectController;
+    @Autowired
+    private UrlPath urlPath;
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -144,7 +147,7 @@ public class APIDownloadController {
                 if (s.equals("OBS exception!")||s.equals("IO exception!")){
                     return "fail";
                 }
-                return "http://localhost:8443/file/" + objectKey;
+                return urlPath.getUrlPath() + "file/" + objectKey;
             }else {
                 return "fail";
             }
@@ -187,7 +190,7 @@ public class APIDownloadController {
                 if (s.equals("download failed")){
                     return "fail";
                 }
-                return "http://localhost:8443/file/" + objectKey;
+                return urlPath.getUrlPath() + "file/" + objectKey;
             }else {
                 return "fail";
             }

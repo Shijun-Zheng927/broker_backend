@@ -1,5 +1,6 @@
 package com.sdu.broker;
 
+import com.sdu.broker.pojo.UrlPath;
 import com.sdu.broker.pojo.User;
 import com.sdu.broker.service.UserService;
 import org.junit.Test;
@@ -13,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class UserTest {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UrlPath urlPath;
 
     @Test
     public void headTest() {
@@ -26,5 +29,10 @@ public class UserTest {
         user.setPassword("666");
         User login = userService.login(user);
         System.out.println(login);
+    }
+
+    @Test
+    public void getUrl() {
+        System.out.println(urlPath.getUrlPath());
     }
 }
