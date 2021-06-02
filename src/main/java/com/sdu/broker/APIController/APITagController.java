@@ -1,6 +1,7 @@
 package com.sdu.broker.APIController;
 
 import com.sdu.broker.aliyun.oss.BucketController;
+import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.ControllerUtils;
 import com.sdu.broker.utils.TokenUtils;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,8 @@ public class APITagController {
     private PlatformService platformService;
     @Autowired
     private BucketController bucketController;
+    @Autowired
+    private BucketService bucketService;
 
     @ResponseBody
     @RequestMapping(value = "/setBucketTagging", method = RequestMethod.POST)
@@ -29,8 +33,12 @@ public class APITagController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
         String tagKey = map.get("tagKey");
         String tagValue = map.get("tagValue");
         if (tagKey == null || tagKey.equals("") || tagValue == null || tagValue.equals("")) {
@@ -49,15 +57,20 @@ public class APITagController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getBucketTagging", method = RequestMethod.POST)
-    public Map<String,String> getBucketTagging(@RequestBody Map<String, String> map,
+//    @RequestMapping(value = "/getBucketTagging", method = RequestMethod.POST)
+    @GetMapping(value = "/getBucketTagging", params = {"bucketName"})
+    public Map<String,String> getBucketTagging(@RequestParam String bucketName,
                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
-        String bucketName = map.get("bucketName");
+//        String platform = platformService.getPlatform(userId);
+//        String bucketName = map.get("bucketName");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
         if (ControllerUtils.verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
@@ -70,29 +83,31 @@ public class APITagController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/listBucketByTag", method = RequestMethod.POST)
-    public List<String> listBucketByTag(@RequestBody Map<String, String> map,
+//    @RequestMapping(value = "/listBucketByTag", method = RequestMethod.POST)
+    @GetMapping(value = "/listBucketByTag", params = {"tagKey", "tagValue"})
+    public List<String> listBucketByTag(@RequestParam String tagKey, @RequestParam String tagValue,
                                         @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
-        String tagKey = map.get("tagKey");
-        String tagValue = map.get("tagValue");
+//        String platform = platformService.getPlatform(userId);
+
+//        String platform = map.get("bucketName");
+//        String tagKey = map.get("tagKey");
+//        String tagValue = map.get("tagValue");
         if (tagKey == null || tagKey.equals("") || tagValue == null || tagValue.equals("")) {
             response.setStatus(777);
         }
-        if (platform.equals("ALI")) {
-            List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
-            if (result.size() == 0) {
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> buckets = ControllerUtils.getBucketsAli(userId, platform, result);
-            return ControllerUtils.bucketToStringAli(buckets);
-        } else {
+        List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
+        if (result.size() == 0) {
             return null;
         }
+        List<com.aliyun.oss.model.Bucket> buckets = ControllerUtils.getBucketsAli(userId, "ALI", result);
+        return ControllerUtils.bucketToStringAli(buckets);
+
+        //HUAWEI
+
     }
 
     @ResponseBody
@@ -103,8 +118,12 @@ public class APITagController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
         if (ControllerUtils.verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
@@ -114,5 +133,22 @@ public class APITagController {
         } else {
             return null;
         }
+
+    }
+
+
+
+    public boolean verify(HttpServletResponse response, Integer userId, String bucketName) {
+        if ("".equals(bucketName)) {
+            response.setStatus(777);
+            return true;
+        }
+//        Bucket bucket = new Bucket(userId, platform, bucketName);
+        Integer legal = bucketService.verify(userId.toString(), bucketName);
+        if (legal == null) {
+            response.setStatus(666);
+            return true;
+        }
+        return false;
     }
 }
