@@ -115,9 +115,6 @@ public class APIDownloadController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
-        String localFile = map.get("localFile");
-        int begin = Integer.parseInt(map.get("begin"));
-        int end = Integer.parseInt(map.get("end"));
 
         if (verify(response, userId, bucketName)) {
             return "fail";
@@ -165,9 +162,6 @@ public class APIDownloadController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
-        String localFile = map.get("localFile");
-        int partSize = Integer.parseInt(map.get("partSize"));
-        int taskNum = Integer.parseInt(map.get("taskNum"));
         if (verify(response, userId, bucketName)) {
             return "fail";
         }
