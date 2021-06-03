@@ -12,6 +12,22 @@ public class History {
     private String platform;
     private String ud;
 
+    @Override
+    public String toString() {
+        return "History{" +
+                "id=" + id +
+                ", url='" + url + '\'' +
+                ", user=" + user +
+                ", size=" + size +
+                ", price=" + price +
+                ", time='" + time + '\'' +
+                ", type=" + type +
+                ", bucketName='" + bucketName + '\'' +
+                ", platform='" + platform + '\'' +
+                ", ud='" + ud + '\'' +
+                '}';
+    }
+
     public String getUd() {
         return ud;
     }

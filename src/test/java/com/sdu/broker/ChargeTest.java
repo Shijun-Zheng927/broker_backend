@@ -1,14 +1,18 @@
 package com.sdu.broker;
 
 import com.sdu.broker.mapper.HistoryMapper;
+import com.sdu.broker.pojo.History;
 import com.sdu.broker.service.AccountService;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.ChargeService;
+import com.sdu.broker.service.HistoryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -19,6 +23,8 @@ public class ChargeTest {
     private HistoryMapper historyMapper;
     @Autowired
     private BucketService bucketService;
+    @Autowired
+    private HistoryService historyService;
 
     @Test
     public void charge() {
@@ -37,4 +43,6 @@ public class ChargeTest {
         Integer result = bucketService.haveName("jklsj");
         System.out.println(result);
     }
+
+
 }
