@@ -2,7 +2,7 @@ package com.sdu.broker.aliyun.oss;
 
 import com.aliyun.oss.*;
 import com.aliyun.oss.model.*;
-import org.checkerframework.checker.units.qual.K;
+//import org.checkerframework.checker.units.qual.K;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -11,9 +11,9 @@ import java.util.*;
 //@ConfigurationProperties(prefix = 'ali')
 @Component
 public class BucketController {
-    private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
-    private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
-    private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
+    private static final String endpoint = "https://oss-cn-beijing.aliyuncs.com";
+    private static final String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
+    private static final String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
 
     //创建一个Bucket
     public int  createBucket(String bucketName, int storageClass, int dataRedundancyType, int cannedACL){
@@ -70,11 +70,8 @@ public class BucketController {
             System.out.println("\t数据中心：" + info.getBucket().getLocation());
             System.out.println("\t创建时间: " + info.getBucket().getCreationDate());
             System.out.println("\t用户标志：" + info.getBucket().getOwner());
-        } catch (OSSException oe){
+        } catch (Exception oe){
             oe.printStackTrace();
-            return 0;
-        }  catch (Exception e){
-            e.printStackTrace();
             return 0;
         } finally{
             ossClient.shutdown();
@@ -379,7 +376,7 @@ public class BucketController {
 
     //访问日志
     //开启访问日志
-    public static int openBucketLogging(String bucketName,String logBucketName,String logPath){
+    public  int openBucketLogging(String bucketName,String logBucketName,String logPath){
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
@@ -397,7 +394,7 @@ public class BucketController {
     }
 
     //查看访问日志
-    public static Map<String,String> checkBucketLogging(String bucketName){
+    public  Map<String,String> checkBucketLogging(String bucketName){
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         Map<String,String> map = new HashMap<>();
@@ -412,7 +409,7 @@ public class BucketController {
     }
 
     //关闭访问日志
-    public static int closeBucketLogging(String bucketName){
+    public  int closeBucketLogging(String bucketName){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         SetBucketLoggingRequest request = new SetBucketLoggingRequest(bucketName);
         request.setTargetBucket(null);
@@ -427,7 +424,7 @@ public class BucketController {
 
     public static void main(String[] args) {
 //        openBucketLogging("xmsx-001","xmsx-001","log/");
-        checkBucketLogging("xmsx-001");
+//        checkBucketLogging("xmsx-001");
     }
 
 }

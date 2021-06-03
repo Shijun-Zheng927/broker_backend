@@ -1,5 +1,6 @@
 package com.sdu.broker.APIController;
 
+import com.sdu.broker.aliyun.oss.AliBucketLoggingController;
 import com.sdu.broker.huaweiyun.HuaweiBuckectLoggingController;
 import com.sdu.broker.huaweiyun.HuaweiDownloadController;
 import com.sdu.broker.service.BucketService;
@@ -16,7 +17,8 @@ public class APIBucketLoggingController {
     private BucketService bucketService;
     @Autowired
     private HuaweiBuckectLoggingController huaweiBuckectLoggingController;
-
+    @Autowired
+    private AliBucketLoggingController aliBucketLoggingController;
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
     public String demo(@RequestBody Map<String, String> map,
@@ -39,10 +41,8 @@ public class APIBucketLoggingController {
             }
 
             //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
 
-            //返回结果
-            return "result";
+
         } else {
             String rwPolicy = map.get("rwPolicy");
             if ("".equals(rwPolicy)) {
@@ -56,6 +56,7 @@ public class APIBucketLoggingController {
             //返回结果
             return "result";
         }
+    return "hhh";
     }
 
     @ResponseBody
@@ -80,10 +81,16 @@ public class APIBucketLoggingController {
             }
 
             //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+            String logBucketName = map.get("logBucketName");
+            String sourceBucketName = map.get("bucketName");
+            String logPath = map.get("logpath");
+            if ("".equals(sourceBucketName) || "".equals(logPath)) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = aliBucketLoggingController.openBucketLogging(sourceBucketName, logBucketName, logPath);
+            return result;
 
-            //返回结果
-            return "result";
         } else {
             /*实际上的三个参数两边是一样的，命名不一样
             HUAWEI.targetBucketName=ALI.logBucketName
@@ -127,12 +134,8 @@ public class APIBucketLoggingController {
                 //设置默认值
                 acl = "0";
             }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return null;
+            Map<String, String> logMap = aliBucketLoggingController.checkBucketLogging(bucketName);
+            return logMap;
         } else {
             /*
             返回的map是
@@ -166,12 +169,8 @@ public class APIBucketLoggingController {
                 //设置默认值
                 acl = "0";
             }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
+            String result = aliBucketLoggingController.closeBucketLogging(bucketName);
+            return result;
         } else {
             /*
             result的结果为“success”或“ObsException”
