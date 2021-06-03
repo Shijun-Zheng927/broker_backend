@@ -3,12 +3,14 @@ package com.sdu.broker.huaweiyun;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.*;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class HuaweiBuckectLoggingController {
     /* 初始化OBS客户端所需的参数 */
     private static final String endPoint     = "https://obs.cn-north-1.myhuaweicloud.com";
