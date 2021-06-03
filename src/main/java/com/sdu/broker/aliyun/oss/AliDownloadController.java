@@ -8,10 +8,11 @@ import com.aliyun.oss.model.DownloadFileRequest;
 import com.aliyun.oss.model.DownloadFileResult;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Date;
-
+@Component
 public class AliDownloadController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
@@ -19,7 +20,7 @@ public class AliDownloadController {
 
 
     //流式下载
-    public static String  streamDownload(String bucketName,String objectName){
+    public  String  streamDownload(String bucketName,String objectName){
         String content="";
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
@@ -67,7 +68,7 @@ public class AliDownloadController {
     若指定了Range: bytes=500~2000，此时范围末端取值不在有效区间，返回整个文件的内容，且HTTP Code为200。
     若指定了Range: bytes=1000~2000，此时范围首端取值不在有效区间，返回整个文件的内容，且HTTP Code为200。
      */
-    public static String rangeDownload(String bucketName,String objectName, String localFile, int begin,int end){
+    public  String rangeDownload(String bucketName,String objectName, String localFile, int begin,int end){
         /*
         输入参数：bucketName:存储空间名称
                 objectName：存储文件名称
@@ -97,6 +98,7 @@ public class AliDownloadController {
             in.close();
         }catch (IOException e) {
             e.printStackTrace();
+            return "false!";
         }
         ossClient.shutdown();
         return localFile;
@@ -137,7 +139,7 @@ public class AliDownloadController {
     }
 
     //断点续传下载
-    public static String checkPointDownload(String bucketName, String objectName, String localFile,
+    public  String checkPointDownload(String bucketName, String objectName, String localFile,
                                             int partSize,int taskNum){
         /*
         localPath: 文件本地保存路径
