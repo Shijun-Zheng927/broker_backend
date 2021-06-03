@@ -27,9 +27,9 @@ public class BucketServiceTest {
     @Test
     public void test2() {
         Bucket bucket = new Bucket();
-        bucket.setUserId(1);
+        bucket.setUserId(11);
         bucket.setPlatform("ALI");
-        bucket.setName("first");
+        bucket.setName("xmsx-001");
         Integer result = bucketService.isLegal(bucket);
         System.out.println(result);
     }

@@ -38,7 +38,7 @@ public class ControllerUtils {
 
     public static List<com.aliyun.oss.model.Bucket> getBucketsAli(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<com.aliyun.oss.model.Bucket> iterator = result.iterator();
         while (iterator.hasNext()) {
@@ -54,7 +54,7 @@ public class ControllerUtils {
 
     public static List<ObsBucket> getBucketsHuawei(Integer userId, String platform, List<ObsBucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<ObsBucket> iterator = result.iterator();
         while (iterator.hasNext()) {

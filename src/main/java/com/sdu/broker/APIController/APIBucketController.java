@@ -76,7 +76,7 @@ public class APIBucketController {
             }
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null) {
-                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName),
+                result = bucketController.createBucket(bucketName,
                         Integer.parseInt(storageClass) + 1,
                         Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
             } else {
@@ -139,18 +139,23 @@ public class APIBucketController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
 
         List<com.aliyun.oss.model.Bucket> result1 = bucketController.listAllBuckets();
-        if (result1.size() == 0) {
-            return null;
-        }
-        List<com.aliyun.oss.model.Bucket> buckets1 = getBucketsAli(userId, platform, result1);
+//        if (result1.size() == 0) {
+//            return null;
+//        }
+//        System.out.println(result1.size());
+        List<com.aliyun.oss.model.Bucket> buckets1 = getBucketsAli(userId, "ALI", result1);
+//        System.out.println("b1" + buckets1.size());
         List<ObsBucket> result2 = huaweiController.listBucket();
-        if (result2.size() == 0) {
-            return null;
-        }
-        List<ObsBucket> buckets2 = getBucketHuawei(userId, platform, result2);
+//        if (result2.size() == 0) {
+//            return null;
+//        }
+//        System.out.println(result2.size());
+        List<ObsBucket> buckets2 = getBucketHuawei(userId, "HUAWEI", result2);
+//        System.out.println("b2" + buckets2.size());
+
 
         List<String> result0 = new ArrayList<>();
         result0.addAll(bucketToStringAli(buckets1));
@@ -700,13 +705,17 @@ public class APIBucketController {
 
     private List<com.aliyun.oss.model.Bucket> getBucketsAli(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<com.aliyun.oss.model.Bucket> iterator = result.iterator();
         while (iterator.hasNext()) {
             com.aliyun.oss.model.Bucket bucket = iterator.next();
             b.setName(bucket.getName());
+//            System.out.println(bucket.getName());
+//            System.out.println(userId);
+//            System.out.println(platform);
             Integer legal = bucketService.isLegal(b);
+//            System.out.println(legal);
             if (legal == null) {
                 iterator.remove();
             }
@@ -723,7 +732,7 @@ public class APIBucketController {
 
     private List<ObsBucket> getBucketHuawei(Integer userId, String platform, List<ObsBucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<ObsBucket> iterator = result.iterator();
         while (iterator.hasNext()) {
