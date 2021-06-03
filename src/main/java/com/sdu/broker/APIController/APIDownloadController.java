@@ -110,6 +110,8 @@ public class APIDownloadController {
                 double stringSize = FileUtils.getStringSize(s);
                 chargeService.operate(bucketName, stringSize, "/streamDownload", userId, "download");
                 return s;
+            } else {
+                return "fail";
             }
         } else {
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
@@ -123,13 +125,13 @@ public class APIDownloadController {
                 return "fail";
             }
         }
-        return "hhh";
+
     }
 
     //范围下载
     @ResponseBody
     @RequestMapping(value = "/rangeDownload", method = RequestMethod.POST)
-    public String rangeDownload(@RequestBody Map<String, String> map,
+    public DownloadFile rangeDownload(@RequestBody Map<String, String> map,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("rangeDownload");
         if (!verifyIdentity(response, authorization)) {
@@ -139,12 +141,14 @@ public class APIDownloadController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
 
+        DownloadFile downloadFile = new DownloadFile("fail", "fail");
+
         if (verify(response, userId, bucketName)) {
-            return "fail";
+            return downloadFile;
         }
         if (objectKey == null || "".equals(objectKey)) {
             response.setStatus(777);
-            return "fail";
+            return downloadFile;
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
@@ -153,43 +157,50 @@ public class APIDownloadController {
             String begin = map.get("begin");
             String end = map.get("end");
             if ("".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
-                return "fail";
+                response.setStatus(777);
+                return downloadFile;
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if(aliObjectController.doesObjectExist(bucketName, objectKey)){
                 String s = aliDownloadController.rangeDownload(bucketName, objectKey, path,
                         Integer.parseInt(begin), Integer.parseInt(end));
                 if(s.equals("false!")){
-                    return "fail";
+                    return downloadFile;
                 } else {
 
                     double stringSize = FileUtils.getFileSize(path);
                     chargeService.operate(bucketName, stringSize, "/rangeDownload", userId, "download");
-                    return urlPath.getUrlPath() + "file/" + objectKey;
+
+                    downloadFile.setUrl(urlPath.getUrlPath() + "file/" + objectKey);
+                    downloadFile.setName(objectKey);
+                    return downloadFile;
                 }
             } else {
-                return "fail";
+                return downloadFile;
             }
         } else {
             String begin = map.get("begin");
             String end = map.get("end");
             if (begin == null || end == null || "".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
                 response.setStatus(777);
-                return "fail";
+                return downloadFile;
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
                 GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName, objectKey);
                 String s = huaweiDownloadController.rangeDownload(request, path, Integer.parseInt(begin), Integer.parseInt(end));
                 if (s.equals("OBS exception!")||s.equals("IO exception!")){
-                    return "fail";
+                    return downloadFile;
                 }
 
                 double stringSize = FileUtils.getFileSize(path);
                 chargeService.operate(bucketName, stringSize, "/rangeDownload", userId, "download");
-                return urlPath.getUrlPath() + "file/" + objectKey;
+
+                downloadFile.setUrl(urlPath.getUrlPath() + "file/" + objectKey);
+                downloadFile.setName(objectKey);
+                return downloadFile;
             }else {
-                return "fail";
+                return downloadFile;
             }
         }
     }
@@ -197,17 +208,20 @@ public class APIDownloadController {
     //断点续传下载
     @ResponseBody
     @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
-    public String checkPointDownload(@RequestBody Map<String, String> map,
+    public DownloadFile checkPointDownload(@RequestBody Map<String, String> map,
                                      @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("checkPointDownload");
+
+        DownloadFile downloadFile = new DownloadFile("fail", "fail");
+
         if (!verifyIdentity(response, authorization)) {
-            return "fail";
+            return downloadFile;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
-            return "fail";
+            return downloadFile;
         }
         if (objectKey == null || "".equals(objectKey)) {
             response.setStatus(777);
@@ -220,7 +234,8 @@ public class APIDownloadController {
             String partSize = map.get("partSize");
             String taskNum = map.get("taskNum");
             if ("".equals(partSize) || "".equals(taskNum) || !BucketUtils.isNumber(partSize) || !BucketUtils.isNumber(taskNum)) {
-                return "fail";
+                response.setStatus(777);
+                return downloadFile;
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if(aliObjectController.doesObjectExist(bucketName,objectKey)){
@@ -229,16 +244,19 @@ public class APIDownloadController {
 
                 double stringSize = FileUtils.getFileSize(path);
                 chargeService.operate(bucketName, stringSize, "/checkPointDownload", userId, "download");
-                return urlPath.getUrlPath() + "file/" + objectKey;
+
+                downloadFile.setUrl(urlPath.getUrlPath() + "file/" + objectKey);
+                downloadFile.setName(objectKey);
+                return downloadFile;
             } else {
-                return "fail";
+                return downloadFile;
             }
         } else {
             String partSize = map.get("partSize");
             String taskNum = map.get("taskNum");
             if ("".equals(partSize) || "".equals(taskNum) || !BucketUtils.isNumber(partSize) || !BucketUtils.isNumber(taskNum)) {
                 response.setStatus(777);
-                return "fail";
+                return downloadFile;
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)) {
@@ -246,35 +264,41 @@ public class APIDownloadController {
                 String s = huaweiDownloadController.checkPointDownload(request, path,
                         Integer.parseInt(partSize), Integer.parseInt(taskNum));
                 if (s.equals("download failed")) {
-                    return "fail";
+                    return downloadFile;
                 }
 
                 double stringSize = FileUtils.getFileSize(path);
                 chargeService.operate(bucketName, stringSize, "/checkPointDownload", userId, "download");
-                return urlPath.getUrlPath() + "file/" + objectKey;
+
+                downloadFile.setUrl(urlPath.getUrlPath() + "file/" + objectKey);
+                downloadFile.setName(objectKey);
+                return downloadFile;
             } else {
-                return "fail";
+                return downloadFile;
             }
         }
     }
     @ResponseBody
     @RequestMapping(value = "/downloadTest")
-    public byte[] downloadTest() {
+    public DownloadFile downloadTest() {
         System.out.println("downloadTest");
         byte[] bytes = null;
         try {
-            File f = new File("D:\\IDEA\\broker\\src\\main\\resources\\static\\head\\groot.jpg");
+            File f = new File("D:/IDEA/broker/src/main/resources/static/file/a.jpg");
             FileInputStream inputStream = new FileInputStream(f);
             bytes = new byte[inputStream.available()];
-            inputStream.read(bytes, 0, inputStream.available());
-            FileOutputStream fos = new FileOutputStream(f);
+//            inputStream.read(bytes, 0, inputStream.available());
+//            FileOutputStream fos = new FileOutputStream(f);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        return new DownloadFile("groot.jpg", bytes);
-        return bytes;
+        DownloadFile downloadFile = new DownloadFile();
+        downloadFile.setName("groot.txt");
+        downloadFile.setUrl(urlPath.getUrlPath() + "file/a.txt");
+        return downloadFile;
+//        return bytes;
     }
 
 
