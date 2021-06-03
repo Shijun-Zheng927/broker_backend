@@ -32,8 +32,9 @@ public class UtilsTest {
 
     @Test
     public void sign() {
-        String result = TokenUtils.sign("1");
+        String result = TokenUtils.sign("11");
         System.out.println(result);
+        String test = null;
     }
 
     @Test

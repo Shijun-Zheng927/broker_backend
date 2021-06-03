@@ -33,6 +33,7 @@ public class APIBucketController {
     @RequestMapping(value = "/createBucket", method = RequestMethod.POST)
     public String createBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("createBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -40,6 +41,10 @@ public class APIBucketController {
 //        String platform = platformService.getPlatform(userId);
         String bucketName = map.get("bucketName");
         String storageClass = map.get("storageClass");
+        if (bucketName == null || storageClass == null) {
+            response.setStatus(777);
+            return null;
+        }
         if ("".equals(bucketName) || "".equals(storageClass) || !BucketUtils.regex(0, 7, storageClass)) {
             response.setStatus(777);
             return null;
@@ -54,10 +59,10 @@ public class APIBucketController {
             String dataRedundancyType = map.get("dataRedundancyType");
             String cannedACL = map.get("rwPolicy");
             int result;
-            if ("".equals(dataRedundancyType)) {
+            if (dataRedundancyType == null || "".equals(dataRedundancyType)) {
                 dataRedundancyType = "0";
             }
-            if ("".equals(cannedACL)) {
+            if (cannedACL == null || "".equals(cannedACL)) {
                 dataRedundancyType = "0";
             }
 //            if (dataRedundancyType == null || cannedACL == null || dataRedundancyType.equals("") || cannedACL.equals("")) {
@@ -69,7 +74,6 @@ public class APIBucketController {
             if (haveName != null) {
                 return "already have bucket";
             }
-
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null) {
                 result = bucketController.createBucket(BucketUtils.addPrefix(bucketName),
@@ -130,6 +134,7 @@ public class APIBucketController {
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
     public List<String> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listAllBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -173,6 +178,7 @@ public class APIBucketController {
     @RequestMapping(value = "/listRequestBucket", method = RequestMethod.POST)
     public List<String> listRequestBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listRequestBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -188,7 +194,7 @@ public class APIBucketController {
                 market = "";
             }
             String maxKeys = map.get("maxKeys");
-            if (!BucketUtils.isNumber(maxKeys)) {
+            if (maxKeys == null || !BucketUtils.isNumber(maxKeys)) {
                 response.setStatus(777);
                 return null;
             }
@@ -207,6 +213,7 @@ public class APIBucketController {
     @GetMapping(value = "/doesBucketExist", params = {"bucketName"})
     public boolean doesBucketExist(@RequestParam String bucketName,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("doesBucketExist");
         if (!verifyIdentity(response, authorization)) {
             return false;
         }
@@ -231,6 +238,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketLocation", params = {"bucketName"})
     public String getBucketLocation(@RequestParam String bucketName,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketLocation");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -254,6 +262,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketInfo", params = {"bucketName"})
     public Object getBucketInfo(@RequestParam String bucketName,
                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketInfo");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -278,6 +287,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketAcl", params = {"bucketName"})
     public String getBucketAcl(@RequestParam String bucketName,
                                              @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketAcl");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -301,6 +311,7 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketAcl", method = RequestMethod.POST)
     public String setBucketAcl(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketAcl");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -334,6 +345,7 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketPolicy", method = RequestMethod.POST)
     public String setBucketPolicy(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketPolicy");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -362,6 +374,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketPolicy", params = {"bucketName"})
     public String getBucketPolicy(@RequestParam String bucketName,
                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketPolicy");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -384,6 +397,7 @@ public class APIBucketController {
     @RequestMapping(value = "/deleteBucketPolicy", method = RequestMethod.DELETE)
     public String deleteBucketPolicy(@RequestBody Map<String, String> map,
                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("deleteBucketPolicy");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -406,6 +420,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketStorageInfo", params = {"bucketName"})
     public Map<String, String> getBucketStorageInfo(@RequestParam String bucketName,
                                      @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketStorageInfo");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -427,7 +442,8 @@ public class APIBucketController {
     @ResponseBody
     @RequestMapping(value = "/setBucketQuota", method = RequestMethod.POST)
     public String setBucketQuota(@RequestBody Map<String, String> map,
-                                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketQuota");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -456,6 +472,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketQuota", params = {"bucketName"})
     public String getBucketQuota(@RequestParam String bucketName,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketQuota");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -478,6 +495,7 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketStoragePolicy", method = RequestMethod.POST)
     public String setBucketStoragePolicy(@RequestBody Map<String, String> map,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketStoragePolicy");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -508,6 +526,7 @@ public class APIBucketController {
     @GetMapping(value = "/getBucketStorageClass", params = {"bucketName"})
     public String getBucketStorageClass(@RequestParam String bucketName,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketStorageClass");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -530,6 +549,7 @@ public class APIBucketController {
     @RequestMapping(value = "/deleteBucket", method = RequestMethod.DELETE)
     public String deleteBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("deleteBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -563,6 +583,7 @@ public class APIBucketController {
     @RequestMapping(value = "/setBucketInventoryConfiguration", method = RequestMethod.POST)
     public String setBucketInventoryConfiguration(@RequestBody Map<String, String> map,
                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketInventoryConfiguration");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }

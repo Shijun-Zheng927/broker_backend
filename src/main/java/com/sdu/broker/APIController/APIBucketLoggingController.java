@@ -73,18 +73,10 @@ public class APIBucketLoggingController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
-
-            //阿里云在此调用方法
             String logBucketName = map.get("logBucketName");
             String sourceBucketName = map.get("bucketName");
             String logPath = map.get("logpath");
-            if ("".equals(sourceBucketName) || "".equals(logPath)) {
+            if (logBucketName == null || logPath == null || "".equals(sourceBucketName) || "".equals(logPath)) {
                 response.setStatus(777);
                 return null;
             }
@@ -101,7 +93,7 @@ public class APIBucketLoggingController {
             String targetBucketName = map.get("logBucketName");
             String sourceBucketName = map.get("bucketName");
             String targetPrefix = map.get("logpath");
-            if ("".equals(targetBucketName) || "".equals(targetPrefix)) {
+            if (targetBucketName == null || targetPrefix == null  || "".equals(targetBucketName) || "".equals(targetPrefix)) {
                 response.setStatus(777);
                 return null;
             }
@@ -129,11 +121,6 @@ public class APIBucketLoggingController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
             Map<String, String> logMap = aliBucketLoggingController.checkBucketLogging(bucketName);
             return logMap;
         } else {
@@ -163,12 +150,7 @@ public class APIBucketLoggingController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
+
             String result = aliBucketLoggingController.closeBucketLogging(bucketName);
             return result;
         } else {
