@@ -66,7 +66,7 @@ public class APIBucketController {
 //            }
 
             Integer haveName = bucketService.haveName(bucketName);
-            if (haveName == null) {
+            if (haveName != null) {
                 return "already have bucket";
             }
 
@@ -101,7 +101,7 @@ public class APIBucketController {
             }
 
             Integer haveName = bucketService.haveName(bucketName);
-            if (haveName == null) {
+            if (haveName != null) {
                 return "already have bucket";
             }
 
