@@ -1,7 +1,9 @@
 package com.sdu.broker.aliyun.oss;
 
+import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.*;
 
 import org.springframework.stereotype.Component;
@@ -47,7 +49,7 @@ public class AliObjectController {
     }
 
     //获取文件访问权限
-    public static String getObjectAcl(String bucketName,String objectPath){
+    public  String getObjectAcl(String bucketName,String objectPath){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectAcl objectAcl = ossClient.getObjectAcl(bucketName, objectPath);
         String acl = objectAcl.getPermission().toString();
@@ -59,7 +61,7 @@ public class AliObjectController {
 
     //列举文件
     //简单列举
-    public static List<String>  simpleListObject(String bucketName){
+    public  List<String>  simpleListObject(String bucketName){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
@@ -73,7 +75,7 @@ public class AliObjectController {
         return objectList;
     }
     //限定前缀列举
-    public static List<String>  simpleListObject(String bucketName,String prefix){
+    public  List<String>  simpleListObject(String bucketName,String prefix){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
@@ -88,7 +90,7 @@ public class AliObjectController {
     }
 
     //指定数目文件列举
-    public static List<String> simpleListObject(String bucketName,int maxKeys) {
+    public  List<String> simpleListObject(String bucketName,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys));
@@ -102,7 +104,7 @@ public class AliObjectController {
     }
 
     //列举指定数目和指定前缀的文件
-    public static List<String> simpleListObject(String bucketName,String prefix,int maxKeys) {
+    public  List<String> simpleListObject(String bucketName,String prefix,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys).withPrefix(prefix));
@@ -115,7 +117,7 @@ public class AliObjectController {
         return  objectList;
     }
     //分页列举全部文件
-    public static  List<String> pageObjectList(String bucketName){
+    public   List<String> pageObjectList(String bucketName){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         final int maxKeys = 200;
@@ -169,16 +171,17 @@ public class AliObjectController {
 
     }
 
+
     //列举文件夹下的所有文件
     //创建文件夹
-    public static String createDirectory(String bucketName,String dirName){
+    public  String createDirectory(String bucketName,String dirName){
         //输入的文件夹名称以右斜线（/）结尾
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.putObject(bucketName, dirName,new File("F://broker_backend//dic.txt"));
         return "2333";
     }
     //列举指定文件夹的文件
-    public static List<String> dicListObject(String bucketName,String dicName){
+    public  List<String> dicListObject(String bucketName,String dicName){
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         List<String> objectList = new ArrayList<>();
@@ -209,7 +212,7 @@ public class AliObjectController {
     }
 
     //简单删除
-    public static String deleteObject(String bucketName,String objectPath){
+    public  String deleteObject(String bucketName,String objectPath){
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteObject(bucketName,objectPath);
         ossClient.shutdown();
@@ -219,17 +222,17 @@ public class AliObjectController {
     //批量删除文件
 
     //拷贝文件
-    public static String simpleCopyObject(String sourceBucketName,String sourceObjectPath,String destinationBucketName,String destinationObjectPath){
+    public  String simpleCopyObject(String sourceBucketName, String sourceObjectPath,String destinationBucketName,String destinationObjectPath){
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         // 拷贝文件。
         CopyObjectResult result = ossClient.copyObject(sourceBucketName, sourceObjectPath, destinationBucketName, destinationObjectPath);
         System.out.println("ETag: " + result.getETag() + " LastModified: " + result.getLastModified());
-
+        String etag = result.getETag();
         // 关闭OSSClient。
         ossClient.shutdown();
-        return result.getETag();
+        return etag;
     }
     public static void main(String[] args) {
     /*
@@ -238,7 +241,7 @@ public class AliObjectController {
         simpleListObject("xmsx-001","app");
         simpleListObject("xmsx-001","app",2);
     */
-        dicListObject("xmsx-001","666/");
+//        dicListObject("xmsx-001","666/");
     }
 
 }
