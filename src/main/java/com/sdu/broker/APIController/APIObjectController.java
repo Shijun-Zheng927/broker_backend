@@ -226,9 +226,6 @@ public class APIObjectController {
             List<String> listObject = aliObjectController.simpleListObject(bucketName,prefix,number);
             //返回结果
             return listObject;
-        }
-        else {
-            return result;
         } else {
             String number = map.get("number");
             if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
@@ -298,9 +295,6 @@ public class APIObjectController {
             List<String> listObject = aliObjectController.pageObjectList(bucketName,prefix);
             //返回结果
             return listObject;
-        }
-        else {
-            return result;
         } else {
             String prefix = map.get("prefix");
             if (prefix == null || "".equals(prefix)) {
