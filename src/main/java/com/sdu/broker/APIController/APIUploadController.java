@@ -41,7 +41,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/putString", method = RequestMethod.POST)
     public String putString(@RequestBody Map<String, String> map,
-                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                            @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("putString");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -90,7 +91,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/putBytes", method = RequestMethod.POST)
     public String putBytes(@RequestBody Map<String, String> map,
-                            @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("putBytes");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -122,7 +124,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/putStream", method = RequestMethod.POST)
     public String putStream(@RequestBody Map<String, String> map,
-                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                            @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("putStream");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -164,7 +167,8 @@ public class APIUploadController {
     @RequestMapping(value = "/putFileStream")
     public String putFileStream(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                 @RequestParam("file") MultipartFile file,
-                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("putFileStream");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -234,8 +238,9 @@ public class APIUploadController {
 
     @RequestMapping(value = "/putFile")
     public String putFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                @RequestParam("file") MultipartFile file,
-                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                          @RequestParam("file") MultipartFile file,
+                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("putFile");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -294,7 +299,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/appendObjectStreamFirst", method = RequestMethod.POST)
     public String appendObjectStreamFirst(@RequestBody Map<String, String> map,
-                            @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("appendObjectStreamFirst");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -342,7 +348,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/appendObjectStream", method = RequestMethod.POST)
     public String appendObjectStream(@RequestBody Map<String, String> map,
-                                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                     @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("appendObjectStream");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -392,8 +399,9 @@ public class APIUploadController {
     @RequestMapping(value = "/appendObjectFileFirst")
     public String appendObjectFileFirst(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                         @RequestParam("contentType") String contentType, HttpServletRequest request,
-                          @RequestParam("file") MultipartFile file,
-                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                        @RequestParam("file") MultipartFile file,
+                                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("appendObjectFileFirst");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -449,10 +457,11 @@ public class APIUploadController {
 
     @RequestMapping(value = "/appendObjectFile")
     public String appendObjectFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                        @RequestParam("contentType") String contentType,
+                                   @RequestParam("contentType") String contentType,
                                    @RequestParam("givenPosition") String givenPosition, HttpServletRequest request,
-                                        @RequestParam("file") MultipartFile file,
-                                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                   @RequestParam("file") MultipartFile file,
+                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("appendObjectFile");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -512,6 +521,7 @@ public class APIUploadController {
     @RequestMapping(value = "/completeMultipartUpload", method = RequestMethod.POST)
     public String completeMultipartUpload(@RequestBody CompleteMultipartUpload req,
                                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("completeMultipartUpload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -547,6 +557,7 @@ public class APIUploadController {
                                    @RequestParam("taskNum") String taskNum, @RequestParam("partSize") String partSize,
                                    @RequestParam("file") MultipartFile file,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("checkPointUpload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -605,7 +616,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/initiateMultipartUpload", method = RequestMethod.POST)
     public String initiateMultipartUpload(@RequestBody Map<String, String> map,
-                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("initiateMultipartUpload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -631,8 +643,9 @@ public class APIUploadController {
 
     @RequestMapping(value = "/multipartUpload")
     public String multipartUpload(@RequestParam("bucketName") String bn, @RequestParam("objectName") String objectName,
-                                   @RequestParam("file") MultipartFile file,
-                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                  @RequestParam("file") MultipartFile file,
+                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("multipartUpload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -688,7 +701,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/abortMultipartUpload", method = RequestMethod.POST)
     public String abortMultipartUpload(@RequestBody Map<String, String> map,
-                                     @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("abortMultipartUpload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -726,7 +740,8 @@ public class APIUploadController {
     @ResponseBody
     @RequestMapping(value = "/createFolder", method = RequestMethod.POST)
     public String createFolder(@RequestBody Map<String, String> map,
-                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("createFolder");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }

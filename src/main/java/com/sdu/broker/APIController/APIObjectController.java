@@ -23,52 +23,12 @@ public class APIObjectController {
     @Autowired
     private HuaweiObjectController huaweiObjectController;
 
-    @ResponseBody
-    @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public String demo(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!verifyIdentity(response, authorization)) {
-            return null;
-        }
-        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String bucketName = map.get("bucketName");
-        if (verify(response, userId, bucketName)) {
-            return null;
-        }
-        String platform = bucketService.getPlatform(bucketName);
-        if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
-        } else {
-            String rwPolicy = map.get("rwPolicy");
-            if ("".equals(rwPolicy)) {
-                //设置默认值
-                rwPolicy = "0";
-            }
-
-            //华为云在此进行方法调用
-//            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
-
-            //返回结果
-            return "result";
-        }
-    }
-
 
     @ResponseBody
     @RequestMapping(value = "/ifObjectExist", method = RequestMethod.POST)
     public String ifObjectExist(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("ifObjectExist");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -110,6 +70,7 @@ public class APIObjectController {
     @RequestMapping(value = "/simpleList", method = RequestMethod.POST)
     public List<String> simpleList(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleList");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -144,6 +105,7 @@ public class APIObjectController {
     @RequestMapping(value = "/simpleListWithNum", method = RequestMethod.POST)
     public List<String> simpleListWithNum(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleListWithNum");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -183,6 +145,7 @@ public class APIObjectController {
     @RequestMapping(value = "/simpleListWithPrefix", method = RequestMethod.POST)
     public List<String> simpleListWithPrefix(@RequestBody Map<String, String> map,
                                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleListWithPrefix");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -221,7 +184,8 @@ public class APIObjectController {
     @ResponseBody
     @RequestMapping(value = "/simpleListWithNumPrefix", method = RequestMethod.POST)
     public List<String> simpleListWithNumPrefix(@RequestBody Map<String, String> map,
-                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleListWithNumPrefix");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -240,8 +204,7 @@ public class APIObjectController {
 
             //返回结果
             return result;
-        }
-        else {
+        } else {
             String number = map.get("number");
             if ("".equals(number) || !BucketUtils.isNumber(number)) {
                 response.setStatus(777);
@@ -265,6 +228,7 @@ public class APIObjectController {
     @RequestMapping(value = "/pagingList", method = RequestMethod.POST)
     public List<String> pagingList(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("pagingList");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -298,7 +262,8 @@ public class APIObjectController {
     @ResponseBody
     @RequestMapping(value = "/pagingListWithPrefix", method = RequestMethod.POST)
     public List<String> pagingListWithPrefix(@RequestBody Map<String, String> map,
-                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("pagingListWithPrefix");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -317,8 +282,7 @@ public class APIObjectController {
 
             //返回结果
             return result;
-        }
-        else {
+        } else {
             String prefix = map.get("prefix");
             if ("".equals(prefix)) {
                 response.setStatus(777);
@@ -338,6 +302,7 @@ public class APIObjectController {
     @RequestMapping(value = "/deleteObject", method = RequestMethod.DELETE)
     public String deleteObject(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("deleteObject");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -374,7 +339,8 @@ public class APIObjectController {
     @ResponseBody
     @RequestMapping(value = "/copyObject", method = RequestMethod.POST)
     public String copyObject(@RequestBody Map<String, String> map,
-                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("copyObject");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }

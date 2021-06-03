@@ -33,6 +33,7 @@ public class APITagController {
     @RequestMapping(value = "/setBucketTagging", method = RequestMethod.POST)
     public String setBucketTagging(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("setBucketTagging");
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }
@@ -64,8 +65,9 @@ public class APITagController {
     @ResponseBody
 //    @RequestMapping(value = "/getBucketTagging", method = RequestMethod.POST)
     @GetMapping(value = "/getBucketTagging", params = {"bucketName"})
-    public Map<String,String> getBucketTagging(@RequestParam String bucketName,
-                                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public Map<String, String> getBucketTagging(@RequestParam String bucketName,
+                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketTagging");
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }
@@ -93,6 +95,7 @@ public class APITagController {
     @GetMapping(value = "/listBucketByTag", params = {"tagKey", "tagValue"})
     public List<String> listBucketByTag(@RequestParam String tagKey, @RequestParam String tagValue,
                                         @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listBucketByTag");
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }
@@ -131,6 +134,7 @@ public class APITagController {
     @RequestMapping(value = "/deleteBucketTagging", method = RequestMethod.DELETE)
     public String deleteBucketTagging(@RequestBody Map<String, String> map,
                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("deleteBucketTagging");
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
             return null;
         }

@@ -19,50 +19,12 @@ public class APIBucketLoggingController {
     private HuaweiBuckectLoggingController huaweiBuckectLoggingController;
     @Autowired
     private AliBucketLoggingController aliBucketLoggingController;
-    @ResponseBody
-    @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public String demo(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!verifyIdentity(response, authorization)) {
-            return null;
-        }
-        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String bucketName = map.get("bucketName");
-        if (verify(response, userId, bucketName)) {
-            return null;
-        }
-        String platform = bucketService.getPlatform(bucketName);
-        if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
-
-            //阿里云在此调用方法
-
-
-        } else {
-            String rwPolicy = map.get("rwPolicy");
-            if ("".equals(rwPolicy)) {
-                //设置默认值
-                rwPolicy = "0";
-            }
-
-            //华为云在此进行方法调用
-//            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
-
-            //返回结果
-            return "result";
-        }
-    return "hhh";
-    }
 
     @ResponseBody
     @RequestMapping(value = "/openBucketLogging", method = RequestMethod.POST)
     public String openBucketLogging(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("openBucketLogging");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -110,6 +72,7 @@ public class APIBucketLoggingController {
     @RequestMapping(value = "/getBucketLogging", method = RequestMethod.POST)
     public Map<String,String> getBucketLogging(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketLogging");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -140,6 +103,7 @@ public class APIBucketLoggingController {
     @RequestMapping(value = "/closeBucketLogging", method = RequestMethod.POST)
     public String closeBucketLogging(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("closeBucketLogging");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }

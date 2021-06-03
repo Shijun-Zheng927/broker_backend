@@ -38,6 +38,7 @@ public class APIDownloadController {
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
     public String demo(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("/demo");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -80,6 +81,7 @@ public class APIDownloadController {
     @RequestMapping(value = "/streamDownload", method = RequestMethod.POST)
     public String streamDownload(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("streamDownload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -119,6 +121,7 @@ public class APIDownloadController {
     @RequestMapping(value = "/rangeDownload", method = RequestMethod.POST)
     public String rangeDownload(@RequestBody Map<String, String> map,
                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("rangeDownload");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -169,6 +172,7 @@ public class APIDownloadController {
     @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
     public String checkPointDownload(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("checkPointDownload");
         if (!verifyIdentity(response, authorization)) {
             return "fail";
         }
@@ -212,6 +216,7 @@ public class APIDownloadController {
     @ResponseBody
     @RequestMapping(value = "/downloadTest")
     public byte[] downloadTest() {
+        System.out.println("downloadTest");
         byte[] bytes = null;
         try {
             File f = new File("D:\\IDEA\\broker\\src\\main\\resources\\static\\head\\groot.jpg");

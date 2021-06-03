@@ -32,8 +32,9 @@ public class APIUploadSelectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListParts", method = RequestMethod.POST)
-    public List<Map<String,String>> simpleListParts(@RequestBody Map<String, String> map,
-                                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> simpleListParts(@RequestBody Map<String, String> map,
+                                                     @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleListParts");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -50,7 +51,7 @@ public class APIUploadSelectController {
                 response.setStatus(777);
                 return null;
             }
-            List<Map<String,String>> result = aliUploadController.simpleListParts(bucketName, objectName, uploadId);
+            List<Map<String, String>> result = aliUploadController.simpleListParts(bucketName, objectName, uploadId);
             return result;
         } else {
             String bucketName = map.get("bucketName");
@@ -63,15 +64,16 @@ public class APIUploadSelectController {
                 response.setStatus(777);
                 return null;
             }
-            List<Map<String,String>> result = huaweiUploadController.simpleListPart(bucketName, objectName, uploadId);
+            List<Map<String, String>> result = huaweiUploadController.simpleListPart(bucketName, objectName, uploadId);
             return result;
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/listPartsAll", method = RequestMethod.POST)
-    public List<Map<String,String>> listPartsAll(@RequestBody Map<String, String> map,
-                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> listPartsAll(@RequestBody Map<String, String> map,
+                                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listPartsAll");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -88,7 +90,7 @@ public class APIUploadSelectController {
                 response.setStatus(777);
                 return null;
             }
-            List<Map<String,String>> result = aliUploadController.listPartsAll(bucketName, objectName, uploadId);
+            List<Map<String, String>> result = aliUploadController.listPartsAll(bucketName, objectName, uploadId);
             return result;
         } else {
             String bucketName = map.get("bucketName");
@@ -101,15 +103,16 @@ public class APIUploadSelectController {
                 response.setStatus(777);
                 return null;
             }
-            List<Map<String,String>> result = huaweiUploadController.listPartsAll(bucketName, objectName, uploadId);
+            List<Map<String, String>> result = huaweiUploadController.listPartsAll(bucketName, objectName, uploadId);
             return result;
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/listPartsByPaper", method = RequestMethod.POST)
-    public List<Map<String,String>> listPartsByPaper(@RequestBody Map<String, String> map,
-                                                     @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> listPartsByPaper(@RequestBody Map<String, String> map,
+                                                      @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listPartsByPaper");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -140,8 +143,9 @@ public class APIUploadSelectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListMultipartUploads", method = RequestMethod.POST)
-    public List<Map<String,String>> simpleListMultipartUploads(@RequestBody Map<String, String> map,
-                                                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> simpleListMultipartUploads(@RequestBody Map<String, String> map,
+                                                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("simpleListMultipartUploads");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -166,8 +170,9 @@ public class APIUploadSelectController {
 
     @ResponseBody
     @RequestMapping(value = "/listMultipartUploads", method = RequestMethod.POST)
-    public List<Map<String,String>> listMultipartUploads(@RequestBody Map<String, String> map,
-                                                         @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> listMultipartUploads(@RequestBody Map<String, String> map,
+                                                          @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listMultipartUploads");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -187,8 +192,9 @@ public class APIUploadSelectController {
 
     @ResponseBody
     @RequestMapping(value = "/listMultipartUploadsByPapper", method = RequestMethod.POST)
-    public List<Map<String,String>> listMultipartUploadsByPapper(@RequestBody Map<String, String> map,
-                                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<Map<String, String>> listMultipartUploadsByPapper(@RequestBody Map<String, String> map,
+                                                                  @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("listMultipartUploadsByPapper");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
