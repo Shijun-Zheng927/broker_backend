@@ -6,6 +6,7 @@ import com.obs.services.model.ObsBucket;
 import com.sdu.broker.aliyun.oss.BucketController;
 import com.sdu.broker.huaweiyun.HuaweiController;
 import com.sdu.broker.pojo.Bucket;
+import com.sdu.broker.pojo.req.ListBucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.BucketUtils;
@@ -133,7 +134,7 @@ public class APIBucketController {
 
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
-    public List<String> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<ListBucket> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("listAllBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -156,10 +157,26 @@ public class APIBucketController {
         List<ObsBucket> buckets2 = getBucketHuawei(userId, "HUAWEI", result2);
 //        System.out.println("b2" + buckets2.size());
 
-
-        List<String> result0 = new ArrayList<>();
-        result0.addAll(bucketToStringAli(buckets1));
-        result0.addAll(bucketToStringHuawei(buckets2));
+        List<ListBucket> result0 = new ArrayList<>();
+        for (com.aliyun.oss.model.Bucket b : buckets1) {
+            ListBucket l = new ListBucket();
+            l.setBucketName(b.getName());
+            l.setLocation(b.getLocation());
+            l.setStorageClass(b.getStorageClass().toString());
+            l.setCreateDate(b.getCreationDate().toString());
+            result0.add(l);
+        }
+        for (ObsBucket o : buckets2) {
+            ListBucket l = new ListBucket();
+            l.setBucketName(o.getBucketName());
+            l.setLocation(o.getLocation());
+            l.setStorageClass(o.getStorageClass());
+            l.setCreateDate(o.getCreationDate().toString());
+            result0.add(l);
+        }
+//        List<String> result0 = new ArrayList<>();
+//        result0.addAll(bucketToStringAli(buckets1));
+//        result0.addAll(bucketToStringHuawei(buckets2));
         return result0;
 //        if (platform.equals("ALI")) {
 //            List<com.aliyun.oss.model.Bucket> result = bucketController.listAllBuckets();

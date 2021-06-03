@@ -106,6 +106,9 @@ public class APIDownloadController {
             //阿里云在此调用方法
             if(aliObjectController.doesObjectExist(bucketName,objectKey)){
                 String s = aliDownloadController.streamDownload(bucketName, objectKey);
+
+                double stringSize = FileUtils.getStringSize(s);
+                chargeService.operate(bucketName, stringSize, "/streamDownload", userId, "download");
                 return s;
             }
         } else {
@@ -158,9 +161,15 @@ public class APIDownloadController {
                         Integer.parseInt(begin), Integer.parseInt(end));
                 if(s.equals("false!")){
                     return "fail";
-                }else return objectKey;
+                } else {
+
+                    double stringSize = FileUtils.getFileSize(path);
+                    chargeService.operate(bucketName, stringSize, "/rangeDownload", userId, "download");
+                    return urlPath.getUrlPath() + "file/" + objectKey;
+                }
+            } else {
+                return "fail";
             }
-            return "result";
         } else {
             String begin = map.get("begin");
             String end = map.get("end");
@@ -217,10 +226,13 @@ public class APIDownloadController {
             if(aliObjectController.doesObjectExist(bucketName,objectKey)){
                 String s = aliDownloadController.checkPointDownload(bucketName, objectKey, path,
                         Integer.parseInt(partSize), Integer.parseInt(taskNum));
-                return s;
 
+                double stringSize = FileUtils.getFileSize(path);
+                chargeService.operate(bucketName, stringSize, "/checkPointDownload", userId, "download");
+                return urlPath.getUrlPath() + "file/" + objectKey;
+            } else {
+                return "fail";
             }
-            return "result";
         } else {
             String partSize = map.get("partSize");
             String taskNum = map.get("taskNum");
