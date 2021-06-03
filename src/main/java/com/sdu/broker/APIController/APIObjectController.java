@@ -154,6 +154,11 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
+            String number = map.get("number");
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
             List<String> listObject = aliObjectController.simpleListObject(bucketName,number);
             //返回结果
             return listObject;
@@ -189,6 +194,11 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
             List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix);
             return listObject;
         }
@@ -223,7 +233,17 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> listObject = aliObjectController.simpleListObject(bucketName,prefix,number);
+            String number = map.get("number");
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
             //返回结果
             return listObject;
         } else {
@@ -292,7 +312,12 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> listObject = aliObjectController.pageObjectList(bucketName,prefix);
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.pageObjectList(bucketName, prefix);
             //返回结果
             return listObject;
         } else {
