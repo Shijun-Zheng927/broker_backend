@@ -60,7 +60,7 @@ public class APIObjectController {
             }
             else return "false";
         }
-    return "hhh";
+
     }
 
     @ResponseBody
