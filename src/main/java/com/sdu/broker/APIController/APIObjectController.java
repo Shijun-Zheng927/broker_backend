@@ -5,6 +5,8 @@ import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObsObject;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
 import com.sdu.broker.service.BucketService;
+import com.sdu.broker.utils.BucketUtils;
+import com.sdu.broker.utils.ControllerUtils;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -72,8 +74,12 @@ public class APIObjectController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
-        String ObjectKey = map.get("ObjectKey");
+        String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        if ("".equals(objectKey)) {
+            response.setStatus(777);
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
@@ -92,8 +98,10 @@ public class APIObjectController {
             return "result";
         }
         else {
-            boolean ifExist = huaweiObjectController.ifObjectExist(bucketName,ObjectKey);
-            if(ifExist) return "true";
+            boolean ifExist = huaweiObjectController.ifObjectExist(bucketName, objectKey);
+            if (ifExist) {
+                return "true";
+            }
             else return "false";
         }
     }
@@ -125,7 +133,9 @@ public class APIObjectController {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request);
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
@@ -139,7 +149,6 @@ public class APIObjectController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
-        int number = Integer.parseInt(map.get("number"));
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -155,10 +164,17 @@ public class APIObjectController {
             return result;
         }
         else {
+            String number = map.get("number");
+            if ("".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
-            List<ObsObject> list = huaweiObjectController.simpleList(request,number);
+            List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number));
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
@@ -172,7 +188,6 @@ public class APIObjectController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
-        String prefix = map.get("prefix");
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -188,10 +203,17 @@ public class APIObjectController {
             return result;
         }
         else {
+            String prefix = map.get("prefix");
+            if ("".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request,prefix);
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
@@ -205,8 +227,6 @@ public class APIObjectController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
-        int number = Integer.parseInt(map.get("number"));
-        String prefix = map.get("prefix");
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -222,10 +242,22 @@ public class APIObjectController {
             return result;
         }
         else {
+            String number = map.get("number");
+            if ("".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
+            String prefix = map.get("prefix");
+            if ("".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
-            List<ObsObject> list = huaweiObjectController.simpleList(request,number,prefix);
+            List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number), prefix);
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
@@ -256,7 +288,9 @@ public class APIObjectController {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.pagingList(request);
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
@@ -270,7 +304,6 @@ public class APIObjectController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
-        String prefix = map.get("prefix");
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -286,16 +319,23 @@ public class APIObjectController {
             return result;
         }
         else {
+            String prefix = map.get("prefix");
+            if ("".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
-            List<ObsObject> list = huaweiObjectController.pagingList(request,prefix);
+            List<ObsObject> list = huaweiObjectController.pagingList(request, prefix);
             List<String> result = new ArrayList<>();
-            for(ObsObject o : list){result.add(o.toString());}
+            for (ObsObject o : list) {
+                result.add(o.toString());
+            }
             return result;
         }
     }
 
     @ResponseBody
-    @RequestMapping(value = "/deleteObject", method = RequestMethod.POST)
+    @RequestMapping(value = "/deleteObject", method = RequestMethod.DELETE)
     public String deleteObject(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
@@ -305,6 +345,10 @@ public class APIObjectController {
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        if ("".equals(objectKey)) {
+            response.setStatus(777);
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
@@ -358,11 +402,15 @@ public class APIObjectController {
             如果复制成功则返回新对象的etag
             失败则返回“copy failed”
              */
-            String sourceBucketName = map.get("sourceBucketName");
+//            String sourceBucketName = map.get("sourceBucketName");
             String sourceObjectName = map.get("sourceObjectName");
             String destBucketName = map.get("destBucketName");
             String destObjectName = map.get("destObjectName");
-            CopyObjectRequest request = new CopyObjectRequest(sourceBucketName,sourceObjectName,destBucketName,destObjectName);
+            if ("".equals(sourceObjectName) || "".equals(destBucketName) || "".equals(destObjectName)) {
+                response.setStatus(777);
+                return null;
+            }
+            CopyObjectRequest request = new CopyObjectRequest(bucketName, sourceObjectName, destBucketName, destObjectName);
             String result = huaweiObjectController.copyObject(request);
             return result;
         }
