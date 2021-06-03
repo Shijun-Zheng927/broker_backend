@@ -198,10 +198,7 @@ public class BucketController {
                     ossClient.setBucketAcl(bucketName, CannedAccessControlList.PublicReadWrite);
                     break;
             }
-        } catch (OSSException e) {
-            e.printStackTrace();
-            return "false";
-        } catch (ClientException e) {
+        } catch (OSSException | ClientException e) {
             e.printStackTrace();
             return "false";
         }
@@ -214,10 +211,7 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
             ossClient.deleteBucket(bucketName);
-        } catch (OSSException e) {
-            e.printStackTrace();
-            return "false";
-        } catch (ClientException e) {
+        } catch (OSSException | ClientException e) {
             e.printStackTrace();
             return "false";
         }
@@ -233,10 +227,7 @@ public class BucketController {
             SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
             request.setTag(tagKey,tagValue);
             ossClient.setBucketTagging(request);
-        } catch (OSSException e) {
-            e.printStackTrace();
-            return "false";
-        } catch (ClientException e) {
+        } catch (OSSException | ClientException e) {
             e.printStackTrace();
             return "false";
         }

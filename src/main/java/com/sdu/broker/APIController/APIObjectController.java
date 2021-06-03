@@ -3,6 +3,7 @@ package com.sdu.broker.APIController;
 import com.obs.services.model.CopyObjectRequest;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObsObject;
+import com.sdu.broker.aliyun.oss.AliObjectController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.BucketUtils;
@@ -22,6 +23,49 @@ public class APIObjectController {
     private BucketService bucketService;
     @Autowired
     private HuaweiObjectController huaweiObjectController;
+    @Autowired
+    private AliObjectController aliObjectController;
+    @ResponseBody
+    @RequestMapping(value = "/demo", method = RequestMethod.POST)
+    public String demo(@RequestBody Map<String, String> map,
+                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String bucketName = map.get("bucketName");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform.equals("ALI")) {
+            //在此获取其他参数并验证
+            String acl = map.get("rwPolicy");
+            if ("".equals(acl)) {
+                //设置默认值
+                acl = "0";
+            }
+
+            //阿里云在此调用方法
+//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+
+            //返回结果
+            return "result";
+        } else {
+            String rwPolicy = map.get("rwPolicy");
+            if ("".equals(rwPolicy)) {
+                //设置默认值
+                rwPolicy = "0";
+            }
+
+            //华为云在此进行方法调用
+//            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
+
+            //返回结果
+            return "result";
+        }
+    }
+
 
 
     @ResponseBody
@@ -51,11 +95,6 @@ public class APIObjectController {
                 acl = "0";
             }
 
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
         }
         else {
             boolean ifExist = huaweiObjectController.ifObjectExist(bucketName, objectKey);
@@ -64,6 +103,7 @@ public class APIObjectController {
             }
             else return "false";
         }
+    return "hhh";
     }
 
     @ResponseBody
@@ -84,11 +124,9 @@ public class APIObjectController {
             List<String> result = new ArrayList<>();
 
 
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
+            List<String> listObject = aliObjectController.simpleListObject(bucketName);
             //返回结果
-            return result;
+            return listObject;
         }
         else {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
@@ -116,14 +154,14 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
+            String number = map.get("number");
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.simpleListObject(bucketName,number);
             //返回结果
-            return result;
+            return listObject;
         }
         else {
             String number = map.get("number");
@@ -156,14 +194,13 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return result;
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix);
+            return listObject;
         }
         else {
             String prefix = map.get("prefix");
@@ -196,14 +233,19 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
+            String number = map.get("number");
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
+                response.setStatus(777);
+                return null;
+            }
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
             //返回结果
-            return result;
+            return listObject;
         } else {
             String number = map.get("number");
             if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
@@ -240,13 +282,9 @@ public class APIObjectController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             List<String> result = new ArrayList<>();
-
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
+            List<String> listObject = aliObjectController.pageObjectList(bucketName);
             //返回结果
-            return result;
+            return listObject;
         }
         else {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
@@ -274,14 +312,14 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
+            String prefix = map.get("prefix");
+            if (prefix == null || "".equals(prefix)) {
+                response.setStatus(777);
+                return null;
+            }
+            List<String> listObject = aliObjectController.pageObjectList(bucketName, prefix);
             //返回结果
-            return result;
+            return listObject;
         } else {
             String prefix = map.get("prefix");
             if (prefix == null || "".equals(prefix)) {
@@ -309,6 +347,7 @@ public class APIObjectController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
         String objectKey = map.get("objectKey");
+        String objectPath = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
             return null;
         }
@@ -324,12 +363,12 @@ public class APIObjectController {
                 //设置默认值
                 acl = "0";
             }
+           if(aliObjectController.doesObjectExist(bucketName, objectKey)){
+               String s = aliObjectController.deleteObject(bucketName,objectPath);
+               return s;
+           }else return "false";
 
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
 
-            //返回结果
-            return "result";
         } else {
             String result = huaweiObjectController.deleteObject(bucketName,objectKey);
             return result;
@@ -357,12 +396,12 @@ public class APIObjectController {
                 //设置默认值
                 acl = "0";
             }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
+            String sourceBucketName = map.get("sourceBucketName");
+            String sourceObjectName = map.get("sourceObjectName");
+            String destBucketName = map.get("destBucketName");
+            String destObjectName = map.get("destObjectName");
+            String etag = aliObjectController.simpleCopyObject(sourceBucketName, sourceObjectName, destBucketName, destObjectName);
+            return etag;
         } else {
             /*
             如果复制成功则返回新对象的etag
