@@ -25,48 +25,6 @@ public class APIObjectController {
     private HuaweiObjectController huaweiObjectController;
     @Autowired
     private AliObjectController aliObjectController;
-    @ResponseBody
-    @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public String demo(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        if (!verifyIdentity(response, authorization)) {
-            return null;
-        }
-        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String bucketName = map.get("bucketName");
-        if (verify(response, userId, bucketName)) {
-            return null;
-        }
-        String platform = bucketService.getPlatform(bucketName);
-        if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
-        } else {
-            String rwPolicy = map.get("rwPolicy");
-            if ("".equals(rwPolicy)) {
-                //设置默认值
-                rwPolicy = "0";
-            }
-
-            //华为云在此进行方法调用
-//            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
-
-            //返回结果
-            return "result";
-        }
-    }
-
-
 
     @ResponseBody
     @RequestMapping(value = "/ifObjectExist", method = RequestMethod.POST)
@@ -88,12 +46,6 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
             boolean doesObjectExist = aliObjectController.doesObjectExist(bucketName, objectKey);
             if (doesObjectExist) {
                 return "true";
