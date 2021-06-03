@@ -38,7 +38,7 @@ public class APIObjectController {
         if (verify(response, userId, bucketName)) {
             return null;
         }
-        if ("".equals(objectKey)) {
+        if (objectKey == null || "".equals(objectKey)) {
             response.setStatus(777);
             return null;
         }
@@ -127,7 +127,7 @@ public class APIObjectController {
         }
         else {
             String number = map.get("number");
-            if ("".equals(number) || !BucketUtils.isNumber(number)) {
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
                 response.setStatus(777);
                 return null;
             }
@@ -167,7 +167,7 @@ public class APIObjectController {
         }
         else {
             String prefix = map.get("prefix");
-            if ("".equals(prefix)) {
+            if (prefix == null || "".equals(prefix)) {
                 response.setStatus(777);
                 return null;
             }
@@ -206,12 +206,12 @@ public class APIObjectController {
             return result;
         } else {
             String number = map.get("number");
-            if ("".equals(number) || !BucketUtils.isNumber(number)) {
+            if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
                 response.setStatus(777);
                 return null;
             }
             String prefix = map.get("prefix");
-            if ("".equals(prefix)) {
+            if (prefix == null || "".equals(prefix)) {
                 response.setStatus(777);
                 return null;
             }
@@ -284,7 +284,7 @@ public class APIObjectController {
             return result;
         } else {
             String prefix = map.get("prefix");
-            if ("".equals(prefix)) {
+            if (prefix == null || "".equals(prefix)) {
                 response.setStatus(777);
                 return null;
             }
@@ -312,7 +312,7 @@ public class APIObjectController {
         if (verify(response, userId, bucketName)) {
             return null;
         }
-        if ("".equals(objectKey)) {
+        if (objectKey == null || "".equals(objectKey)) {
             response.setStatus(777);
             return null;
         }
@@ -372,6 +372,10 @@ public class APIObjectController {
             String sourceObjectName = map.get("sourceObjectName");
             String destBucketName = map.get("destBucketName");
             String destObjectName = map.get("destObjectName");
+            if (sourceObjectName == null || destBucketName == null || destObjectName == null) {
+                response.setStatus(777);
+                return null;
+            }
             if ("".equals(sourceObjectName) || "".equals(destBucketName) || "".equals(destObjectName)) {
                 response.setStatus(777);
                 return null;

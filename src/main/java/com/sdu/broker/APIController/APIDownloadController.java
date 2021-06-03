@@ -91,7 +91,7 @@ public class APIDownloadController {
         if (verify(response, userId, bucketName)) {
             return "fail";
         }
-        if ("".equals(objectKey)) {
+        if (objectKey == null || "".equals(objectKey)) {
             return "fail";
         }
         String platform = bucketService.getPlatform(bucketName);
@@ -132,7 +132,8 @@ public class APIDownloadController {
         if (verify(response, userId, bucketName)) {
             return "fail";
         }
-        if ("".equals(objectKey)) {
+        if (objectKey == null || "".equals(objectKey)) {
+            response.setStatus(777);
             return "fail";
         }
         String platform = bucketService.getPlatform(bucketName);
@@ -147,7 +148,8 @@ public class APIDownloadController {
         } else {
             String begin = map.get("begin");
             String end = map.get("end");
-            if ("".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
+            if (begin == null || end == null || "".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
+                response.setStatus(777);
                 return "fail";
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
@@ -171,7 +173,7 @@ public class APIDownloadController {
     @ResponseBody
     @RequestMapping(value = "/checkPointDownload", method = RequestMethod.POST)
     public String checkPointDownload(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+                                     @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("checkPointDownload");
         if (!verifyIdentity(response, authorization)) {
             return "fail";
@@ -181,6 +183,10 @@ public class APIDownloadController {
         String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
             return "fail";
+        }
+        if (objectKey == null || "".equals(objectKey)) {
+            response.setStatus(777);
+            return null;
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
@@ -194,21 +200,22 @@ public class APIDownloadController {
             String partSize = map.get("partSize");
             String taskNum = map.get("taskNum");
             if ("".equals(partSize) || "".equals(taskNum) || !BucketUtils.isNumber(partSize) || !BucketUtils.isNumber(taskNum)) {
+                response.setStatus(777);
                 return "fail";
             }
             String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
-            if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
+            if (huaweiObjectController.ifObjectExist(bucketName, objectKey)) {
                 DownloadFileRequest request = huaweiDownloadController.newDownloadRequest(bucketName, objectKey);
                 String s = huaweiDownloadController.checkPointDownload(request, path,
                         Integer.parseInt(partSize), Integer.parseInt(taskNum));
-                if (s.equals("download failed")){
+                if (s.equals("download failed")) {
                     return "fail";
                 }
 
                 double stringSize = FileUtils.getFileSize(path);
                 chargeService.operate(bucketName, stringSize, "/checkPointDownload", userId, "download");
                 return urlPath.getUrlPath() + "file/" + objectKey;
-            }else {
+            } else {
                 return "fail";
             }
         }
