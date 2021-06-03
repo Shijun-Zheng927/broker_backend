@@ -168,6 +168,9 @@ public class APIDownloadController {
         if (verify(response, userId, bucketName)) {
             return "fail";
         }
+        if ("".equals(objectKey)) {
+            return "fail";
+        }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
 

@@ -91,9 +91,13 @@ public class APIBucketLoggingController {
             HUAWEI.targetPrefix=ALI.logpath
             按照map返回的参数修改吧
              */
-            String targetBucketName = map.get("targetBucketName");
-            String sourceBucketName = map.get("sourceBucketName");
-            String targetPrefix = map.get("targetPrefix");
+            String targetBucketName = map.get("logBucketName");
+            String sourceBucketName = map.get("bucketName");
+            String targetPrefix = map.get("logpath");
+            if ("".equals(targetBucketName) || "".equals(targetPrefix)) {
+                response.setStatus(777);
+                return null;
+            }
 
             String result = huaweiBuckectLoggingController.setBuckectLogging(targetBucketName,targetPrefix,sourceBucketName);
 
@@ -105,7 +109,7 @@ public class APIBucketLoggingController {
 
     @ResponseBody
     @RequestMapping(value = "/getBucketLogging", method = RequestMethod.POST)
-    public String getBucketLogging(@RequestBody Map<String, String> map,
+    public Map<String,String> getBucketLogging(@RequestBody Map<String, String> map,
                        @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -128,7 +132,7 @@ public class APIBucketLoggingController {
 //            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
 
             //返回结果
-            return "result";
+            return null;
         } else {
             /*
             返回的map是
@@ -136,9 +140,9 @@ public class APIBucketLoggingController {
             <"targetPrefix",桶内路径>
             路径指向日志文件夹
              */
-            String sourceBucketName = map.get("sourceBucketName");
-            Map<String,String> logMap = huaweiBuckectLoggingController.getBucketLogging(sourceBucketName);
-            return "result";
+//            String sourceBucketName = map.get("sourceBucketName");
+            Map<String,String> logMap = huaweiBuckectLoggingController.getBucketLogging(bucketName);
+            return logMap;
         }
     }
 
