@@ -94,7 +94,11 @@ public class APIObjectController {
                 //设置默认值
                 acl = "0";
             }
-
+            boolean doesObjectExist = aliObjectController.doesObjectExist(bucketName, objectKey);
+            if (doesObjectExist) {
+                return "true";
+            }
+            else return "false";
         }
         else {
             boolean ifExist = huaweiObjectController.ifObjectExist(bucketName, objectKey);
@@ -103,7 +107,6 @@ public class APIObjectController {
             }
             else return "false";
         }
-    return "hhh";
     }
 
     @ResponseBody
