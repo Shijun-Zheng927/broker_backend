@@ -425,6 +425,10 @@ public class BucketController {
 
     }
 
+    public static void main(String[] args) {
+//        openBucketLogging("xmsx-001","xmsx-001","log/");
+        checkBucketLogging("xmsx-001");
+    }
 
 }
 

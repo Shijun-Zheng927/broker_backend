@@ -14,12 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
-public class                 AliUploadController {
+public class  AliUploadController {
     private static String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
     //    Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
-    //流式上传：上传字符串、上传数组、上传网络流
+    //流式上传：上传字符串、上传数组、上传网络
 
     //上传字符串
     public String putString(String content, String bucketName, String objectPath){

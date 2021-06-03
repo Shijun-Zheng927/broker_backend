@@ -168,9 +168,6 @@ public class APIDownloadController {
         if (verify(response, userId, bucketName)) {
             return "fail";
         }
-        if ("".equals(objectKey)) {
-            return "fail";
-        }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
 
@@ -201,10 +198,10 @@ public class APIDownloadController {
     }
     @ResponseBody
     @RequestMapping(value = "/downloadTest")
-    public DownloadFile downloadTest() {
+    public byte[] downloadTest() {
         byte[] bytes = null;
         try {
-            File f = new File("D:/IDEA/broker/src/main/resources/static/file/groot.jpg");
+            File f = new File("D:\\IDEA\\broker\\src\\main\\resources\\static\\head\\groot.jpg");
             FileInputStream inputStream = new FileInputStream(f);
             bytes = new byte[inputStream.available()];
             inputStream.read(bytes, 0, inputStream.available());
@@ -215,10 +212,7 @@ public class APIDownloadController {
             e.printStackTrace();
         }
 //        return new DownloadFile("groot.jpg", bytes);
-        DownloadFile downloadFile = new DownloadFile();
-        downloadFile.setName("groot.jpg");
-        downloadFile.setUrl(urlPath.getUrlPath() + "file/groot.jpg");
-        return downloadFile;
+        return bytes;
     }
 
 
