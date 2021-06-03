@@ -7,7 +7,9 @@ import com.obs.services.model.GetObjectRequest;
 import com.sdu.broker.huaweiyun.HuaweiDownloadController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
 import com.sdu.broker.service.BucketService;
+import com.sdu.broker.service.ChargeService;
 import com.sdu.broker.utils.BucketUtils;
+import com.sdu.broker.utils.FileUtils;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,8 @@ public class APIDownloadController {
     private HuaweiObjectController huaweiObjectController;
     @Autowired
     private UrlPath urlPath;
+    @Autowired
+    private ChargeService chargeService;
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -100,6 +104,9 @@ public class APIDownloadController {
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
                 GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName,objectKey);
                 String s = huaweiDownloadController.streamDownload(request);
+
+                double stringSize = FileUtils.getStringSize(s);
+                chargeService.operate(bucketName, stringSize, "/streamDownload", userId, "download");
                 return s;
             }else {
                 return "fail";
@@ -147,6 +154,9 @@ public class APIDownloadController {
                 if (s.equals("OBS exception!")||s.equals("IO exception!")){
                     return "fail";
                 }
+
+                double stringSize = FileUtils.getFileSize(path);
+                chargeService.operate(bucketName, stringSize, "/rangeDownload", userId, "download");
                 return urlPath.getUrlPath() + "file/" + objectKey;
             }else {
                 return "fail";
@@ -193,6 +203,9 @@ public class APIDownloadController {
                 if (s.equals("download failed")){
                     return "fail";
                 }
+
+                double stringSize = FileUtils.getFileSize(path);
+                chargeService.operate(bucketName, stringSize, "/checkPointDownload", userId, "download");
                 return urlPath.getUrlPath() + "file/" + objectKey;
             }else {
                 return "fail";
