@@ -1,6 +1,7 @@
 package com.sdu.broker.conf;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,5 +18,15 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/file/**").addResourceLocations("file:" + path2);
         String path3 = "D:/IDEA/broker/src/main/resources/static/md/";
         registry.addResourceHandler("/md/**").addResourceLocations("file:" + path3);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .maxAge(3600);
     }
 }

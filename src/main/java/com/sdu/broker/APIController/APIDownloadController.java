@@ -201,7 +201,7 @@ public class APIDownloadController {
     public DownloadFile downloadTest() {
         byte[] bytes = null;
         try {
-            File f = new File("D:/IDEA/broker/src/main/resources/static/file/groot.txt");
+            File f = new File("D:/IDEA/broker/src/main/resources/static/file/groot.jpg");
             FileInputStream inputStream = new FileInputStream(f);
             bytes = new byte[inputStream.available()];
             inputStream.read(bytes, 0, inputStream.available());
@@ -213,8 +213,8 @@ public class APIDownloadController {
         }
 //        return new DownloadFile("groot.jpg", bytes);
         DownloadFile downloadFile = new DownloadFile();
-        downloadFile.setName("groot.txt");
-        downloadFile.setUrl(urlPath.getUrlPath() + "file/groot.txt");
+        downloadFile.setName("groot.jpg");
+        downloadFile.setUrl(urlPath.getUrlPath() + "file/groot.jpg");
         return downloadFile;
     }
 
