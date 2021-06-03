@@ -220,18 +220,24 @@ public class APIBucketController {
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
 //        String platform = platformService.getPlatform(userId);
 //        String bucketName = map.get("bucketName");
-        if (verify(response, userId, bucketName)) {
+//        if (verify(response, userId, bucketName)) {
+//            return false;
+//        }
+        if (bucketName == null || "".equals(bucketName)) {
+            response.setStatus(777);
             return false;
         }
-        boolean result;
+//        boolean result;
         String platform = bucketService.getPlatform(bucketName);
 
-        if (platform.equals("ALI")) {
-            result = bucketController.doesBucketExist(bucketName);
-        } else {
-            result = huaweiController.existBucket(bucketName);
-        }
-        return result;
+//        if (platform.equals("ALI")) {
+        boolean result1 = bucketController.doesBucketExist(bucketName);
+        System.out.println(result1);
+//        } else {
+        boolean result2 = huaweiController.existBucket(bucketName);
+        System.out.println(result2);
+//        }
+        return result1 || result2;
     }
 
     @ResponseBody
