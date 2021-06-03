@@ -47,13 +47,11 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
+            boolean doesObjectExist = aliObjectController.doesObjectExist(bucketName, objectKey);
+            if (doesObjectExist) {
+                return "true";
             }
-
+            else return "false";
         }
         else {
             boolean ifExist = huaweiObjectController.ifObjectExist(bucketName, objectKey);
