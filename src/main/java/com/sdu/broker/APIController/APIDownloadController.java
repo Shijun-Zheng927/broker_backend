@@ -1,5 +1,7 @@
 package com.sdu.broker.APIController;
 
+import com.sdu.broker.aliyun.oss.AliDownloadController;
+import com.sdu.broker.aliyun.oss.AliObjectController;
 import com.sdu.broker.pojo.UrlPath;
 import com.sdu.broker.pojo.req.DownloadFile;
 import com.obs.services.model.DownloadFileRequest;
@@ -29,6 +31,10 @@ public class APIDownloadController {
     private HuaweiObjectController huaweiObjectController;
     @Autowired
     private UrlPath urlPath;
+    @Autowired
+    private AliDownloadController aliDownloadController;
+    @Autowired
+    private AliObjectController aliObjectController;
 
     @ResponseBody
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -92,10 +98,10 @@ public class APIDownloadController {
         if (platform.equals("ALI")) {
 
             //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
+            if(aliObjectController.doesObjectExist(bucketName,objectKey)){
+                String s = aliDownloadController.streamDownload(bucketName, objectKey);
+                return s;
+            }
         } else {
             if (huaweiObjectController.ifObjectExist(bucketName, objectKey)){
                 GetObjectRequest request = huaweiDownloadController.newObjectRequest(bucketName,objectKey);
@@ -105,6 +111,7 @@ public class APIDownloadController {
                 return "fail";
             }
         }
+        return "hhh";
     }
 
     //范围下载
@@ -129,10 +136,19 @@ public class APIDownloadController {
         if (platform.equals("ALI")) {
             //在此获取其他参数并验证
 
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
+            String begin = map.get("begin");
+            String end = map.get("end");
+            if ("".equals(begin) || "".equals(end) || !BucketUtils.isNumber(begin) || !BucketUtils.isNumber(end)) {
+                return "fail";
+            }
+            String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
+            if(aliObjectController.doesObjectExist(bucketName, objectKey)){
+                String s = aliDownloadController.rangeDownload(bucketName, objectKey, path,
+                        Integer.parseInt(begin), Integer.parseInt(end));
+                if(s.equals("false!")){
+                    return "fail";
+                }else return objectKey;
+            }
             return "result";
         } else {
             String begin = map.get("begin");
@@ -172,9 +188,18 @@ public class APIDownloadController {
         if (platform.equals("ALI")) {
 
             //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+            String partSize = map.get("partSize");
+            String taskNum = map.get("taskNum");
+            if ("".equals(partSize) || "".equals(taskNum) || !BucketUtils.isNumber(partSize) || !BucketUtils.isNumber(taskNum)) {
+                return "fail";
+            }
+            String path = "D:/IDEA/broker/src/main/resources/static/file/" + objectKey;
+            if(aliObjectController.doesObjectExist(bucketName,objectKey)){
+                String s = aliDownloadController.checkPointDownload(bucketName, objectKey, path,
+                        Integer.parseInt(partSize), Integer.parseInt(taskNum));
+                return s;
 
-            //返回结果
+            }
             return "result";
         } else {
             String partSize = map.get("partSize");
