@@ -200,10 +200,10 @@ public class BucketController {
             }
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
         ossClient.shutdown();
-        return "设置存储空间访问权限成功";
+        return "success";
     }
 
     //删除存储空间
@@ -213,10 +213,10 @@ public class BucketController {
             ossClient.deleteBucket(bucketName);
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
         ossClient.shutdown();
-        return "删除存储空间成功";
+        return "success";
     }
 
     //设置存储标签

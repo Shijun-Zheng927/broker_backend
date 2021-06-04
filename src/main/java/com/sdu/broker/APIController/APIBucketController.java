@@ -578,6 +578,8 @@ public class APIBucketController {
     public String deleteBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("deleteBucket");
+//        System.out.println(map.get("bucketName"));
+//        return null;
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -590,7 +592,7 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             String result = bucketController.deleteBucket(bucketName);
-            if (result.equals("删除存储空间成功")) {
+            if (result.equals("success")) {
                 Bucket bucket = new Bucket(platform, bucketName);
                 bucketService.deleteBucket(bucket);
             }
@@ -600,9 +602,9 @@ public class APIBucketController {
             if (result == 1) {
                 Bucket bucket = new Bucket(platform, bucketName);
                 bucketService.deleteBucket(bucket);
-                return "删除存储空间成功";
+                return "success";
             } else {
-                return "失败";
+                return "fail";
             }
         }
     }
