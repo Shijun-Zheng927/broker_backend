@@ -7,6 +7,7 @@ import com.sdu.broker.aliyun.oss.BucketController;
 import com.sdu.broker.huaweiyun.HuaweiController;
 import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.pojo.req.ListBucket;
+import com.sdu.broker.pojo.resp.RespBucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.BucketUtils;
@@ -288,7 +289,7 @@ public class APIBucketController {
 
     @ResponseBody
     @GetMapping(value = "/getBucketInfo", params = {"bucketName"})
-    public Object getBucketInfo(@RequestParam String bucketName,
+    public RespBucket getBucketInfo(@RequestParam String bucketName,
                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("getBucketInfo");
         if (!verifyIdentity(response, authorization)) {
@@ -303,10 +304,14 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             BucketInfo result = bucketController.getBucketInfo(bucketName);
-            return result;
+
+            RespBucket respBucket = new RespBucket(result);
+            return respBucket;
         } else {
             BucketMetadataInfoResult result = huaweiController.getresult(bucketName);
-            return result;
+
+            RespBucket respBucket = new RespBucket(result);
+            return respBucket;
         }
     }
 
