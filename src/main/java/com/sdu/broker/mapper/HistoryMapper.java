@@ -23,4 +23,10 @@ public interface HistoryMapper {
 
     @Select("select sum(size) from history where user=#{user} and ud='download'")
     Double getDownload(Integer user);
+
+    @Select("select sum(size) from history where bucketName=#{bucketName} and ud='upload'")
+    Double getBucketUpFlow(String bucketName);
+
+    @Select("select sum(size) from history where bucketName=#{bucketName} and ud='download'")
+    Double getBucketDownFlow(String bucketName);
 }

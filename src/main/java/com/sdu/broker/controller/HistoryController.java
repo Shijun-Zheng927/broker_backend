@@ -38,6 +38,20 @@ public class HistoryController {
         return result;
     }
 
+    @CrossOrigin
+    @RequestMapping("/getBucketFlow")
+    public Map<String, String> getBucketFlow(@RequestBody Map<String, String> map,
+                                             @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getBucketFlow");
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        String bucketName = map.get("bucketName");
+//        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        Map<String, String> result = historyService.getBucketFlow(bucketName);
+        return result;
+    }
+
 
     //工具类
     public boolean verifyIdentity(HttpServletResponse response, String token) {

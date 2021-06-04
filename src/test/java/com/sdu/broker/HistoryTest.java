@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,5 +38,12 @@ public class HistoryTest {
     public void getUploads() {
         String result = historyService.getDownload(12);
         System.out.println(result);
+    }
+
+    @Test
+    public void getFlow() {
+        Map<String, String> result = historyService.getBucketFlow("hh");
+        System.out.println(result.get("upload"));
+        System.out.println(result.get("download"));
     }
 }
