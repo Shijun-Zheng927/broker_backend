@@ -36,21 +36,25 @@ public class huaweitest  {
         String downloadPath1 = "D:\\ ProjectTraining\\download\\test.mp4";
 
 
+        List<ObsBucket> list = htc.listBucketByTag("keycold","valuecold");
+        for (ObsBucket o : list){
+            System.out.println(o.getBucketName());
+        }
 //        huc.concurrentMultipartUpload(pathname3,bucketname1,objectKey2);
-
-        String uploadid = huc.InitiateMultipartUpload(bucketname1,objectKey2,"video");
-        String etag1 = huc.uploadPartFirst(pathname3,bucketname1,objectKey2,uploadid);
-        String etag2 = huc.uploadParts(2,pathname3,bucketname1,objectKey2,uploadid);
-        String etag3 = huc.uploadParts(3,pathname3,bucketname1,objectKey2,uploadid);
-        System.out.println(etag1);
-        System.out.println(etag2);
-        System.out.println(etag3);
-        PartEtag e1 = new PartEtag(etag1.substring(16,48),Integer.parseInt(etag1.substring(62,63)));
-        PartEtag e2 = new PartEtag(etag2.substring(16,48),Integer.parseInt(etag2.substring(62,63)));
-        PartEtag e3 = new PartEtag(etag3.substring(16,48),Integer.parseInt(etag3.substring(62,63)));
-        List<PartEtag> partEtagList = new ArrayList<PartEtag>();
-        partEtagList.add(e1);partEtagList.add(e2);partEtagList.add(e3);
-        System.out.println(huc.CompleteMultipartUpload(partEtagList,bucketname1,objectKey2,uploadid));
+//
+//        String uploadid = huc.InitiateMultipartUpload(bucketname1,objectKey2,"video");
+//        String etag1 = huc.uploadPartFirst(pathname3,bucketname1,objectKey2,uploadid);
+//        String etag2 = huc.uploadParts(2,pathname3,bucketname1,objectKey2,uploadid);
+//        String etag3 = huc.uploadParts(3,pathname3,bucketname1,objectKey2,uploadid);
+//        System.out.println(etag1);
+//        System.out.println(etag2);
+//        System.out.println(etag3);
+//        PartEtag e1 = new PartEtag(etag1.substring(16,48),Integer.parseInt(etag1.substring(62,63)));
+//        PartEtag e2 = new PartEtag(etag2.substring(16,48),Integer.parseInt(etag2.substring(62,63)));
+//        PartEtag e3 = new PartEtag(etag3.substring(16,48),Integer.parseInt(etag3.substring(62,63)));
+//        List<PartEtag> partEtagList = new ArrayList<PartEtag>();
+//        partEtagList.add(e1);partEtagList.add(e2);partEtagList.add(e3);
+//        System.out.println(huc.CompleteMultipartUpload(partEtagList,bucketname1,objectKey2,uploadid));
 
 //        CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketname1, objectKey1, uploadid, partEtagList);
 //
