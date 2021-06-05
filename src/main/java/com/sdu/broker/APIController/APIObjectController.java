@@ -353,11 +353,11 @@ public class APIObjectController {
                 //设置默认值
                 acl = "0";
             }
-            String sourceBucketName = map.get("sourceBucketName");
+//            String sourceBucketName = map.get("sourceBucketName");
             String sourceObjectName = map.get("sourceObjectName");
             String destBucketName = map.get("destBucketName");
             String destObjectName = map.get("destObjectName");
-            String etag = aliObjectController.simpleCopyObject(sourceBucketName, sourceObjectName, destBucketName, destObjectName);
+            String etag = aliObjectController.simpleCopyObject(bucketName, sourceObjectName, destBucketName, destObjectName);
             return etag;
         } else {
             /*
