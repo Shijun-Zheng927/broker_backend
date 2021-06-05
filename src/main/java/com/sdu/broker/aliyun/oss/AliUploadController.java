@@ -371,7 +371,7 @@ public class  AliUploadController {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(contentType);
 
-        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName,objectPath,new File(localPath),metadata);
+        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName, objectPath, new File(localPath), metadata);
 
         /*
          通过AppendObjectRequest设置单个参数。

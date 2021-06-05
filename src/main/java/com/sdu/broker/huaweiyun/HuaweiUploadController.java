@@ -76,7 +76,7 @@ public class HuaweiUploadController {
     {
         File newfile = new File(pathname);
         obsClient.putObject(BucketName, objectKey, newfile);
-        return "success";
+        return getUrl(BucketName, objectKey);
     }
 
     /* 获取上传进度 */

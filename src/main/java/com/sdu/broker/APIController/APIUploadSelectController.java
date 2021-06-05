@@ -78,9 +78,15 @@ public class APIUploadSelectController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform == null) {
+            response.setStatus(666);
+            return null;
+        }
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -93,7 +99,7 @@ public class APIUploadSelectController {
             List<Map<String, String>> result = aliUploadController.listPartsAll(bucketName, objectName, uploadId);
             return result;
         } else {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -117,9 +123,15 @@ public class APIUploadSelectController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform == null) {
+            response.setStatus(666);
+            return null;
+        }
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -150,16 +162,22 @@ public class APIUploadSelectController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform == null) {
+            response.setStatus(666);
+            return null;
+        }
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
             List<Map<String, String>> result = aliUploadController.simpleListMultipartUploads(bucketName);
             return result;
         } else {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -177,9 +195,15 @@ public class APIUploadSelectController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform == null) {
+            response.setStatus(666);
+            return null;
+        }
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -199,9 +223,15 @@ public class APIUploadSelectController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
+        String bucketName = map.get("bucketName");
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform == null) {
+            response.setStatus(666);
+            return null;
+        }
         if (platform.equals("ALI")) {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
@@ -213,7 +243,7 @@ public class APIUploadSelectController {
             List<Map<String, String>> result = aliUploadController.listMultipartUploadsByPapper(bucketName, Integer.parseInt(maxUploads));
             return result;
         } else {
-            String bucketName = map.get("bucketName");
+//            String bucketName = map.get("bucketName");
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }

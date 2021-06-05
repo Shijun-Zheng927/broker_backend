@@ -73,6 +73,7 @@ public class APIUploadController {
 
             double stringSize = FileUtils.getStringSize(content);
             chargeService.operate(bucketName, stringSize, "/putString", userId, "upload");
+            System.out.println(result);
 
             return result;
         } else {
@@ -183,6 +184,7 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/putFileStream")
     public String putFileStream(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                 @RequestParam("file") MultipartFile file,
@@ -261,6 +263,7 @@ public class APIUploadController {
     }
 
     @RequestMapping(value = "/putFile")
+    @ResponseBody
     public String putFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                           @RequestParam("file") MultipartFile file,
                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
@@ -307,6 +310,7 @@ public class APIUploadController {
 
             double stringSize = FileUtils.getFileSize(fileSize);
             chargeService.operate(bucketName, stringSize, "/putFile", userId, "upload");
+            System.out.println(result);
             return result;
         } else {
             String bucketName = bn;
@@ -437,6 +441,7 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/appendObjectFileFirst")
     public String appendObjectFileFirst(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                         @RequestParam("contentType") String contentType, HttpServletRequest request,
@@ -501,10 +506,10 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/appendObjectFile")
     public String appendObjectFile(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
-                                   @RequestParam("contentType") String contentType,
-                                   @RequestParam("givenPosition") String givenPosition, HttpServletRequest request,
+                                   @RequestParam("contentType") String contentType, HttpServletRequest request,
                                    @RequestParam("file") MultipartFile file,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("appendObjectFile");
@@ -539,11 +544,17 @@ public class APIUploadController {
             if (verifyBucketName(response, userId, platform, bucketName)) {
                 return null;
             }
+            String givenPosition = request.getParameter("givenPosition");
             if (objectPath == null || objectPath.equals("") || contentType == null || contentType.equals("") ||
                     givenPosition == null || givenPosition.equals("")) {
                 response.setStatus(777);
                 return null;
             }
+            System.out.println(bucketName);
+            System.out.println(objectPath);
+            System.out.println(contentType);
+            System.out.println(path);
+            System.out.println(givenPosition);
             String result = aliUploadController.appendObjectFile(bucketName, objectPath, contentType, path, givenPosition);
 
             double stringSize = FileUtils.getFileSize(path);
@@ -556,6 +567,8 @@ public class APIUploadController {
             }
             String uploadId = request.getParameter("uploadId");
             String partNum = request.getParameter("partNum");
+            System.out.println(uploadId);
+            System.out.println(partNum);
             if ("".equals(objectPath) || "".equals(contentType) || "".equals(uploadId) || "".equals(partNum)) {
                 response.setStatus(777);
                 return null;
@@ -576,6 +589,17 @@ public class APIUploadController {
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
+        List<String> etag = req.getEtag();
+        for (String s : etag) {
+            System.out.println(s);
+        }
+        List<Integer> partNumber1 = req.getPartNumber();
+        for (Integer i : partNumber1) {
+            System.out.println(i);
+        }
+        System.out.println(req.getUploadId());
+        System.out.println(req.getBucketName());
+        System.out.println(req.getObjectKey());
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
 //        String platform = platformService.getPlatform(userId);
         String bucketName = req.getBucketName();
@@ -600,6 +624,9 @@ public class APIUploadController {
                 PartEtag p = new PartEtag(etags.get(i), partNumber.get(i));
                 partEtags.add(p);
             }
+            for (PartEtag p : partEtags) {
+                System.out.println(p.toString());
+            }
             String result = huaweiUploadController.CompleteMultipartUpload(partEtags, bucketName, req.getObjectKey(), req.getUploadId());
             return result;
         } else {
@@ -607,6 +634,7 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/checkPointUploadA")
     public String checkPointUploadA(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                    @RequestParam("contentType") String contentType,
@@ -662,6 +690,7 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/checkPointUploadB")
     public String checkPointUploadB(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                    @RequestParam("file") MultipartFile file,
@@ -735,6 +764,8 @@ public class APIUploadController {
             }
             String objectPath = map.get("objectPath");
             String contentType = map.get("contentType");
+            System.out.println(objectPath);
+            System.out.println(contentType);
             if ("".equals(objectPath) || "".equals(contentType)) {
                 response.setStatus(777);
                 return null;
@@ -746,6 +777,7 @@ public class APIUploadController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/multipartUpload")
     public String multipartUpload(@RequestParam("bucketName") String bn, @RequestParam("objectName") String objectName,
                                   @RequestParam("file") MultipartFile file,
