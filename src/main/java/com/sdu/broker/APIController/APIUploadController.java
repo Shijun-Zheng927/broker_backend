@@ -551,13 +551,13 @@ public class APIUploadController {
         }
     }
 
-    @RequestMapping(value = "/checkPointUpload")
-    public String checkPointUpload(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
+    @RequestMapping(value = "/checkPointUploadA")
+    public String checkPointUploadA(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
                                    @RequestParam("contentType") String contentType,
                                    @RequestParam("taskNum") String taskNum, @RequestParam("partSize") String partSize,
                                    @RequestParam("file") MultipartFile file,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        System.out.println("checkPointUpload");
+        System.out.println("checkPointUploadA");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -610,6 +610,51 @@ public class APIUploadController {
             double stringSize = FileUtils.getFileSize(path);
             chargeService.operate(bucketName, stringSize, "/checkPointUpload", userId, "upload");
             return result;
+        }
+    }
+
+    @RequestMapping(value = "/checkPointUploadB")
+    public String checkPointUploadB(@RequestParam("bucketName") String bn, @RequestParam("objectPath") String objectPath,
+                                   @RequestParam("file") MultipartFile file,
+                                   @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("checkPointUploadB");
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        if (file == null) {
+            System.out.println("file is null");
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String platform = platformService.getPlatform(userId);
+        String path = "";
+        try {
+            String filePath = "D:/IDEA/broker/src/main/resources/file/";
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + file.getOriginalFilename();
+            File f = new File(filePath + fileName);
+//                result = "http://localhost:8443/imgs/" + fileName;
+            path = filePath + fileName;
+            file.transferTo(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (platform.equals("HUAWEI")) {
+            String bucketName = bn;
+            if (verifyBucketName(response, userId, platform, bucketName)) {
+                return null;
+            }
+            if (objectPath == null || objectPath.equals("")) {
+                response.setStatus(777);
+                return null;
+            }
+            String result = huaweiUploadController.CheckpointUpload(path, bucketName, objectPath);
+
+            double stringSize = FileUtils.getFileSize(path);
+            chargeService.operate(bucketName, stringSize, "/checkPointUpload", userId, "upload");
+            return result;
+        } else {
+            return null;
         }
     }
 
