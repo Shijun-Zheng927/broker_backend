@@ -597,19 +597,7 @@ public class APIUploadController {
             chargeService.operate(bucketName, stringSize, "/checkPointUpload", userId, "upload");
             return result;
         } else {
-            String bucketName = bn;
-            if (verifyBucketName(response, userId, platform, bucketName)) {
-                return null;
-            }
-            if (objectPath == null || objectPath.equals("")) {
-                response.setStatus(777);
-                return null;
-            }
-            String result = huaweiUploadController.CheckpointUpload(path, bucketName, objectPath);
-
-            double stringSize = FileUtils.getFileSize(path);
-            chargeService.operate(bucketName, stringSize, "/checkPointUpload", userId, "upload");
-            return result;
+            return null;
         }
     }
 
