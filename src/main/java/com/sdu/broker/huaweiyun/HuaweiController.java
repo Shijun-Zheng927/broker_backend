@@ -99,6 +99,8 @@ public class HuaweiController {
         ListBucketsRequest request = new ListBucketsRequest();
         request.setQueryLocation(true);
         List<ObsBucket> buckets = obsClient.listBuckets(request);
+
+//        closeObsClient();
         return buckets;
     }
 

@@ -207,29 +207,29 @@ public class APIBucketController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
-        if (platform.equals("ALI")) {
-            String prefix = map.get("prefix");
-            if (prefix == null) {
-                prefix = "";
-            }
-            String market = map.get("market");
-            if (market == null) {
-                market = "";
-            }
-            String maxKeys = map.get("maxKeys");
-            if (maxKeys == null || !BucketUtils.isNumber(maxKeys)) {
-                response.setStatus(777);
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> result = bucketController.listRequestBuckets(prefix, market, Integer.parseInt(maxKeys));
-            if (result.size() == 0) {
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, platform, result);
-            return bucketToStringAli(buckets);
-        } else {
+//        if (platform.equals("ALI")) {
+        String prefix = map.get("prefix");
+        if (prefix == null) {
+            prefix = "";
+        }
+        String market = map.get("market");
+        if (market == null) {
+            market = "";
+        }
+        String maxKeys = map.get("maxKeys");
+        if (maxKeys == null || !BucketUtils.isNumber(maxKeys)) {
+            response.setStatus(777);
             return null;
         }
+        List<com.aliyun.oss.model.Bucket> result = bucketController.listRequestBuckets(prefix, market, Integer.parseInt(maxKeys));
+        if (result.size() == 0) {
+            return null;
+        }
+        List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, "ALI", result);
+        return bucketToStringAli(buckets);
+//        } else {
+//            return null;
+//        }
     }
 
     @ResponseBody
@@ -631,52 +631,62 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         String inventoryId = map.get("inventoryId");
         if (inventoryId == null || inventoryId.equals("")) {
-            System.out.println(inventoryId);
+//            System.out.println(inventoryId);
+            System.out.println("inven");
             response.setStatus(777);
             return null;
         }
         String inventoryFrequency = map.get("inventoryFrequency");
         if (inventoryFrequency == null || !BucketUtils.regex(1, 2, inventoryFrequency)) {
+            System.out.println("inven2");
             response.setStatus(777);
             return null;
         }
         String inventoryIncludedObjectVersions = map.get("inventoryIncludedObjectVersions");
         if (inventoryIncludedObjectVersions == null || !BucketUtils.regex(1, 2, inventoryIncludedObjectVersions)) {
+            System.out.println("3");
             response.setStatus(777);
             return null;
         }
         String isEnabled = map.get("isEnabled");
         if (isEnabled == null || !BucketUtils.regex(0, 1, isEnabled)) {
+            System.out.println("4");
             response.setStatus(777);
             return null;
         }
         String objPrefix = map.get("objPrefix");
         if (objPrefix == null || objPrefix.equals("")) {
+            System.out.println("5");
             response.setStatus(777);
             return null;
         }
         String destinationPrefix = map.get("destinationPrefix");
         if (destinationPrefix == null || destinationPrefix.equals("")) {
+            System.out.println("6");
             response.setStatus(777);
             return null;
         }
         String bucketFormat = map.get("bucketFormat");
         if (bucketFormat == null || !BucketUtils.regex(1, 1, bucketFormat)) {
+            System.out.println("7");
             response.setStatus(777);
             return null;
         }
         String accountId = map.get("accountId");
         if (accountId == null || accountId.equals("")) {
+            System.out.println("8");
             response.setStatus(777);
             return null;
         }
         String roleArn = map.get("roleArn");
         if (roleArn == null || roleArn.equals("")) {
+            System.out.println("9");
             response.setStatus(777);
             return null;
         }
         String destBucketName = map.get("destBucketName");
         if (destBucketName == null || destBucketName.equals("")) {
+            System.out.println("10");
             response.setStatus(777);
             return null;
         }
