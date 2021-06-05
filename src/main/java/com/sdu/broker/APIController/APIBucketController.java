@@ -114,7 +114,7 @@ public class APIBucketController {
             int result;
             if (BucketUtils.regex(0, 4, rwPolicy)) {
                 result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy),
-                        Integer.parseInt(storageClass) - 3);
+                        Integer.parseInt(storageClass) - 4);
             } else {
                 response.setStatus(777);
                 return null;
@@ -124,6 +124,7 @@ public class APIBucketController {
                 bucket.setName(bucketName);
                 bucket.setUserId(userId);
                 bucket.setPlatform("HUAWEI");
+                bucket.setType(Integer.parseInt(storageClass) - 4);
                 bucketService.addBucket(bucket);
                 return "success";
             } else {
