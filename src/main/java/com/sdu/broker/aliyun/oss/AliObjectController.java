@@ -216,7 +216,7 @@ public class AliObjectController {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteObject(bucketName,objectPath);
         ossClient.shutdown();
-        return "hhh";
+        return "success";
     }
 
     //批量删除文件

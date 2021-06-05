@@ -229,11 +229,11 @@ public class BucketController {
             ossClient.setBucketTagging(request);
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
 
         ossClient.shutdown();
-        return "设置标签成功";
+        return "success";
     }
 
     //获取存储标签
@@ -265,7 +265,7 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteBucketTagging(new GenericRequest(bucketName));
         ossClient.shutdown();
-        return "成功删除标签";
+        return "success";
     }
 
     //添加存储空间清单配置
@@ -301,6 +301,15 @@ public class BucketController {
         fields.add(InventoryOptionalFields.ETag);
         fields.add(InventoryOptionalFields.EncryptionStatus);
         inventoryConfiguration.setOptionalFields(fields);
+
+        switch (InventoryIncludedObjectVersions){
+            case 1:
+                inventoryConfiguration.setIncludedObjectVersions(com.aliyun.oss.model.InventoryIncludedObjectVersions.Current);
+                break;
+            case 2:
+                inventoryConfiguration.setIncludedObjectVersions(com.aliyun.oss.model.InventoryIncludedObjectVersions.All);
+                break;
+        }
 
         //设置清单生成频率
         switch (inventoryFrequency){
@@ -361,7 +370,7 @@ public class BucketController {
 
         // 关闭ossClient。
         ossClient.shutdown();
-        return "创建清单配置成功";
+        return "success";
     }
 
 

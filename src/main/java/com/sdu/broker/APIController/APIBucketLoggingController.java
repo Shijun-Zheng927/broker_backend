@@ -6,12 +6,14 @@ import com.sdu.broker.huaweiyun.HuaweiDownloadController;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Objects;
 
+@Controller
 public class APIBucketLoggingController {
     @Autowired
     private BucketService bucketService;

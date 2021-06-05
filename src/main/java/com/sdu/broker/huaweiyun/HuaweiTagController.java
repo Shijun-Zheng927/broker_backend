@@ -54,8 +54,8 @@ public class HuaweiTagController {
         Map<String,String> map = new HashMap<>();
         for(BucketTagInfo.TagSet.Tag tag : bucketTagInfo.getTagSet().getTags()){
             System.out.println("\t" + tag.getKey() + ":" + tag.getValue());
-            map.put("tagValue",tag.getValue());
-            map.put("tagKey",tag.getKey());
+            map.put(tag.getKey(), tag.getValue());
+//            map.put("tagKey",tag.getKey());
         }
         return map;
     }

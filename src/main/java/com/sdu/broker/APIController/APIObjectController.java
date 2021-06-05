@@ -92,7 +92,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.simpleList(request);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -132,7 +132,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number));
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -171,7 +171,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.simpleList(request,prefix);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -220,7 +220,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number), prefix);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -250,7 +250,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.pagingList(request);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -289,7 +289,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.pagingList(request, prefix);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
