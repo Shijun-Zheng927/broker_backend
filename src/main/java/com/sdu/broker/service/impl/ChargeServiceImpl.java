@@ -48,9 +48,9 @@ public class ChargeServiceImpl implements ChargeService {
         historyMapper.addHistory(h);
 
         Double money = accountMapper.getAccount(user);
-        System.out.println(money);
+//        System.out.println(money);
         money -= price * size;
-        System.out.println(money);
+//        System.out.println(money);
         Integer result = accountMapper.recharge(user, money);
         return null;
     }

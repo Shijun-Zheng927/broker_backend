@@ -177,8 +177,8 @@ public class AliObjectController {
     public  String createDirectory(String bucketName,String dirName){
         //输入的文件夹名称以右斜线（/）结尾
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        ossClient.putObject(bucketName, dirName,new File("F://broker_backend//dic.txt"));
-        return "2333";
+        ossClient.putObject(bucketName, dirName,new File("D:/IDEA/broker/src/main/resources/static/file/null.txt"));
+        return "success";
     }
     //列举指定文件夹的文件
     public  List<String> dicListObject(String bucketName,String dicName){
