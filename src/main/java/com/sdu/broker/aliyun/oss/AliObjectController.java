@@ -61,60 +61,60 @@ public class AliObjectController {
 
     //列举文件
     //简单列举
-    public  List<String>  simpleListObject(String bucketName){
+    public  List<OSSObjectSummary>  simpleListObject(String bucketName){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
         ObjectListing objectListing = ossClient.listObjects(bucketName);
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return objectList;
+        return sums;
     }
     //限定前缀列举
-    public  List<String>  simpleListObject(String bucketName,String prefix){
+    public  List<OSSObjectSummary>  simpleListObject(String bucketName,String prefix){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
         ObjectListing objectListing = ossClient.listObjects(bucketName, prefix);
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return objectList;
+        return sums;
     }
 
     //指定数目文件列举
-    public  List<String> simpleListObject(String bucketName,int maxKeys) {
+    public  List<OSSObjectSummary> simpleListObject(String bucketName,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys));
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return  objectList;
+        return sums;
     }
 
     //列举指定数目和指定前缀的文件
-    public  List<String> simpleListObject(String bucketName,String prefix,int maxKeys) {
+    public  List<OSSObjectSummary> simpleListObject(String bucketName,String prefix,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys).withPrefix(prefix));
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return  objectList;
+        return sums;
     }
     //分页列举全部文件
     public   List<String> pageObjectList(String bucketName){

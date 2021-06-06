@@ -1,10 +1,12 @@
 package com.sdu.broker.APIController;
 
+import com.aliyun.oss.model.OSSObjectSummary;
 import com.obs.services.model.CopyObjectRequest;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObsObject;
 import com.sdu.broker.aliyun.oss.AliObjectController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
+import com.sdu.broker.pojo.resp.RespObject;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.BucketUtils;
 import com.sdu.broker.utils.ControllerUtils;
@@ -67,8 +69,8 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleList", method = RequestMethod.POST)
-    public List<String> simpleList(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<RespObject> simpleList(@RequestBody Map<String, String> map,
+                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleList");
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -80,19 +82,20 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            List<String> listObject = aliObjectController.simpleListObject(bucketName);
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName);
             //返回结果
-            return listObject;
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.getObjectKey());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -100,7 +103,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithNum", method = RequestMethod.POST)
-    public List<String> simpleListWithNum(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithNum(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithNum");
         if (!verifyIdentity(response, authorization)) {
@@ -118,9 +121,13 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName,number);
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, number);
             //返回结果
-            return listObject;
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             String number = map.get("number");
@@ -130,9 +137,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number));
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.getObjectKey());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -140,7 +147,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithPrefix", method = RequestMethod.POST)
-    public List<String> simpleListWithPrefix(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithPrefix(@RequestBody Map<String, String> map,
                                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithPrefix");
         if (!verifyIdentity(response, authorization)) {
@@ -158,8 +165,12 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix);
-            return listObject;
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, prefix);
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             String prefix = map.get("prefix");
@@ -169,9 +180,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request,prefix);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.getObjectKey());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -179,7 +190,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithNumPrefix", method = RequestMethod.POST)
-    public List<String> simpleListWithNumPrefix(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithNumPrefix(@RequestBody Map<String, String> map,
                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithNumPrefix");
         if (!verifyIdentity(response, authorization)) {
@@ -202,9 +213,13 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
             //返回结果
-            return listObject;
+            return result;
         } else {
             String number = map.get("number");
             if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
@@ -218,9 +233,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number), prefix);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.getObjectKey());
+                result.add(new RespObject(o));
             }
             return result;
         }
