@@ -123,6 +123,7 @@ public class APIBucketLoggingController {
             /*
             result的结果为“success”或“ObsException”
              */
+            System.out.println(bucketName);
             String result = huaweiBuckectLoggingController.shutdownBucketLogging(bucketName);
             return result;
         }
