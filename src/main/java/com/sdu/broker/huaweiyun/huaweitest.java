@@ -35,11 +35,11 @@ public class huaweitest  {
         String downloadPath = "D:\\ ProjectTraining\\download\\download4.txt";
         String downloadPath1 = "D:\\ ProjectTraining\\download\\test.mp4";
 
-
-        List<ObsBucket> list = htc.listBucketByTag("keycold","valuecold");
-        for (ObsBucket o : list){
-            System.out.println(o.getBucketName());
-        }
+        System.out.println("hello");
+//        List<ObsBucket> list = htc.listBucketByTag("keycold","valuecold");
+//        for (ObsBucket o : list){
+//            System.out.println(o.getBucketName());
+//        }
 //        huc.concurrentMultipartUpload(pathname3,bucketname1,objectKey2);
 //
 //        String uploadid = huc.InitiateMultipartUpload(bucketname1,objectKey2,"video");
