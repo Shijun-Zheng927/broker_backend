@@ -27,7 +27,7 @@ public class HuaweiBuckectLoggingController {
 
         HuaweiController hwc = new HuaweiController();
         hwc.setBucketAclForLog(targetBucketName);
-        hwc.closeObsClient();
+//        hwc.closeObsClient();
 
         // 为所有用户设置对日志对象的读权限
         GrantAndPermission grant1 = new GrantAndPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_FULL_CONTROL);
@@ -74,8 +74,9 @@ public class HuaweiBuckectLoggingController {
     public Map<String,String> getBucketLogging(String bucketName){
         BucketLoggingConfiguration config = obsClient.getBucketLogging(bucketName);
         Map<String,String> map = new HashMap<>();
-        map.put("targetBucketName",config.getTargetBucketName());
-        map.put("targetPrefix",config.getLogfilePrefix());
+//        map.put("targetBucketName",config.getTargetBucketName());
+//        map.put("targetPrefix",config.getLogfilePrefix());
+        map.put(config.getTargetBucketName(), config.getLogfilePrefix());
         System.out.println("\t" + config.getTargetBucketName());
         System.out.println("\t" + config.getLogfilePrefix());
         return map;

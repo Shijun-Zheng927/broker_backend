@@ -65,7 +65,7 @@ public class APIBucketController {
                 dataRedundancyType = "0";
             }
             if (cannedACL == null || "".equals(cannedACL)) {
-                dataRedundancyType = "0";
+                cannedACL = "0";
             }
 //            if (dataRedundancyType == null || cannedACL == null || dataRedundancyType.equals("") || cannedACL.equals("")) {
 //                response.setStatus(777);
@@ -80,7 +80,7 @@ public class APIBucketController {
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null) {
                 result = bucketController.createBucket(bucketName,
                         Integer.parseInt(storageClass) + 1,
-                        Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
+                        Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL) + 1);
             } else {
                 response.setStatus(777);
                 return null;
@@ -362,7 +362,7 @@ public class APIBucketController {
                 response.setStatus(777);
                 return null;
             }
-            String s = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+            String s = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl) + 1);
             return s;
         } else {
             String rwPolicy = map.get("rwPolicy");

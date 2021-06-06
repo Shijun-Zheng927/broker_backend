@@ -111,21 +111,25 @@ public class APITagController {
 
         List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
         System.out.println(result.size());
-        if (result.size() == 0) {
-            return null;
-        }
+//        if (result.size() == 0) {
+//            return null;
+//        }
         List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, "ALI", result);
 
 
         List<ObsBucket> result0 = huaweiTagController.listBucketByTag(tagKey, tagValue);
         System.out.println(result0.size());
-        if (result0.size() == 0) {
-            return null;
-        }
+//        if (result0.size() == 0) {
+//            return null;
+//        }
         List<ObsBucket> huawei = getBucketsHuawei(userId, "HUAWEI", result0);
 
-        allBuckets.addAll(bucketToStringAli(buckets));
-        allBuckets.addAll(bucketToStringHuawei(huawei));
+        if (buckets != null) {
+            allBuckets.addAll(bucketToStringAli(buckets));
+        }
+        if (huawei != null) {
+            allBuckets.addAll(bucketToStringHuawei(huawei));
+        }
         return allBuckets;
 
     }
@@ -208,6 +212,9 @@ public class APITagController {
     }
 
     public List<com.aliyun.oss.model.Bucket> getBucketsAli(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
+        if (result.size() == 0) {
+            return null;
+        }
         Bucket b = new Bucket();
         b.setUserId(userId);
         b.setPlatform(platform);
@@ -224,6 +231,9 @@ public class APITagController {
     }
 
     public List<ObsBucket> getBucketsHuawei(Integer userId, String platform, List<ObsBucket> result) {
+        if (result.size() == 0) {
+            return null;
+        }
         Bucket b = new Bucket();
         b.setUserId(userId);
         b.setPlatform(platform);

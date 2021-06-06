@@ -40,8 +40,10 @@ public class BucketController {
                         break;
                     case 3:
                         bucketRequest.setStorageClass(StorageClass.Archive);
+                        break;
                     case 4:
                         bucketRequest.setStorageClass(StorageClass.ColdArchive);
+                        break;
                 }
 
                 switch (dataRedundancyType){
@@ -59,8 +61,10 @@ public class BucketController {
                         break;
                     case 2:
                         bucketRequest.setCannedACL(CannedAccessControlList.PublicRead);
+                        break;
                     case 3:
                         bucketRequest.setCannedACL(CannedAccessControlList.PublicReadWrite);
+                        break;
                 }
                 ossClient.createBucket(bucketRequest);
             }
@@ -243,6 +247,11 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         TagSet tagSet = ossClient.getBucketTagging(new GenericRequest(bucketName));
         Map<String,String> tags = tagSet.getAllTags();
+//        Map<String, String> result = new HashMap<>();
+//        for (String key : tags.keySet()) {
+//            result.put()
+//            System.out.println("Key = " + key);
+//        }
         ossClient.shutdown();
         return tags;
     }
