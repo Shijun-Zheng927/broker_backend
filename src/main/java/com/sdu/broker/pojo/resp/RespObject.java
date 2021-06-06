@@ -32,6 +32,21 @@ public class RespObject {
         this.owner = obsObject.getOwner().toString();
     }
 
+    @Override
+    public String toString() {
+        return "RespObject{" +
+                "bucketName='" + bucketName + '\'' +
+                ", key='" + key + '\'' +
+                ", eTag='" + eTag + '\'' +
+                ", size=" + size +
+                ", lastModified='" + lastModified + '\'' +
+                ", storageClass='" + storageClass + '\'' +
+                ", owner='" + owner + '\'' +
+                ", type='" + type + '\'' +
+                ", metadata='" + metadata + '\'' +
+                '}';
+    }
+
     public String getBucketName() {
         return bucketName;
     }
