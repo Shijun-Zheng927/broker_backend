@@ -4,6 +4,7 @@ import com.obs.services.model.ObsBucket;
 import com.sdu.broker.aliyun.oss.BucketController;
 import com.sdu.broker.huaweiyun.HuaweiTagController;
 import com.sdu.broker.pojo.Bucket;
+import com.sdu.broker.pojo.req.ReqTag;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.ControllerUtils;
@@ -29,7 +30,7 @@ public class APITagController {
 
     @ResponseBody
     @RequestMapping(value = "/setBucketTagging", method = RequestMethod.POST)
-    public String setBucketTagging(@RequestBody Map<String, String> map,
+    public String setBucketTagging(@RequestBody ReqTag reqTag,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("setBucketTagging");
         if (!ControllerUtils.verifyIdentity(response, authorization)) {
@@ -37,26 +38,34 @@ public class APITagController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
 //        String platform = platformService.getPlatform(userId);
-        String bucketName = map.get("bucketName");
+        String bucketName = reqTag.getBucketName();
         if (verify(response, userId, bucketName)) {
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
-        String tagKey = map.get("tagKey");
-        String tagValue = map.get("tagValue");
-        if (tagKey == null || tagKey.equals("") || tagValue == null || tagValue.equals("")) {
+//        String tagKey = map.get("tagKey");
+//        String tagValue = map.get("tagValue");
+//        if (tagKey == null || tagKey.equals("") || tagValue == null || tagValue.equals("")) {
+//            response.setStatus(777);
+//            return "format wrong";
+//        }
+        List<String> tagKey = reqTag.getTagKey();
+        List<String> tagValue = reqTag.getTagValue();
+        if (tagKey == null || tagValue == null || tagKey.size() == 0 || tagValue.size() == 0 || tagKey.size() != tagValue.size()) {
             response.setStatus(777);
-            return "format wrong";
+            return "fail";
         }
         if (verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
         if (platform.equals("ALI")) {
-            String result = bucketController.setBucketTagging(bucketName,tagKey, tagValue);
+//            String result = bucketController.setBucketTagging(bucketName,tagKey, tagValue);
+            String result = bucketController.setBucketTags(bucketName, tagKey, tagValue);
             return result;
         } else {
-            String result = huaweiTagController.setOneTag(bucketName, tagKey, tagValue);
-            return result;
+//            String result = huaweiTagController.setOneTag(bucketName, tagKey, tagValue);
+//            return result;
+            return null;
         }
     }
 

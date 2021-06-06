@@ -45,6 +45,7 @@ public class PayController {
     private final String RETURN_URL = "http://192.168.1.109:8443/returnUrl";
 
     @GetMapping(value = "/alipay", params = {"amount", "token"})
+    @ResponseBody
     public void alipay(HttpServletResponse httpResponse, @RequestParam String amount, @RequestParam String token) throws IOException {
 //        String amount = map.get("amount");
 //        String token = map.get("token");
@@ -100,6 +101,7 @@ public class PayController {
     private AccountService accountService;
 
     @RequestMapping(value = "/returnUrl", method = RequestMethod.GET)
+    @ResponseBody
     public String returnUrl(HttpServletRequest request, HttpServletResponse response)
             throws IOException, AlipayApiException {
         System.out.println("=================================同步回调=====================================");

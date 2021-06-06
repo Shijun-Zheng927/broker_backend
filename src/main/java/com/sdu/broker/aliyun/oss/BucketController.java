@@ -250,10 +250,10 @@ public class BucketController {
             ossClient.setBucketTagging(request);
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
         ossClient.shutdown();
-        return "设置标签成功";
+        return "success";
     }
 
     //获取存储标签
