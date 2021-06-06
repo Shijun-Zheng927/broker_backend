@@ -357,7 +357,7 @@ public class HuaweiUploadController {
 
     /* 分页列举分段上传任务 */
     public List<Map<String,String>> listMultipartUploadsByPapper(String bucketName){
-        ListMultipartUploadsRequest request = new ListMultipartUploadsRequest();
+        ListMultipartUploadsRequest request = new ListMultipartUploadsRequest(bucketName);
         MultipartUploadListing result;
 
         List<Map<String, String>> list = new ArrayList<>();
