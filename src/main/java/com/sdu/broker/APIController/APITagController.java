@@ -52,7 +52,7 @@ public class APITagController {
             return null;
         }
         if (platform.equals("ALI")) {
-            String result = bucketController.setBucketTagging(bucketName, tagKey, tagValue);
+            String result = bucketController.setBucketTagging(bucketName,tagKey, tagValue);
             return result;
         } else {
             String result = huaweiTagController.setOneTag(bucketName, tagKey, tagValue);

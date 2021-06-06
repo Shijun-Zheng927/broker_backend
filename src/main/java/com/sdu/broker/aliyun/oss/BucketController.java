@@ -239,13 +239,13 @@ public class BucketController {
         ossClient.shutdown();
         return "success";
     }
-    //同一个Bucket
-    public String setBucketTags(String bucketName, Map<String,String> tags){
+    //同一个Bucketz最多创建20组标签
+    public String setBucketTags(String bucketName, List<String> tagsKey,List<String> tagsValue){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         try {
             SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
-            for (Map.Entry<String,String> entry: tags.entrySet()){
-                request.setTag(entry.getKey(),entry.getValue());
+            for (int i = 0;i < tagsKey.size();i++){
+                request.setTag(tagsKey.get(i), tagsValue.get(i));
             }
             ossClient.setBucketTagging(request);
         } catch (OSSException | ClientException e) {
