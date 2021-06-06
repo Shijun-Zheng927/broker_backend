@@ -10,15 +10,15 @@ import java.util.Map;
 import java.util.Objects;
 
 @RestController
-public class BucketController {
+public class BrokerBucketController {
     @Autowired
     private BucketService bucketService;
 
     @CrossOrigin
-    @RequestMapping("/getPlatform")
-    public String getPlatform(@RequestBody Map<String, String> map,
+    @RequestMapping("/getBucketPlatform")
+    public String getBucketPlatform(@RequestBody Map<String, String> map,
                               @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
-        System.out.println("getUpload");
+        System.out.println("getBucketPlatform");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
