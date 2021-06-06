@@ -6,6 +6,7 @@ import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObsObject;
 import com.sdu.broker.aliyun.oss.AliObjectController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
+import com.sdu.broker.huaweiyun.HuaweiUploadController;
 import com.sdu.broker.pojo.resp.RespObject;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.BucketUtils;
@@ -29,6 +30,38 @@ public class APIObjectController {
     private HuaweiObjectController huaweiObjectController;
     @Autowired
     private AliObjectController aliObjectController;
+    @Autowired
+    private HuaweiUploadController huaweiUploadController;
+
+    @ResponseBody
+    @RequestMapping(value = "/getUrl", method = RequestMethod.POST)
+    public String getUrl(@RequestBody Map<String, String> map,
+                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getUrl");
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        String bucketName = map.get("bucketName");
+        String objectKey = map.get("objectKey");
+        if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        if (objectKey == null || "".equals(objectKey)) {
+            response.setStatus(777);
+            return null;
+        }
+        String platform = bucketService.getPlatform(bucketName);
+        if (platform.equals("ALI")) {
+            String result = aliObjectController.getUrl(bucketName, objectKey);
+            return result;
+        }
+        else {
+            String result = huaweiUploadController.getUrl(bucketName, objectKey);
+            return result;
+        }
+
+    }
 
 
     @ResponseBody

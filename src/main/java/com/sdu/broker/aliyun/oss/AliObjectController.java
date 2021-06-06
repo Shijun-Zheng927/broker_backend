@@ -8,8 +8,11 @@ import com.aliyun.oss.model.*;
 
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //文件管理/对象管理
@@ -18,6 +21,16 @@ public class AliObjectController {
     private static final String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static final String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static final String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
+
+    //生成url
+    public String getUrl(String bucketName, String objectPath) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+        ossClient.shutdown();
+        //返回上传地址
+        return url;
+    }
 
     //判断文件是否存在
     public boolean doesObjectExist(String bucketName, String objectPath){
