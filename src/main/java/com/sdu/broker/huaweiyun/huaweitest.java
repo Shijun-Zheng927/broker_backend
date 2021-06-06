@@ -1,5 +1,6 @@
 package com.sdu.broker.huaweiyun;
 
+import com.obs.services.ObsClient;
 import com.obs.services.model.*;
 import com.sun.org.apache.xalan.internal.xsltc.dom.SimpleResultTreeImpl;
 
@@ -7,12 +8,13 @@ import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class huaweitest  {
-    public static void main(String [] args){
+    public static void main(String [] args) throws IOException {
         HuaweiController hwc = new HuaweiController();
         HuaweiDownloadController hdc = new HuaweiDownloadController();
         HuaweiBuckectLoggingController hblc = new HuaweiBuckectLoggingController();
@@ -25,11 +27,49 @@ public class huaweitest  {
         String bucketname3 = "brokertest-cold";
         String pathname1 = "D:\\ ProjectTraining\\brokertest.txt";
         String pathname2 = "D:\\ ProjectTraining\\test.mp4";
+        String pathname3 = "D:\\ ProjectTraining\\test2.mp4";
         String objectKey = "test1.txt";
         String objectKey1 = "test.mp4";
+        String objectKey2 = "test2.mp4";
         String objectKeynotexist = "notexist";
         String downloadPath = "D:\\ ProjectTraining\\download\\download4.txt";
         String downloadPath1 = "D:\\ ProjectTraining\\download\\test.mp4";
+
+
+        List<ObsBucket> list = htc.listBucketByTag("keycold","valuecold");
+        for (ObsBucket o : list){
+            System.out.println(o.getBucketName());
+        }
+//        huc.concurrentMultipartUpload(pathname3,bucketname1,objectKey2);
+//
+//        String uploadid = huc.InitiateMultipartUpload(bucketname1,objectKey2,"video");
+//        String etag1 = huc.uploadPartFirst(pathname3,bucketname1,objectKey2,uploadid);
+//        String etag2 = huc.uploadParts(2,pathname3,bucketname1,objectKey2,uploadid);
+//        String etag3 = huc.uploadParts(3,pathname3,bucketname1,objectKey2,uploadid);
+//        System.out.println(etag1);
+//        System.out.println(etag2);
+//        System.out.println(etag3);
+//        PartEtag e1 = new PartEtag(etag1.substring(16,48),Integer.parseInt(etag1.substring(62,63)));
+//        PartEtag e2 = new PartEtag(etag2.substring(16,48),Integer.parseInt(etag2.substring(62,63)));
+//        PartEtag e3 = new PartEtag(etag3.substring(16,48),Integer.parseInt(etag3.substring(62,63)));
+//        List<PartEtag> partEtagList = new ArrayList<PartEtag>();
+//        partEtagList.add(e1);partEtagList.add(e2);partEtagList.add(e3);
+//        System.out.println(huc.CompleteMultipartUpload(partEtagList,bucketname1,objectKey2,uploadid));
+
+//        CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketname1, objectKey1, uploadid, partEtagList);
+//
+//        String endPoint     = "https://obs.cn-north-1.myhuaweicloud.com";
+//        String ak           = "XR4PD1I3LLF52K1KDRRG";
+//        String sk           = "BD5DfWx2w3Od8XGCiuqsJPXfYJiKucNofuQUuZD4";
+//        ObsClient obsClient1 = new ObsClient(ak,sk,endPoint);
+//        obsClient1.completeMultipartUpload(completeMultipartUploadRequest);
+//        obsClient1.close();
+
+
+
+
+
+
 
 
 //        ListObjectsRequest requestl1 = hoc.newListRequest(bucketname1);
@@ -40,7 +80,7 @@ public class huaweitest  {
 //        String targetprefix = new String("prefix/");
 //        System.out.println(hblc.setBuckectLogging(bucketname1,targetprefix,bucketname1));
 
-        System.out.println(hblc.shutdownBucketLogging(bucketname1));
+//        System.out.println(hblc.shutdownBucketLogging(bucketname1));
 //        GetObjectRequest request = hdc.newObjectRequest(bucketname1,objectKeynotexist);
 //        System.out.println(hdc.streamDownload(request));
 //        System.out.println(hblc.getBucketLogging(bucketname1));
