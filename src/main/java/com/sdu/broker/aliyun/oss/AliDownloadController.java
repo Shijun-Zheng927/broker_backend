@@ -30,7 +30,7 @@ public class AliDownloadController {
                 String  line = bufferedReader.readLine();
                 if(line==null) break;
                 System.out.println("\n"+line);
-                content = content+line;
+                content = content + line;
             }
             bufferedReader.close();
         } catch (IOException e) {

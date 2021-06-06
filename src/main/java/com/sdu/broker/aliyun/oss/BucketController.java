@@ -40,8 +40,10 @@ public class BucketController {
                         break;
                     case 3:
                         bucketRequest.setStorageClass(StorageClass.Archive);
+                        break;
                     case 4:
                         bucketRequest.setStorageClass(StorageClass.ColdArchive);
+                        break;
                 }
 
                 switch (dataRedundancyType){
@@ -59,8 +61,10 @@ public class BucketController {
                         break;
                     case 2:
                         bucketRequest.setCannedACL(CannedAccessControlList.PublicRead);
+                        break;
                     case 3:
                         bucketRequest.setCannedACL(CannedAccessControlList.PublicReadWrite);
+                        break;
                 }
                 ossClient.createBucket(bucketRequest);
             }
@@ -200,10 +204,10 @@ public class BucketController {
             }
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
         ossClient.shutdown();
-        return "设置存储空间访问权限成功";
+        return "success";
     }
 
     //删除存储空间
@@ -213,10 +217,10 @@ public class BucketController {
             ossClient.deleteBucket(bucketName);
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
         ossClient.shutdown();
-        return "删除存储空间成功";
+        return "success";
     }
 
     //设置存储标签
@@ -229,11 +233,11 @@ public class BucketController {
             ossClient.setBucketTagging(request);
         } catch (OSSException | ClientException e) {
             e.printStackTrace();
-            return "false";
+            return "fail";
         }
 
         ossClient.shutdown();
-        return "设置标签成功";
+        return "success";
     }
     //同一个Bucket
     public String setBucketTags(String bucketName, Map<String,String> tags){
@@ -259,6 +263,11 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         TagSet tagSet = ossClient.getBucketTagging(new GenericRequest(bucketName));
         Map<String,String> tags = tagSet.getAllTags();
+//        Map<String, String> result = new HashMap<>();
+//        for (String key : tags.keySet()) {
+//            result.put()
+//            System.out.println("Key = " + key);
+//        }
         ossClient.shutdown();
         return tags;
     }
@@ -281,7 +290,7 @@ public class BucketController {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteBucketTagging(new GenericRequest(bucketName));
         ossClient.shutdown();
-        return "成功删除标签";
+        return "success";
     }
 
     //添加存储空间清单配置
@@ -317,6 +326,15 @@ public class BucketController {
         fields.add(InventoryOptionalFields.ETag);
         fields.add(InventoryOptionalFields.EncryptionStatus);
         inventoryConfiguration.setOptionalFields(fields);
+
+        switch (InventoryIncludedObjectVersions){
+            case 1:
+                inventoryConfiguration.setIncludedObjectVersions(com.aliyun.oss.model.InventoryIncludedObjectVersions.Current);
+                break;
+            case 2:
+                inventoryConfiguration.setIncludedObjectVersions(com.aliyun.oss.model.InventoryIncludedObjectVersions.All);
+                break;
+        }
 
         //设置清单生成频率
         switch (inventoryFrequency){
@@ -377,7 +395,7 @@ public class BucketController {
 
         // 关闭ossClient。
         ossClient.shutdown();
-        return "创建清单配置成功";
+        return "success";
     }
 
 

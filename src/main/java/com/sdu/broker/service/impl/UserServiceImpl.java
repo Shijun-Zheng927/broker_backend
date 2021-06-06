@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
         Integer hasPhone = userMapper.selectPhone(user.getPhone());
 //        System.out.println(hasPhone);
         if (hasPhone == null) {
-            user.setHead("null");
+            user.setHead("http://192.168.1.109:8443/head/0b11580a-3330-4150-a7f5-aae807536589logo.png");
             userMapper.register(user);
             accountMapper.register(user.getId());
             return 1;

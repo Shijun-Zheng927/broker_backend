@@ -3,6 +3,7 @@ package com.sdu.broker.APIController;
 import com.obs.services.model.ObsBucket;
 import com.sdu.broker.aliyun.oss.BucketController;
 import com.sdu.broker.huaweiyun.HuaweiTagController;
+import com.sdu.broker.pojo.Bucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.ControllerUtils;
@@ -12,10 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 @CrossOrigin
@@ -50,7 +48,7 @@ public class APITagController {
             response.setStatus(777);
             return "format wrong";
         }
-        if (ControllerUtils.verifyBucketName(response, userId, platform, bucketName)) {
+        if (verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
         if (platform.equals("ALI")) {
@@ -78,7 +76,7 @@ public class APITagController {
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
-        if (ControllerUtils.verifyBucketName(response, userId, platform, bucketName)) {
+        if (verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
         if (platform.equals("ALI")) {
@@ -112,20 +110,26 @@ public class APITagController {
         List<String> allBuckets = new ArrayList<>();
 
         List<com.aliyun.oss.model.Bucket> result = bucketController.listBucketByTag(tagKey, tagValue);
-        if (result.size() == 0) {
-            return null;
-        }
-        List<com.aliyun.oss.model.Bucket> buckets = ControllerUtils.getBucketsAli(userId, "ALI", result);
+        System.out.println(result.size());
+//        if (result.size() == 0) {
+//            return null;
+//        }
+        List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, "ALI", result);
 
 
         List<ObsBucket> result0 = huaweiTagController.listBucketByTag(tagKey, tagValue);
-        if (result0.size() == 0) {
-            return null;
-        }
-        List<ObsBucket> huawei = ControllerUtils.getBucketsHuawei(userId, "HUAWEI", result0);
+        System.out.println(result0.size());
+//        if (result0.size() == 0) {
+//            return null;
+//        }
+        List<ObsBucket> huawei = getBucketsHuawei(userId, "HUAWEI", result0);
 
-        allBuckets.addAll(bucketToStringAli(buckets));
-        allBuckets.addAll(bucketToStringHuawei(huawei));
+        if (buckets != null) {
+            allBuckets.addAll(bucketToStringAli(buckets));
+        }
+        if (huawei != null) {
+            allBuckets.addAll(bucketToStringHuawei(huawei));
+        }
         return allBuckets;
 
     }
@@ -145,7 +149,7 @@ public class APITagController {
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
-        if (ControllerUtils.verifyBucketName(response, userId, platform, bucketName)) {
+        if (verifyBucketName(response, userId, platform, bucketName)) {
             return null;
         }
         if (platform.equals("ALI")) {
@@ -186,6 +190,61 @@ public class APITagController {
         List<String> result = new ArrayList<>();
         for (ObsBucket bucket : list) {
             result.add(bucket.toString());
+        }
+        return result;
+    }
+
+    public boolean verifyBucketName(HttpServletResponse response, Integer userId, String platform, String bucketName) {
+        if (bucketName == null || bucketName.equals("")) {
+            response.setStatus(777);
+            return true;
+        }
+        Bucket bucket = new Bucket(userId, platform, bucketName);
+        System.out.println(userId);
+        System.out.println(platform);
+        System.out.println(bucketName);
+        Integer legal = bucketService.isLegal(bucket);
+        if (legal == null) {
+            response.setStatus(666);
+            return true;
+        }
+        return false;
+    }
+
+    public List<com.aliyun.oss.model.Bucket> getBucketsAli(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
+        if (result.size() == 0) {
+            return null;
+        }
+        Bucket b = new Bucket();
+        b.setUserId(userId);
+        b.setPlatform(platform);
+        Iterator<com.aliyun.oss.model.Bucket> iterator = result.iterator();
+        while (iterator.hasNext()) {
+            com.aliyun.oss.model.Bucket bucket = iterator.next();
+            b.setName(bucket.getName());
+            Integer legal = bucketService.isLegal(b);
+            if (legal == null) {
+                iterator.remove();
+            }
+        }
+        return result;
+    }
+
+    public List<ObsBucket> getBucketsHuawei(Integer userId, String platform, List<ObsBucket> result) {
+        if (result.size() == 0) {
+            return null;
+        }
+        Bucket b = new Bucket();
+        b.setUserId(userId);
+        b.setPlatform(platform);
+        Iterator<ObsBucket> iterator = result.iterator();
+        while (iterator.hasNext()) {
+            ObsBucket bucket = iterator.next();
+            b.setName(bucket.getBucketName());
+            Integer legal = bucketService.isLegal(b);
+            if (legal == null) {
+                iterator.remove();
+            }
         }
         return result;
     }

@@ -6,6 +6,8 @@ import com.obs.services.model.ObsBucket;
 import com.sdu.broker.aliyun.oss.BucketController;
 import com.sdu.broker.huaweiyun.HuaweiController;
 import com.sdu.broker.pojo.Bucket;
+import com.sdu.broker.pojo.req.ListBucket;
+import com.sdu.broker.pojo.resp.RespBucket;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.service.PlatformService;
 import com.sdu.broker.utils.BucketUtils;
@@ -63,7 +65,7 @@ public class APIBucketController {
                 dataRedundancyType = "0";
             }
             if (cannedACL == null || "".equals(cannedACL)) {
-                dataRedundancyType = "0";
+                cannedACL = "0";
             }
 //            if (dataRedundancyType == null || cannedACL == null || dataRedundancyType.equals("") || cannedACL.equals("")) {
 //                response.setStatus(777);
@@ -76,9 +78,9 @@ public class APIBucketController {
             }
             if (BucketUtils.regex(0, 4, storageClass) && BucketUtils.regex(0, 1, dataRedundancyType)
                     && BucketUtils.regex(0, 2, cannedACL) && bucketName != null) {
-                result = bucketController.createBucket(BucketUtils.addPrefix(bucketName),
+                result = bucketController.createBucket(bucketName,
                         Integer.parseInt(storageClass) + 1,
-                        Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL));
+                        Integer.parseInt(dataRedundancyType), Integer.parseInt(cannedACL) + 1);
             } else {
                 response.setStatus(777);
                 return null;
@@ -112,7 +114,7 @@ public class APIBucketController {
             int result;
             if (BucketUtils.regex(0, 4, rwPolicy)) {
                 result = huaweiController.createBucket(bucketName, Integer.parseInt(rwPolicy),
-                        Integer.parseInt(storageClass) - 3);
+                        Integer.parseInt(storageClass) - 4);
             } else {
                 response.setStatus(777);
                 return null;
@@ -122,6 +124,7 @@ public class APIBucketController {
                 bucket.setName(bucketName);
                 bucket.setUserId(userId);
                 bucket.setPlatform("HUAWEI");
+                bucket.setType(Integer.parseInt(storageClass) - 4);
                 bucketService.addBucket(bucket);
                 return "success";
             } else {
@@ -133,28 +136,49 @@ public class APIBucketController {
 
     @ResponseBody
     @RequestMapping(value = "/listAllBucket", method = RequestMethod.GET)
-    public List<String> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<ListBucket> listAllBucket(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("listAllBucket");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        String platform = platformService.getPlatform(userId);
+//        String platform = platformService.getPlatform(userId);
 
         List<com.aliyun.oss.model.Bucket> result1 = bucketController.listAllBuckets();
-        if (result1.size() == 0) {
-            return null;
-        }
-        List<com.aliyun.oss.model.Bucket> buckets1 = getBucketsAli(userId, platform, result1);
+//        if (result1.size() == 0) {
+//            return null;
+//        }
+//        System.out.println(result1.size());
+        List<com.aliyun.oss.model.Bucket> buckets1 = getBucketsAli(userId, "ALI", result1);
+//        System.out.println("b1" + buckets1.size());
         List<ObsBucket> result2 = huaweiController.listBucket();
-        if (result2.size() == 0) {
-            return null;
-        }
-        List<ObsBucket> buckets2 = getBucketHuawei(userId, platform, result2);
+//        if (result2.size() == 0) {
+//            return null;
+//        }
+//        System.out.println(result2.size());
+        List<ObsBucket> buckets2 = getBucketHuawei(userId, "HUAWEI", result2);
+//        System.out.println("b2" + buckets2.size());
 
-        List<String> result0 = new ArrayList<>();
-        result0.addAll(bucketToStringAli(buckets1));
-        result0.addAll(bucketToStringHuawei(buckets2));
+        List<ListBucket> result0 = new ArrayList<>();
+        for (com.aliyun.oss.model.Bucket b : buckets1) {
+            ListBucket l = new ListBucket();
+            l.setBucketName(b.getName());
+            l.setLocation(b.getLocation());
+            l.setStorageClass(b.getStorageClass().toString());
+            l.setCreateDate(b.getCreationDate().toString());
+            result0.add(l);
+        }
+        for (ObsBucket o : buckets2) {
+            ListBucket l = new ListBucket();
+            l.setBucketName(o.getBucketName());
+            l.setLocation(o.getLocation());
+            l.setStorageClass(o.getStorageClass());
+            l.setCreateDate(o.getCreationDate().toString());
+            result0.add(l);
+        }
+//        List<String> result0 = new ArrayList<>();
+//        result0.addAll(bucketToStringAli(buckets1));
+//        result0.addAll(bucketToStringHuawei(buckets2));
         return result0;
 //        if (platform.equals("ALI")) {
 //            List<com.aliyun.oss.model.Bucket> result = bucketController.listAllBuckets();
@@ -184,29 +208,29 @@ public class APIBucketController {
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String platform = platformService.getPlatform(userId);
-        if (platform.equals("ALI")) {
-            String prefix = map.get("prefix");
-            if (prefix == null) {
-                prefix = "";
-            }
-            String market = map.get("market");
-            if (market == null) {
-                market = "";
-            }
-            String maxKeys = map.get("maxKeys");
-            if (maxKeys == null || !BucketUtils.isNumber(maxKeys)) {
-                response.setStatus(777);
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> result = bucketController.listRequestBuckets(prefix, market, Integer.parseInt(maxKeys));
-            if (result.size() == 0) {
-                return null;
-            }
-            List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, platform, result);
-            return bucketToStringAli(buckets);
-        } else {
+//        if (platform.equals("ALI")) {
+        String prefix = map.get("prefix");
+        if (prefix == null) {
+            prefix = "";
+        }
+        String market = map.get("market");
+        if (market == null) {
+            market = "";
+        }
+        String maxKeys = map.get("maxKeys");
+        if (maxKeys == null || !BucketUtils.isNumber(maxKeys)) {
+            response.setStatus(777);
             return null;
         }
+        List<com.aliyun.oss.model.Bucket> result = bucketController.listRequestBuckets(prefix, market, Integer.parseInt(maxKeys));
+        if (result.size() == 0) {
+            return null;
+        }
+        List<com.aliyun.oss.model.Bucket> buckets = getBucketsAli(userId, "ALI", result);
+        return bucketToStringAli(buckets);
+//        } else {
+//            return null;
+//        }
     }
 
     @ResponseBody
@@ -266,7 +290,7 @@ public class APIBucketController {
 
     @ResponseBody
     @GetMapping(value = "/getBucketInfo", params = {"bucketName"})
-    public Object getBucketInfo(@RequestParam String bucketName,
+    public RespBucket getBucketInfo(@RequestParam String bucketName,
                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("getBucketInfo");
         if (!verifyIdentity(response, authorization)) {
@@ -281,10 +305,14 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             BucketInfo result = bucketController.getBucketInfo(bucketName);
-            return result;
+
+            RespBucket respBucket = new RespBucket(result);
+            return respBucket;
         } else {
             BucketMetadataInfoResult result = huaweiController.getresult(bucketName);
-            return result;
+
+            RespBucket respBucket = new RespBucket(result);
+            return respBucket;
         }
     }
 
@@ -334,7 +362,7 @@ public class APIBucketController {
                 response.setStatus(777);
                 return null;
             }
-            String s = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
+            String s = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl) + 1);
             return s;
         } else {
             String rwPolicy = map.get("rwPolicy");
@@ -556,6 +584,8 @@ public class APIBucketController {
     public String deleteBucket(@RequestBody Map<String, String> map,
                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("deleteBucket");
+//        System.out.println(map.get("bucketName"));
+//        return null;
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
@@ -568,7 +598,7 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
             String result = bucketController.deleteBucket(bucketName);
-            if (result.equals("删除存储空间成功")) {
+            if (result.equals("success")) {
                 Bucket bucket = new Bucket(platform, bucketName);
                 bucketService.deleteBucket(bucket);
             }
@@ -578,9 +608,9 @@ public class APIBucketController {
             if (result == 1) {
                 Bucket bucket = new Bucket(platform, bucketName);
                 bucketService.deleteBucket(bucket);
-                return "删除存储空间成功";
+                return "success";
             } else {
-                return "失败";
+                return "fail";
             }
         }
     }
@@ -602,52 +632,62 @@ public class APIBucketController {
         String platform = bucketService.getPlatform(bucketName);
         String inventoryId = map.get("inventoryId");
         if (inventoryId == null || inventoryId.equals("")) {
-            System.out.println(inventoryId);
+//            System.out.println(inventoryId);
+            System.out.println("inven");
             response.setStatus(777);
             return null;
         }
         String inventoryFrequency = map.get("inventoryFrequency");
         if (inventoryFrequency == null || !BucketUtils.regex(1, 2, inventoryFrequency)) {
+            System.out.println("inven2");
             response.setStatus(777);
             return null;
         }
         String inventoryIncludedObjectVersions = map.get("inventoryIncludedObjectVersions");
         if (inventoryIncludedObjectVersions == null || !BucketUtils.regex(1, 2, inventoryIncludedObjectVersions)) {
+            System.out.println("3");
             response.setStatus(777);
             return null;
         }
         String isEnabled = map.get("isEnabled");
         if (isEnabled == null || !BucketUtils.regex(0, 1, isEnabled)) {
+            System.out.println("4");
             response.setStatus(777);
             return null;
         }
         String objPrefix = map.get("objPrefix");
         if (objPrefix == null || objPrefix.equals("")) {
+            System.out.println("5");
             response.setStatus(777);
             return null;
         }
         String destinationPrefix = map.get("destinationPrefix");
         if (destinationPrefix == null || destinationPrefix.equals("")) {
+            System.out.println("6");
             response.setStatus(777);
             return null;
         }
         String bucketFormat = map.get("bucketFormat");
         if (bucketFormat == null || !BucketUtils.regex(1, 1, bucketFormat)) {
+            System.out.println("7");
             response.setStatus(777);
             return null;
         }
         String accountId = map.get("accountId");
         if (accountId == null || accountId.equals("")) {
+            System.out.println("8");
             response.setStatus(777);
             return null;
         }
         String roleArn = map.get("roleArn");
         if (roleArn == null || roleArn.equals("")) {
+            System.out.println("9");
             response.setStatus(777);
             return null;
         }
         String destBucketName = map.get("destBucketName");
         if (destBucketName == null || destBucketName.equals("")) {
+            System.out.println("10");
             response.setStatus(777);
             return null;
         }
@@ -700,13 +740,17 @@ public class APIBucketController {
 
     private List<com.aliyun.oss.model.Bucket> getBucketsAli(Integer userId, String platform, List<com.aliyun.oss.model.Bucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<com.aliyun.oss.model.Bucket> iterator = result.iterator();
         while (iterator.hasNext()) {
             com.aliyun.oss.model.Bucket bucket = iterator.next();
             b.setName(bucket.getName());
+//            System.out.println(bucket.getName());
+//            System.out.println(userId);
+//            System.out.println(platform);
             Integer legal = bucketService.isLegal(b);
+//            System.out.println(legal);
             if (legal == null) {
                 iterator.remove();
             }
@@ -723,7 +767,7 @@ public class APIBucketController {
 
     private List<ObsBucket> getBucketHuawei(Integer userId, String platform, List<ObsBucket> result) {
         Bucket b = new Bucket();
-        b.setId(userId);
+        b.setUserId(userId);
         b.setPlatform(platform);
         Iterator<ObsBucket> iterator = result.iterator();
         while (iterator.hasNext()) {

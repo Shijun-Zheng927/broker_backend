@@ -1,15 +1,19 @@
 package com.sdu.broker.APIController;
 
+import com.aliyun.oss.model.OSSObjectSummary;
 import com.obs.services.model.CopyObjectRequest;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObsObject;
 import com.sdu.broker.aliyun.oss.AliObjectController;
 import com.sdu.broker.huaweiyun.HuaweiObjectController;
+import com.sdu.broker.huaweiyun.HuaweiUploadController;
+import com.sdu.broker.pojo.resp.RespObject;
 import com.sdu.broker.service.BucketService;
 import com.sdu.broker.utils.BucketUtils;
 import com.sdu.broker.utils.ControllerUtils;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Controller
 public class APIObjectController {
     @Autowired
     private BucketService bucketService;
@@ -25,47 +30,38 @@ public class APIObjectController {
     private HuaweiObjectController huaweiObjectController;
     @Autowired
     private AliObjectController aliObjectController;
+    @Autowired
+    private HuaweiUploadController huaweiUploadController;
+
     @ResponseBody
-    @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public String demo(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    @RequestMapping(value = "/getUrl", method = RequestMethod.POST)
+    public String getUrl(@RequestBody Map<String, String> map,
+                                @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getUrl");
         if (!verifyIdentity(response, authorization)) {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         String bucketName = map.get("bucketName");
+        String objectKey = map.get("objectKey");
         if (verify(response, userId, bucketName)) {
+            return null;
+        }
+        if (objectKey == null || "".equals(objectKey)) {
+            response.setStatus(777);
             return null;
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
-
-            //阿里云在此调用方法
-//            String result = bucketController.setBucketAcl(bucketName, Integer.parseInt(acl));
-
-            //返回结果
-            return "result";
-        } else {
-            String rwPolicy = map.get("rwPolicy");
-            if ("".equals(rwPolicy)) {
-                //设置默认值
-                rwPolicy = "0";
-            }
-
-            //华为云在此进行方法调用
-//            huaweiController.setBucketAcl(bucketName, Integer.parseInt(rwPolicy));
-
-            //返回结果
-            return "result";
+            String result = aliObjectController.getUrl(bucketName, objectKey);
+            return result;
         }
-    }
+        else {
+            String result = huaweiUploadController.getUrl(bucketName, objectKey);
+            return result;
+        }
 
+    }
 
 
     @ResponseBody
@@ -88,12 +84,6 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            //在此获取其他参数并验证
-            String acl = map.get("rwPolicy");
-            if ("".equals(acl)) {
-                //设置默认值
-                acl = "0";
-            }
             boolean doesObjectExist = aliObjectController.doesObjectExist(bucketName, objectKey);
             if (doesObjectExist) {
                 return "true";
@@ -107,12 +97,13 @@ public class APIObjectController {
             }
             else return "false";
         }
+
     }
 
     @ResponseBody
     @RequestMapping(value = "/simpleList", method = RequestMethod.POST)
-    public List<String> simpleList(@RequestBody Map<String, String> map,
-                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+    public List<RespObject> simpleList(@RequestBody Map<String, String> map,
+                                       @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleList");
         if (!verifyIdentity(response, authorization)) {
             return null;
@@ -124,19 +115,20 @@ public class APIObjectController {
         }
         String platform = bucketService.getPlatform(bucketName);
         if (platform.equals("ALI")) {
-            List<String> result = new ArrayList<>();
-
-
-            List<String> listObject = aliObjectController.simpleListObject(bucketName);
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName);
             //返回结果
-            return listObject;
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -144,7 +136,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithNum", method = RequestMethod.POST)
-    public List<String> simpleListWithNum(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithNum(@RequestBody Map<String, String> map,
                                    @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithNum");
         if (!verifyIdentity(response, authorization)) {
@@ -162,9 +154,13 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName,number);
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, number);
             //返回结果
-            return listObject;
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             String number = map.get("number");
@@ -174,9 +170,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number));
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -184,7 +180,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithPrefix", method = RequestMethod.POST)
-    public List<String> simpleListWithPrefix(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithPrefix(@RequestBody Map<String, String> map,
                                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithPrefix");
         if (!verifyIdentity(response, authorization)) {
@@ -202,8 +198,12 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix);
-            return listObject;
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, prefix);
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
+            return result;
         }
         else {
             String prefix = map.get("prefix");
@@ -213,9 +213,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request,prefix);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -223,7 +223,7 @@ public class APIObjectController {
 
     @ResponseBody
     @RequestMapping(value = "/simpleListWithNumPrefix", method = RequestMethod.POST)
-    public List<String> simpleListWithNumPrefix(@RequestBody Map<String, String> map,
+    public List<RespObject> simpleListWithNumPrefix(@RequestBody Map<String, String> map,
                                                 @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
         System.out.println("simpleListWithNumPrefix");
         if (!verifyIdentity(response, authorization)) {
@@ -246,9 +246,13 @@ public class APIObjectController {
                 response.setStatus(777);
                 return null;
             }
-            List<String> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
+            List<OSSObjectSummary> listObject = aliObjectController.simpleListObject(bucketName, prefix, Integer.parseInt(number));
+            List<RespObject> result = new ArrayList<>();
+            for (OSSObjectSummary o : listObject) {
+                result.add(new RespObject(o));
+            }
             //返回结果
-            return listObject;
+            return result;
         } else {
             String number = map.get("number");
             if (number == null || "".equals(number) || !BucketUtils.isNumber(number)) {
@@ -262,9 +266,9 @@ public class APIObjectController {
             }
             ListObjectsRequest request = huaweiObjectController.newListRequest(bucketName);
             List<ObsObject> list = huaweiObjectController.simpleList(request, Integer.parseInt(number), prefix);
-            List<String> result = new ArrayList<>();
+            List<RespObject> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(new RespObject(o));
             }
             return result;
         }
@@ -294,7 +298,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.pagingList(request);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -333,7 +337,7 @@ public class APIObjectController {
             List<ObsObject> list = huaweiObjectController.pagingList(request, prefix);
             List<String> result = new ArrayList<>();
             for (ObsObject o : list) {
-                result.add(o.toString());
+                result.add(o.getObjectKey());
             }
             return result;
         }
@@ -399,11 +403,11 @@ public class APIObjectController {
                 //设置默认值
                 acl = "0";
             }
-            String sourceBucketName = map.get("sourceBucketName");
+//            String sourceBucketName = map.get("sourceBucketName");
             String sourceObjectName = map.get("sourceObjectName");
             String destBucketName = map.get("destBucketName");
             String destObjectName = map.get("destObjectName");
-            String etag = aliObjectController.simpleCopyObject(sourceBucketName, sourceObjectName, destBucketName, destObjectName);
+            String etag = aliObjectController.simpleCopyObject(bucketName, sourceObjectName, destBucketName, destObjectName);
             return etag;
         } else {
             /*

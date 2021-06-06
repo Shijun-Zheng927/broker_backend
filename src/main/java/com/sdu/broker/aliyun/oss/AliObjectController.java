@@ -8,8 +8,11 @@ import com.aliyun.oss.model.*;
 
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //文件管理/对象管理
@@ -18,6 +21,16 @@ public class AliObjectController {
     private static final String endpoint = "https://oss-cn-beijing.aliyuncs.com";
     private static final String accessKeyId = "LTAI5tE3U2xuvubTk8qocyd2";
     private static final String accessKeySecret = "Q0cqcMmjKGBmyRM6s0G51QYCMSn6aO";
+
+    //生成url
+    public String getUrl(String bucketName, String objectPath) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        Date expiration = new Date(System.currentTimeMillis() + 24 * 1000 * 90);
+        String  url = ossClient.generatePresignedUrl(bucketName, objectPath, expiration).toString();
+        ossClient.shutdown();
+        //返回上传地址
+        return url;
+    }
 
     //判断文件是否存在
     public boolean doesObjectExist(String bucketName, String objectPath){
@@ -61,60 +74,60 @@ public class AliObjectController {
 
     //列举文件
     //简单列举
-    public  List<String>  simpleListObject(String bucketName){
+    public  List<OSSObjectSummary>  simpleListObject(String bucketName){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
         ObjectListing objectListing = ossClient.listObjects(bucketName);
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return objectList;
+        return sums;
     }
     //限定前缀列举
-    public  List<String>  simpleListObject(String bucketName,String prefix){
+    public  List<OSSObjectSummary>  simpleListObject(String bucketName,String prefix){
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 列举文件。如果不设置KeyPrefix，则列举存储空间下的所有文件。如果设置KeyPrefix，则列举包含指定前缀的文件。
         ObjectListing objectListing = ossClient.listObjects(bucketName, prefix);
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return objectList;
+        return sums;
     }
 
     //指定数目文件列举
-    public  List<String> simpleListObject(String bucketName,int maxKeys) {
+    public  List<OSSObjectSummary> simpleListObject(String bucketName,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys));
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return  objectList;
+        return sums;
     }
 
     //列举指定数目和指定前缀的文件
-    public  List<String> simpleListObject(String bucketName,String prefix,int maxKeys) {
+    public  List<OSSObjectSummary> simpleListObject(String bucketName,String prefix,int maxKeys) {
         List<String> objectList = new ArrayList<>();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(bucketName).withMaxKeys(maxKeys).withPrefix(prefix));
         List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        for (OSSObjectSummary s : sums) {
-            System.out.println("\t" + s.getKey());
-            objectList.add(s.getKey());
-        }
+//        for (OSSObjectSummary s : sums) {
+//            System.out.println("\t" + s.getKey());
+//            objectList.add(s.getKey());
+//        }
         ossClient.shutdown();
-        return  objectList;
+        return sums;
     }
     //分页列举全部文件
     public   List<String> pageObjectList(String bucketName){
@@ -177,8 +190,8 @@ public class AliObjectController {
     public  String createDirectory(String bucketName,String dirName){
         //输入的文件夹名称以右斜线（/）结尾
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        ossClient.putObject(bucketName, dirName,new File("F://broker_backend//dic.txt"));
-        return "2333";
+        ossClient.putObject(bucketName, dirName,new File("D:/IDEA/broker/src/main/resources/static/file/null.txt"));
+        return "success";
     }
     //列举指定文件夹的文件
     public  List<String> dicListObject(String bucketName,String dicName){
@@ -216,7 +229,7 @@ public class AliObjectController {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.deleteObject(bucketName,objectPath);
         ossClient.shutdown();
-        return "hhh";
+        return "success";
     }
 
     //批量删除文件

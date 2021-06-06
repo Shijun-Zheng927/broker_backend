@@ -371,7 +371,7 @@ public class  AliUploadController {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(contentType);
 
-        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName,objectPath,new File(localPath),metadata);
+        AppendObjectRequest appendObjectRequest = new AppendObjectRequest(bucketName, objectPath, new File(localPath), metadata);
 
         /*
          通过AppendObjectRequest设置单个参数。
@@ -526,13 +526,10 @@ public class  AliUploadController {
         InitiateMultipartUploadResult uploadResult = ossClient.initiateMultipartUpload(request);
         //返回uploadId 分片上传的唯一标识
         String uploadId = uploadResult.getUploadId();
-        System.out.println(uploadId);
 
         //partEtags是partETag的集合 PartFTag由分片的ETag和分片号组成
-//        ArrayList<Map> result = new ArrayList<Map>();
         ArrayList<PartETag> partETags = new ArrayList<>();
-//        Map<String,String> map1 = new HashMap<>();
-//        Map<String,List<PartETag>> map2 = new HashMap<>();
+
         //计算文件有多少分片
         final long partSize = 1*1024*1024L;//1MB
         final File sampleFile = new File(localFilePath);
@@ -594,6 +591,10 @@ public class  AliUploadController {
 
         CompleteMultipartUploadRequest completeMultipartUploadRequest =
                 new CompleteMultipartUploadRequest(bucketName, objectName, uploadId, partETags);
+
+        // 如果需要在完成文件上传的同时设置文件访问权限，请参考以下示例代码。
+        // completeMultipartUploadRequest.setObjectACL(CannedAccessControlList.PublicRead);
+
         // 完成上传。
         CompleteMultipartUploadResult completeMultipartUploadResult = ossClient.completeMultipartUpload(completeMultipartUploadRequest);
 
@@ -608,6 +609,7 @@ public class  AliUploadController {
         try{
             // 创建OSSClient实例。
             OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
             // 取消分片上传，其中uploadId源自InitiateMultipartUpload。
             AbortMultipartUploadRequest abortMultipartUploadRequest =
                     new AbortMultipartUploadRequest(bucketName,objectName,uploadId);
@@ -622,7 +624,7 @@ public class  AliUploadController {
 
     //列举已上传分片
     //简单列举已上传的分片
-    public  List<Map<String,String>> simpleListParts(String bucketName,String objectName, String uploadId){
+    public List<Map<String,String>> simpleListParts(String bucketName,String objectName, String uploadId){
         //maxParts:每个分页的分片数量
         //marker: 分片的起始位置
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
@@ -641,11 +643,6 @@ public class  AliUploadController {
         for(PartSummary part : partListing.getParts()) {
             //获取分片号
             String partNumber = String.valueOf(part.getPartNumber());
-            System.out.println("-----");
-            System.out.println(partNumber);
-            System.out.println("-----");
-
-
             //获取分片数据大小
             String size = String.valueOf(part.getSize());
             //获取分片的最后修改时间
@@ -727,7 +724,7 @@ public class  AliUploadController {
             String eTag = part.getETag();
 
             Map<String, String> map = new HashMap<>();
-            map.put("partNumber", String.valueOf(partNumber));
+            map.put("partNumber",partNumber);
             map.put("size",size);
             map.put("lastModified",lastModified);
             map.put("eTag",eTag);

@@ -99,6 +99,8 @@ public class HuaweiController {
         ListBucketsRequest request = new ListBucketsRequest();
         request.setQueryLocation(true);
         List<ObsBucket> buckets = obsClient.listBuckets(request);
+
+//        closeObsClient();
         return buckets;
     }
 
@@ -111,12 +113,12 @@ public class HuaweiController {
         if (exist) {
             obsClient.deleteBucket(bucketName);
             System.out.println("delete bucket : " + bucketName + "success");
-            try {
-                obsClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return 0;
-            }
+//            try {
+//                obsClient.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                return 0;
+//            }
             return 1;
         } else {
             System.out.println("Not exist:" + bucketName);

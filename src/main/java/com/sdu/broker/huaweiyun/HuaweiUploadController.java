@@ -76,7 +76,7 @@ public class HuaweiUploadController {
     {
         File newfile = new File(pathname);
         obsClient.putObject(BucketName, objectKey, newfile);
-        return "success";
+        return getUrl(BucketName, objectKey);
     }
 
     /* 获取上传进度 */
@@ -137,7 +137,7 @@ public class HuaweiUploadController {
         request.setFile(new File(pathname));
 
         // 设置分段大小
-        request.setPartSize(5 * 1024 * 1024L);
+        request.setPartSize(10 * 1024 * 1024L);
         UploadPartResult result = obsClient.uploadPart(request);
         partEtag = new PartEtag(result.getEtag(), result.getPartNumber());
 
@@ -158,14 +158,14 @@ public class HuaweiUploadController {
         File file = new File(pathname);
         request.setFile(file);
         // 设置第二段的段偏移量
-        request.setOffset((partNum-1)* 5 * 1024 * 1024L);
+        request.setOffset((partNum-1)* 10 * 1024 * 1024L);
         // 设置分段大小
         long size = file.length();
-        long restsize = size-(partNum-1)*(5 * 1024 * 1024L);
-        if (restsize < 5 * 1024 * 1024L){
+        long restsize = size-(partNum-1)*(10 * 1024 * 1024L);
+        if (restsize < 10 * 1024 * 1024L){
             request.setPartSize(restsize);
         } else{
-            request.setPartSize(5 * 1024 * 1024L);
+            request.setPartSize(10 * 1024 * 1024L);
         }
 
         UploadPartResult result = obsClient.uploadPart(request);
@@ -175,7 +175,7 @@ public class HuaweiUploadController {
 
     /* 合并分段 */
     public String CompleteMultipartUpload(List<PartEtag> partEtags,String bucketName,String objectKey,String uploadId){
-        CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(bucketName, objectKey, uploadId, partEtags);
+        CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(bucketName,objectKey,uploadId,partEtags);
         obsClient.completeMultipartUpload(request);
         return "success";
     }
@@ -357,7 +357,7 @@ public class HuaweiUploadController {
 
     /* 分页列举分段上传任务 */
     public List<Map<String,String>> listMultipartUploadsByPapper(String bucketName){
-        ListMultipartUploadsRequest request = new ListMultipartUploadsRequest();
+        ListMultipartUploadsRequest request = new ListMultipartUploadsRequest(bucketName);
         MultipartUploadListing result;
 
         List<Map<String, String>> list = new ArrayList<>();
