@@ -43,9 +43,11 @@ public class HuaweiTagController {
     }
 
 
-    public String setOneTag(String bucketName, String key , String value){
+    public String setTag(String bucketName,List<String> tagsKey,List<String> tagsValue){
         BucketTagInfo.TagSet tag = newTagSet();
-        tag.addTag(key,value);
+        for (int i = 0;i < tagsKey.size();i++){
+            tag.addTag(tagsKey.get(i), tagsValue.get(i));
+        }
         String result = setBucketTag(tag,bucketName);
         return result;
     }

@@ -63,9 +63,9 @@ public class APITagController {
             String result = bucketController.setBucketTags(bucketName, tagKey, tagValue);
             return result;
         } else {
-//            String result = huaweiTagController.setOneTag(bucketName, tagKey, tagValue);
-//            return result;
-            return null;
+            String result = huaweiTagController.setTag(bucketName, tagKey, tagValue);
+            return result;
+//            return null;
         }
     }
 
