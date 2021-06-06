@@ -547,7 +547,8 @@ public class APIUploadController {
             String result = huaweiUploadController.CompleteMultipartUpload(partEtags, bucketName, req.getObjectKey(), req.getUploadId());
             return result;
         } else {
-            return null;
+            String result = aliUploadController.completeMultipartUpload(bucketName, req.getObjectKey(), req.getUploadId());
+            return result;
         }
     }
 
@@ -676,6 +677,7 @@ public class APIUploadController {
                 response.setStatus(777);
                 return null;
             }
+
             String result = aliUploadController.multipartUpload(bucketName, objectName, path);
 
             double stringSize = FileUtils.getFileSize(path);

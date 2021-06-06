@@ -73,9 +73,20 @@ public class HuaweiTagController {
                 result.add(bucket);
             }
         }
+
         return result;
 
     }
+//
+//    public static void listBucketByTag(String tagKey, String tagValue){
+//        ListBucketsRequest request = new ListBucketsRequest();
+//        request.setQueryLocation(true);
+//        List<ObsBucket> obsBuckets = obsClient.listBuckets(request);
+//        for (ObsBucket bucket:obsBuckets){
+//            Map<String, String> bucketTagging = getBucketTagging(bucket.getBucketName());
+//            System.out.println(bucketTagging);
+//        }
+//    }
     public String deleteBucketTagging(String bucketName){
         try {
             obsClient.deleteBucketTagging(bucketName);
@@ -98,5 +109,9 @@ public class HuaweiTagController {
             System.out.println("close obs client error.");
         }
 
+    }
+
+    public static void main(String[] args) {
+//        listBucketByTag("a","a");
     }
 }

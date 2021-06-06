@@ -235,6 +235,22 @@ public class BucketController {
         ossClient.shutdown();
         return "设置标签成功";
     }
+    //同一个Bucket
+    public String setBucketTags(String bucketName, Map<String,String> tags){
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        try {
+            SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
+            for (Map.Entry<String,String> entry: tags.entrySet()){
+                request.setTag(entry.getKey(),entry.getValue());
+            }
+            ossClient.setBucketTagging(request);
+        } catch (OSSException | ClientException e) {
+            e.printStackTrace();
+            return "false";
+        }
+        ossClient.shutdown();
+        return "设置标签成功";
+    }
 
     //获取存储标签
     public Map<String,String> getBucketTagging(String bucketName){
@@ -412,10 +428,51 @@ public class BucketController {
         return 0;
 
     }
+    public static void checkInventory(String bucketName,String inventoryId){
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        // 查看指定id的清单配置信息。
+        GetBucketInventoryConfigurationRequest request = new GetBucketInventoryConfigurationRequest(bucketName, inventoryId);
+        GetBucketInventoryConfigurationResult getResult = ossClient.getBucketInventoryConfiguration(request);
+
+        // 打印清单配置信息。
+        InventoryConfiguration config = getResult.getInventoryConfiguration();
+        System.out.println("=====Inventory configuration=====");
+        System.out.println("inventoryId:" + config.getInventoryId());
+        System.out.println("isenabled:" + config.isEnabled());
+        System.out.println("includedVersions:" + config.getIncludedObjectVersions());
+        System.out.println("schdule:" + config.getSchedule().getFrequency());
+        if (config.getInventoryFilter().getPrefix() != null) {
+            System.out.println("filter, prefix:" + config.getInventoryFilter().getPrefix());
+        }
+
+        List<String> fields = config.getOptionalFields();
+        for (String field : fields) {
+            System.out.println("field:" + field);
+        }
+
+        System.out.println("===bucket destination config===");
+        InventoryOSSBucketDestination destin = config.getDestination().getOssBucketDestination();
+        System.out.println("format:" + destin.getFormat());
+        System.out.println("bucket:" + destin.getBucket());
+        System.out.println("prefix:" + destin.getPrefix());
+        System.out.println("accountId:" + destin.getAccountId());
+        System.out.println("roleArn:" + destin.getRoleArn());
+        if (destin.getEncryption() != null) {
+            if (destin.getEncryption().getServerSideKmsEncryption() != null) {
+                System.out.println("server-side kms encryption, key id:" + destin.getEncryption().getServerSideKmsEncryption().getKeyId());
+            } else if (destin.getEncryption().getServerSideOssEncryption() != null) {
+                System.out.println("server-side oss encryption.");
+            }
+        }
+
+        // 关闭ossClient。
+        ossClient.shutdown();
+    }
 
     public static void main(String[] args) {
 //        openBucketLogging("xmsx-001","xmsx-001","log/");
 //        checkBucketLogging("xmsx-001");
+        checkInventory("xmsx-003","inventory");
     }
 
 }

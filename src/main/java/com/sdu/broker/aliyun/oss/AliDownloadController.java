@@ -110,7 +110,7 @@ public class AliDownloadController {
     若范围末端取值不在有效区间，返回能读取的字节范围内容，HTTP Code 为206
     若范围首端取值不在有效区间，返回HTTP Code 为416，错误码为InvalidRange
      */
-    public static String rangeDownloadCompatible(String bucketName, String objectName, String localFile, int begin,int end){
+    public  String rangeDownloadCompatible(String bucketName, String objectName, String localFile, int begin,int end){
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, objectName);
         getObjectRequest.setRange(begin,end);
