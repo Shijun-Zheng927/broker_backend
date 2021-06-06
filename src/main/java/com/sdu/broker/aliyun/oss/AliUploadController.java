@@ -617,7 +617,7 @@ public class  AliUploadController {
         //设置分页时每一个分页的分片数量，默认值为1000
         listPartsRequest.setMaxParts(100);
         //指定列举的起始位置，只有分片号大于此参数值得分片会被列举
-        listPartsRequest.setPartNumberMarker(0);
+        listPartsRequest.setPartNumberMarker(1);
 
         PartListing partListing = ossClient.listParts(listPartsRequest);
 
