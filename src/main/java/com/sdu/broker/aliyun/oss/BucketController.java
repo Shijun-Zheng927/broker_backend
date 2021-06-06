@@ -255,6 +255,22 @@ public class BucketController {
         ossClient.shutdown();
         return "success";
     }
+    //同一个Bucket
+    public String setBucketTags(String bucketName, Map<String,String> tags){
+        OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
+        try {
+            SetBucketTaggingRequest request = new SetBucketTaggingRequest(bucketName);
+            for (Map.Entry<String,String> entry: tags.entrySet()){
+                request.setTag(entry.getKey(),entry.getValue());
+            }
+            ossClient.setBucketTagging(request);
+        } catch (OSSException | ClientException e) {
+            e.printStackTrace();
+            return "false";
+        }
+        ossClient.shutdown();
+        return "设置标签成功";
+    }
 
     //获取存储标签
     public Map<String,String> getBucketTagging(String bucketName){
