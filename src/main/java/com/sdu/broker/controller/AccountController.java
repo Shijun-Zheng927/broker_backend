@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Objects;
 
@@ -21,7 +22,7 @@ public class AccountController {
      */
     @CrossOrigin
     @PostMapping( "/getAccount")
-    public Double getAccount(@RequestHeader("Authorization") String authorization,
+    public String getAccount(@RequestHeader("Authorization") String authorization,
                              HttpServletResponse response) {
 //        System.out.println(map.get("id"));
         if (!TokenUtils.verify(authorization)) {
@@ -29,6 +30,8 @@ public class AccountController {
             return null;
         }
         Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
-        return accountService.getAccount(userId.toString());
+        DecimalFormat df = new DecimalFormat("#.00");
+        Double result = accountService.getAccount(userId.toString());
+        return df.format(result);
     }
 }

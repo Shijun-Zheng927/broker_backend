@@ -49,21 +49,21 @@ public class IntroduceController {
     @GetMapping(value = "/getIntroduceName", params = {"name"})
     @ResponseBody
     public String uploadIntroduce(@RequestParam String name) {
-        return null;
-//        String path = introduceService.getPath(name);
-//        String markdown = "";
-//        String thisLine;
-//        try {
-//            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-//            while((thisLine = br.readLine()) != null) {
-//                markdown += thisLine + "\n";
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-////        System.out.println(markdown);
-//
-//        return markdown;
+//        return null;
+        String path = introduceService.getPath(name);
+        String markdown = "";
+        String thisLine;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            while((thisLine = br.readLine()) != null) {
+                markdown += thisLine + "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(markdown);
+
+        return markdown;
     }
 
     @CrossOrigin

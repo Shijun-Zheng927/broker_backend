@@ -149,7 +149,7 @@ public class PayController {
 //                response.setStatus(999);
 //                return "no";
 //            }
-            accountService.recharge(userId, Double.parseDouble(total_amount));
+            accountService.recharge(userId, Double.parseDouble(total_amount), out_trade_no);
 
             //支付成功，修复支付状态
 //            payService.updateById(Integer.valueOf(out_trade_no));

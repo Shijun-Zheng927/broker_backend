@@ -6,12 +6,17 @@ public class RechargeRecord {
     private Double amount;
     private String time;
     private String result;
+    private String orderNum;
 
-    public RechargeRecord(Integer userId, Double amount, String time, String result) {
+    public RechargeRecord() {
+    }
+
+    public RechargeRecord(Integer userId, Double amount, String time, String result, String orderNum) {
         this.userId = userId;
         this.amount = amount;
         this.time = time;
         this.result = result;
+        this.orderNum = orderNum;
     }
 
     public Integer getUserId() {
@@ -52,5 +57,13 @@ public class RechargeRecord {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(String orderNum) {
+        this.orderNum = orderNum;
     }
 }

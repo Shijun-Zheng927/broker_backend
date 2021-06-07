@@ -1,11 +1,14 @@
 package com.sdu.broker.controller;
 
+import com.sdu.broker.pojo.RechargeRecord;
 import com.sdu.broker.service.HistoryService;
+import com.sdu.broker.service.RechargeRecordService;
 import com.sdu.broker.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -13,6 +16,8 @@ import java.util.Objects;
 public class HistoryController {
     @Autowired
     private HistoryService historyService;
+    @Autowired
+    private RechargeRecordService rechargeRecordService;
 
     @CrossOrigin
     @RequestMapping("/getUpload")
@@ -49,6 +54,18 @@ public class HistoryController {
         String bucketName = map.get("bucketName");
 //        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
         Map<String, String> result = historyService.getBucketFlow(bucketName);
+        return result;
+    }
+
+    @CrossOrigin
+    @RequestMapping("/getRecharge")
+    public List<RechargeRecord> getRecharge(@RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        System.out.println("getRecharge");
+        if (!verifyIdentity(response, authorization)) {
+            return null;
+        }
+        Integer userId = Integer.valueOf(Objects.requireNonNull(TokenUtils.getUserId(authorization)));
+        List<RechargeRecord> result = rechargeRecordService.getRecord(userId.toString());
         return result;
     }
 
