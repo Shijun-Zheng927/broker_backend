@@ -1,6 +1,5 @@
 package com.sdu.broker.mapper;
 
-import com.sdu.broker.pojo.Account;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -12,4 +11,7 @@ public interface AccountMapper {
 
     @Update("insert into account(user_id, account) values (#{id}, 0)")
     void register(Integer id);
+
+    @Update("update account set account = #{account} where user_id = #{id} ")
+    Integer recharge(Integer id, Double account);
 }
