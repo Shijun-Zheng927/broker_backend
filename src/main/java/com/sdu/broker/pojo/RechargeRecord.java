@@ -8,6 +8,9 @@ public class RechargeRecord {
     private String result;
     private String orderNum;
 
+    public RechargeRecord() {
+    }
+
     public RechargeRecord(Integer userId, Double amount, String time, String result, String orderNum) {
         this.userId = userId;
         this.amount = amount;
