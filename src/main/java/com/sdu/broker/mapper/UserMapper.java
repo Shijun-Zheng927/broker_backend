@@ -21,4 +21,10 @@ public interface UserMapper {
 
     @Update("update user set head = #{head} where id = #{id}")
     Integer setHead(String head, Integer id);
+
+    @Update("update user set phone = #{phone} where id = #{id}")
+    Integer setPhone(String phone, Integer id);
+
+    @Update("update user set password = #{password} where id = #{id}")
+    Integer setPassword(String password, Integer id);
 }

@@ -88,4 +88,44 @@ public class UserController {
         }
         return result;
     }
+
+    @RequestMapping("/setPhone")
+    public String setPhone(@RequestBody Map<String, String> map,
+                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!TokenUtils.verify(authorization)) {
+            response.setStatus(999);
+            return "fail";
+        }
+        String result;
+
+        Integer userId = Integer.parseInt(TokenUtils.getUserId(authorization));
+        String phone = map.get("phone");
+        if (phone == null) {
+            response.setStatus(666);
+            return null;
+        }
+        result = userService.setPhone(phone, userId).toString();
+
+        return result;
+    }
+
+    @RequestMapping("/setPassword")
+    public String setPassword(@RequestBody Map<String, String> map,
+                           @RequestHeader("Authorization") String authorization, HttpServletResponse response) {
+        if (!TokenUtils.verify(authorization)) {
+            response.setStatus(999);
+            return "fail";
+        }
+        String result = "";
+
+        Integer userId = Integer.parseInt(TokenUtils.getUserId(authorization));
+        String password = map.get("password");
+        if (password == null) {
+            response.setStatus(666);
+            return null;
+        }
+        result = userService.setPassword(password, userId).toString();
+
+        return result;
+    }
 }

@@ -10,4 +10,8 @@ public interface UserService {
     Integer selectPhone(String str);
 
     Integer setHead(String head, Integer id);
+
+    Integer setPhone(String phone, Integer id);
+
+    Integer setPassword(String password, Integer id);
 }

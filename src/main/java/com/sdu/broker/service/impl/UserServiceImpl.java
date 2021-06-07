@@ -43,4 +43,21 @@ public class UserServiceImpl implements UserService {
     public Integer setHead(String head, Integer id) {
         return userMapper.setHead(head, id);
     }
+
+    @Override
+    public Integer setPhone(String phone, Integer id) {
+        Integer hasPhone = userMapper.selectPhone(id.toString());
+//        System.out.println(hasPhone);
+        if (hasPhone == null) {
+            Integer result = userMapper.setPhone(phone, id);
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public Integer setPassword(String password, Integer id) {
+        Integer result = userMapper.setPassword(password, id);
+        return result;
+    }
 }
