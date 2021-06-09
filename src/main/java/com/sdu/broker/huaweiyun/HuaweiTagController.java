@@ -79,7 +79,7 @@ public class HuaweiTagController {
             if (map != null){
                 String value = map.get("tagValue");
                 String key = map.get("tagKey");
-            if (value.equals(tagValue)&&key.equals(tagKey)){
+            if (tagValue.equals(value) && tagKey.equals(key)){
                 result.add(bucket);
             }
             }
